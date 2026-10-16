@@ -1,5 +1,11 @@
 # Changelog / 更新记录
 
+## 0.2.0.dev6 — Workbench recording / 本地录音
+
+Input selection, live level meter, mono PCM WAV capture, audition and explicit adoption at the playhead.
+Stop/cancel release devices; failed saves retain downloads; retry cannot duplicate a take. Undo/redo and export supported.
+独立工作台新增录音、试听与入轨。当前无同步叠录或延迟补偿，见 [录音说明](docs/recording.md)。
+
 ## 0.2.0.dev5 — Separation into arrangement / 分轨进入编排
 
 Optional pinned Mel-Band RoFormer KJ in an isolated offline worker. Audition task audio without

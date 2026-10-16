@@ -35,6 +35,12 @@ def package(root: Path, dist: Path, *, build=True):
         output.write(wheel, f"{prefix}/packages/{wheel.name}")
     for required in (
         "Start-Music-Workbench.cmd",
+        "src/music_studio/ui/static/station-recorder.js",
+        "src/music_studio/ui/static/station-recorder-worklet.js",
+        "src/music_studio/ui/static/station-recording-ui.js",
+        "src/music_studio/ui/static/station-recording.css",
+        "docs/recording.md",
+        "docs/recording.en.md",
         "Start-Music-Studio.cmd",
         "QUICKSTART.md",
         "scripts/launch.ps1",

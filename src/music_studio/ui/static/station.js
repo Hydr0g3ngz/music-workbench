@@ -6,6 +6,7 @@
     previewEngine = new StationEngine(),
     generationAudio = new Audio(),
     colors = ["#b69aff", "#86c9bc", "#e7b985", "#8cabed", "#d592b5"];
+  let recordingPanel;
   const s = {
     session: null,
     track: null,
@@ -35,6 +36,20 @@
   let generationAudioKey = null,
     generationSubmitting = false;
   const words = {
+    recording: "Record your sound",
+    recordingCopy:
+      "Connect a microphone or instrument input. Check the level, record and audition, then add your take to the session.",
+    recordDevice: "Audio input",
+    recordDefault: "System default input",
+    recordEnable: "Enable input",
+    recordLevel: "Input level",
+    recordStart: "Start recording",
+    recordStop: "Stop recording",
+    recordAdopt: "Add to session",
+    recordDownload: "Download WAV",
+    recordDiscard: "Discard and reset",
+    recordNote:
+      "Mono recording, no models required; input is never played through speakers. Arrangement pauses during capture; synchronized overdubbing and latency compensation are not available yet. Add or download your take before closing this page.",
     projects: "Sessions",
     new: "New",
     previous: "Previous workbench ↗",
@@ -201,6 +216,7 @@
           : words[el.dataset.t] || chinese.get(el);
     });
     $("language").textContent = s.lang === "zh" ? "EN" : "中文";
+    recordingPanel?.render();
     $("asset-search").placeholder = tr("搜索素材…", "Search assets…");
     $("generation-prompt").placeholder = tr(
       "例如：温暖的爵士钢琴、轻鼓点和木贝斯，适合夜晚写作",
@@ -2074,7 +2090,11 @@
           e.offsetY <= d.clientHeight
         )
           return;
-        if (e.target === d) d.close();
+        if (
+          e.target === d &&
+          !(d.id === "recording-dialog" && recordingPanel?.busy())
+        )
+          d.close();
       }),
   );
   document.addEventListener("keydown", (e) => {
@@ -2152,6 +2172,32 @@
     }
     requestAnimationFrame(animate);
   }
+  recordingPanel = StationRecording.mount({
+    $,
+    tr,
+    uid,
+    toast,
+    flush,
+    position: () => s.position,
+    session: () => s.session,
+    pause: () => {
+      stopPreview();
+      pause();
+    },
+    adopt: async (blob, name, target) => {
+      await flush();
+      const form = new FormData();
+      form.append("file", blob, name);
+      const query = new URLSearchParams({
+        revision: s.session.revision,
+        at: target.at,
+        import_id: target.importId,
+      });
+      accept(await request(base() + "/import?" + query, form), {
+        selectLast: true,
+      });
+    },
+  });
   guarded(async () => {
     localize();
     s.library = await request("/api/workstation/library");

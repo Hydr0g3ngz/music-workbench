@@ -1,0 +1,139 @@
+.record-button {
+  color: #ef919d;
+  background: #ef919d12;
+  border: 1px solid #ef919d40;
+  border-radius: 50%;
+  width: 31px;
+  height: 31px;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.record-button:hover {
+  background: #ef919d28;
+}
+#recording-dialog {
+  width: min(600px, calc(100vw - 24px));
+}
+.record-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0;
+}
+.record-input-row label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.record-input-row select {
+  flex: 1;
+  min-width: 140px;
+  max-width: 100%;
+  background: #191a23;
+  color: #eee;
+  border: 1px solid #393945;
+  border-radius: 6px;
+  padding: 10px;
+}
+.record-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0;
+}
+.record-display strong {
+  font:
+    38px ui-monospace,
+    monospace;
+  letter-spacing: -2px;
+}
+.record-format {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 10px;
+  text-align: right;
+}
+.record-dot {
+  width: 12px;
+  height: 12px;
+  background: #5b5058;
+  border-radius: 50%;
+}
+.is-recording .record-dot {
+  background: #ff8195;
+  box-shadow: 0 0 15px #ff819550;
+}
+.record-meter-label {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+#record-level {
+  width: 100%;
+  height: 14px;
+  display: block;
+  accent-color: #86c9bc;
+}
+#record-peak {
+  display: block;
+  text-align: right;
+  font:
+    11px ui-monospace,
+    monospace;
+  margin: 7px 0 22px;
+  min-height: 14px;
+}
+#record-status {
+  font-size: 12px;
+  color: #bfb9d0;
+  line-height: 1.7;
+  min-height: 40px;
+}
+#record-status.error,
+#record-peak.error {
+  color: #ef919d;
+}
+#record-preview {
+  width: 100%;
+  margin: 12px 0;
+  height: 40px;
+}
+.record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.record-actions a {
+  color: #b69aff;
+  font-size: 12px;
+  padding: 8px 0;
+}
+.record-note {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+  border-top: 1px solid #ffffff10;
+  padding-top: 18px;
+  margin: 24px 0 0;
+}
+@media (max-width: 760px) {
+  .transport-controls {
+    flex-wrap: wrap;
+  }
+  .transport-time {
+    min-width: 85px;
+    padding-left: 6px;
+  }
+  .tempo {
+    padding-left: 0;
+  }
+  #recording-dialog {
+    padding: 18px;
+  }
+  .record-input-row select {
+    flex-basis: 100%;
+  }
+}

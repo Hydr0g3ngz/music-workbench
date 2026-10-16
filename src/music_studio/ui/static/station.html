@@ -8,8 +8,11 @@
     <link rel="stylesheet" href="/station.css" />
     <link rel="stylesheet" href="/station-library.css" />
     <link rel="stylesheet" href="/station-effects.css" />
+    <link rel="stylesheet" href="/station-recording.css" />
     <script src="/effects-dsp.js" defer></script>
     <script src="/station-engine.js" defer></script>
+    <script src="/station-recorder.js" defer></script>
+    <script src="/station-recording-ui.js" defer></script>
     <script src="/station.js" defer></script>
   </head>
   <body>
@@ -68,7 +71,11 @@
       <a class="brand" href="/station.html"
         ><span class="brand-mark"
           ><svg><use href="#i-wave" /></svg></span
-        ><span>music studio<span class="brand-tag">WORKSTATION</span></span></a
+        ><span
+          >music workbench<span class="brand-tag"
+            >LOCAL MUSIC STATION</span
+          ></span
+        ></a
       >
       <span class="header-divider"></span
       ><input
@@ -240,6 +247,13 @@
           ><button id="play" class="play-button" aria-label="播放 / Play">
             <svg><use href="#i-play" /></svg></button
           ><button id="stop" class="icon-button" title="停止 / Stop">■</button
+          ><button
+            id="record"
+            class="record-button"
+            title="录音 / Record"
+            aria-label="录音 / Record"
+          >
+            ●</button
           ><button
             id="loop"
             class="icon-button"
@@ -594,6 +608,61 @@
           加入工程
         </button>
       </div>
+    </dialog>
+    <dialog id="recording-dialog" aria-labelledby="record-heading">
+      <div class="dialog-heading">
+        <h2 id="record-heading" data-t="recording">录下你的声音</h2>
+        <button id="record-close" class="icon-button" aria-label="关闭 / Close">
+          ×
+        </button>
+      </div>
+      <p class="panel-copy" data-t="recordingCopy">
+        接入麦克风或乐器输入。先检查电平，录完试听，满意后再加入工程。
+      </p>
+      <div class="record-input-row">
+        <label for="record-device" data-t="recordDevice">音频输入</label>
+        <select id="record-device" disabled aria-label="音频输入 / Audio input">
+          <option data-t="recordDefault">系统默认输入</option>
+        </select>
+        <button id="record-enable" data-t="recordEnable">启用输入</button>
+      </div>
+      <div class="record-display">
+        <span class="record-dot" aria-hidden="true"></span>
+        <strong id="record-time">0.00s</strong>
+        <span class="record-format">WAV · PCM 16-bit · MONO</span>
+      </div>
+      <label class="record-meter-label" for="record-level" data-t="recordLevel"
+        >输入电平</label
+      >
+      <meter
+        id="record-level"
+        min="-60"
+        max="0"
+        low="-48"
+        high="-3"
+        optimum="-12"
+        value="-60"
+      ></meter>
+      <span id="record-peak">−∞ dBFS</span>
+      <p id="record-target" class="panel-copy"></p>
+      <p id="record-status" role="status"></p>
+      <audio id="record-preview" controls hidden></audio>
+      <div class="record-actions">
+        <button id="record-start" class="primary" data-t="recordStart" disabled>
+          开始录音
+        </button>
+        <button id="record-stop" data-t="recordStop" disabled>停止录音</button>
+        <button id="record-adopt" class="primary" data-t="recordAdopt" disabled>
+          加入工程
+        </button>
+        <a id="record-download" data-t="recordDownload" hidden>下载 WAV</a>
+        <button id="record-discard" class="quiet" data-t="recordDiscard">
+          放弃并重置
+        </button>
+      </div>
+      <p class="record-note" data-t="recordNote">
+        单声道录音，无需安装模型；输入不会外放。录制时编排暂停，不提供同步叠录或延迟补偿。页面关闭前请加入工程或下载录音。
+      </p>
     </dialog>
     <button
       id="panel-shade"

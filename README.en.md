@@ -21,6 +21,8 @@ music-workbench
 
 Default port: 8920. Project directory: `outputs/workbench`. Existing projects are never automatically migrated or overwritten. This is a development preview, not a complete DAW.
 
+New: **local recording → audition → adoption at the playhead**, with input devices, meter, WAV download and undo. [Usage and limits](docs/recording.en.md).
+
 ## Available
 
 - Sample instruments, grooves, MIDI import, note editing and reversible multitrack arrangement.

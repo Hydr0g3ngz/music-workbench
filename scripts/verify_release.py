@@ -74,6 +74,9 @@ def verify_next():
     with tempfile.TemporaryDirectory(prefix="music-studio-next-release-") as temporary:
         with TestClient(create_app(Path(temporary)), base_url="http://127.0.0.1") as client:
             assert client.get("/next.html").status_code == 200
+            for asset in ("station.html", "station-recorder.js", "station-recorder-worklet.js",
+                          "station-recording-ui.js", "station-recording.css"):
+                assert client.get("/" + asset).status_code == 200
             for asset in ("next.js", "next.css", "transport.js", "comparison.js"):
                 assert client.get("/" + asset).status_code == 200
             models = client.get("/api/studio/models").json()

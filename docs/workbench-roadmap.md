@@ -10,8 +10,8 @@ Every capability must support audition, aligned adoption, undo, reopen and expor
 
 ## 1. 制作基础优先 / Production foundations first
 
-下一阶段优先录音与输入设备选择、输入电平、录音延迟补偿；随后补片段分割/复制/吸附、循环区间与节拍器。录音失败不能破坏项目。
-Next: recording/device selection, input meters and latency compensation; then clip split/duplicate/snap, loop ranges and metronome. Failed recording must preserve projects.
+首版单声道录音、设备选择与电平、试听后入轨、失败后的下载恢复已完成。现有切分、复制、吸附和整曲循环保留。下一步：节拍器与自定义循环区间；同步叠录、预备拍和延迟校准需要独立验证。
+Initial mono recording, device selection/metering, audition/adoption and recovery downloads are implemented. Existing split/duplicate/snap and whole-session looping remain. Next: metronome and custom loop ranges; synchronized overdubbing, count-in and latency calibration require separate validation.
 
 ## 2. 模型平台 / Model platform
 

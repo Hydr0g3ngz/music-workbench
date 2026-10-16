@@ -1,5 +1,6 @@
 """Versioned multitrack projects. Source audio and the classic editor stay immutable."""
 
+import hashlib
 import io
 import json
 import re
@@ -11,7 +12,7 @@ from typing import Literal
 
 import numpy as np
 import soundfile as sf
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.routing import APIRoute
 from pydantic import Field, model_validator
@@ -218,8 +219,12 @@ class ArrangementService:
     def update(self, key, revision, content, new_asset=None, new_assets=()):
         with self.studio.transaction() as db:
             row = self.row(db, key)
-            self.studio._check_revision(row, revision)
             assets = json.loads(row["assets"])
+            if new_asset and new_asset.get("import_id"):
+                existing = self.imported(assets, new_asset["import_id"], new_asset["import_hash"])
+                if existing:
+                    return self.public(row)
+            self.studio._check_revision(row, revision)
             for candidate in ([new_asset] if new_asset else []) + list(new_assets):
                 if candidate["id"] not in {a["id"] for a in assets}:
                     if len(assets) >= 256:
@@ -275,7 +280,7 @@ class ArrangementService:
             )
         return {"id": key, "deleted": not restore}
 
-    def attach(self, key, request, origin=None):
+    def attach(self, key, request, origin=None, import_meta=None):
         state = self.get(key)
         if state["revision"] != request.revision:
             raise StudioError("Session changed; reload before importing", 409)
@@ -293,6 +298,8 @@ class ArrangementService:
             "duration": info["duration"],
             "waveform": dsp.peaks(path, 480),
         }
+        if import_meta:
+            asset.update(import_meta)
         if request.asset.startswith("asset:"):
             registered = self.studio.registered_assets(request.source_project)
             match = next((a for a in registered if "asset:" + a["id"] == request.asset), None)
@@ -441,15 +448,38 @@ class ArrangementService:
         content = Arrangement.model_validate(content.model_dump())
         return self.update(key, revision, content, new_assets=additions)
 
-    def import_file(self, key, revision, upload):
-        self.get(key)
+    @staticmethod
+    def imported(assets, import_id, digest):
+        existing = next((a for a in assets if a.get("import_id") == import_id), None)
+        if existing and existing["import_hash"] != digest:
+            raise StudioError("Import identifier already belongs to a different recording", 409)
+        return existing
+
+    def import_file(self, key, revision, upload, at=0, import_id=None):
+        state = self.get(key)
         upload.file.seek(0, 2)
         if upload.file.tell() > 256 * 1024 * 1024:
             raise StudioError("Audio upload limit is 256 MiB", 413)
         upload.file.seek(0)
+        meta = None
+        if import_id:
+            digest = hashlib.sha256()
+            while chunk := upload.file.read(1024 * 1024):
+                digest.update(chunk)
+            upload.file.seek(0)
+            digest = fingerprint({"sha256": digest.hexdigest(), "at": at})
+            if self.imported(state["assets"], import_id, digest):
+                return state
+            meta = {"import_id": import_id, "import_hash": digest}
+        if state["revision"] != revision:
+            raise StudioError("Session changed; save or reload before importing", 409)
+        if len(state["content"]["tracks"]) >= 32:
+            raise StudioError("This preview supports at most 32 tracks")
         record = self.import_stream(upload.filename or "audio.wav", upload.file)
         return self.attach(
-            key, Attach(revision=revision, source_project=record["id"], asset="source")
+            key,
+            Attach(revision=revision, source_project=record["id"], asset="source", at=at),
+            import_meta=meta,
         )
 
     def import_stream(self, name, stream):
@@ -923,8 +953,14 @@ def router(studio, manager):
         return service.trash(key, request.revision, True)
 
     @api.post("/projects/{key}/import")
-    def import_file(key: str, revision: int, file: UploadFile):
-        return service.import_file(key, revision, file)
+    def import_file(
+        key: str,
+        revision: int,
+        file: UploadFile,
+        at: float = Query(default=0, ge=0, le=599, allow_inf_nan=False),
+        import_id: str | None = Query(default=None, pattern=ID),
+    ):
+        return service.import_file(key, revision, file, at, import_id)
 
     @api.post("/projects/{key}/attach")
     def attach(key: str, request: Attach):
