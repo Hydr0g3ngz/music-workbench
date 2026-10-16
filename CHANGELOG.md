@@ -1,5 +1,16 @@
 # Changelog / 更新记录
 
+## 0.2.0.dev7 — Loop and metronome / 循环与节拍器
+
+Custom beat-based loop ranges, selected-clip/whole-arrangement shortcuts, a visible ruler range,
+and a live metronome with level and bar accents. Timing settings autosave with undo/redo.
+Loop cycles share decoded buffers and effect graphs, scheduled against the audio clock;
+WAV/MIDI exports remain full arrangements without clicks or repetitions.
+新增自定义循环区间与节拍器，支持所选片段、完整编排快捷设置，随工程保存并可撤销。
+节拍器开关与音量调整不重载编排；循环复用已解码音频与效果器。旧工程按默认设置读取。
+后台长时间阻塞仍可能造成漏播；同步叠录、预备拍与延迟校准尚未实现。
+详见 [中文指南](docs/timing.md) / [English](docs/timing.en.md)。
+
 ## 0.2.0.dev6 — Workbench recording / 本地录音
 
 Input selection, live level meter, mono PCM WAV capture, audition and explicit adoption at the playhead.

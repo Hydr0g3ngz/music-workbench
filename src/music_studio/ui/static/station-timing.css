@@ -1,0 +1,130 @@
+.loop-band {
+  position: absolute;
+  inset-block: 0;
+  background: #b69aff20;
+  border-inline: 2px solid #b69aff;
+  pointer-events: none;
+}
+.timing-settings {
+  font: 11px var(--mono, monospace);
+  white-space: nowrap;
+}
+.transport-controls .icon-button {
+  padding: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.timing-settings.active {
+  color: #d7c5ff;
+  background: #b69aff22;
+}
+.timing-dialog {
+  width: min(480px, calc(100vw - 28px));
+  max-height: calc(100dvh - 32px);
+}
+.timing-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.timing-dialog .dialog-heading {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+.timing-body {
+  min-height: 0;
+  overflow: auto;
+}
+.timing-dialog .dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  padding-top: 14px;
+}
+.timing-dialog .dialog-actions button {
+  padding: 10px 16px;
+  border-radius: 6px;
+}
+.timing-section {
+  border-top: 1px solid var(--border, #33343e);
+  padding: 18px 0;
+}
+.timing-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+}
+.timing-range-inputs {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  margin: 16px 0 8px;
+}
+.timing-range-inputs label {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: #b7b5c2;
+}
+.timing-range-inputs input {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  font: 18px monospace;
+  padding: 10px;
+  color: #eee7fa;
+  background: #191a22;
+  border: 1px solid #4a4558;
+  border-radius: 6px;
+}
+.timing-range-inputs > span {
+  padding-bottom: 10px;
+  color: #b69aff;
+}
+.timing-presets {
+  display: flex;
+  gap: 8px;
+}
+.timing-volume {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 18px 0;
+  font-size: 12px;
+}
+.timing-volume input {
+  flex: 1;
+  min-width: 30px;
+}
+.timing-volume output {
+  min-width: 50px;
+  font-family: monospace;
+}
+#timing-error {
+  color: #f6a8a8;
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  .transport-bar {
+    gap: 5px;
+    padding-inline: 7px;
+  }
+  .transport-time {
+    min-width: 92px;
+    padding-left: 7px;
+  }
+  .transport-time strong {
+    font-size: 15px;
+  }
+  .transport-controls .icon-button {
+    width: 27px;
+    min-width: 27px;
+  }
+  .tempo {
+    padding-left: 4px;
+  }
+  .tempo input {
+    width: 39px;
+  }
+}

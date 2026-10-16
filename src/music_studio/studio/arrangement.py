@@ -82,6 +82,24 @@ class Track(StrictModel):
     clips: list[Clip] = Field(default_factory=list, max_length=128)
 
 
+class Loop(StrictModel):
+    enabled: bool = False
+    start: float = Field(default=0, ge=0, le=2999.75)
+    end: float = Field(default=16, gt=0, le=3000)
+
+    @model_validator(mode="after")
+    def bounds(self):
+        if self.end - self.start < 0.25:
+            raise ValueError("Loop must span at least a quarter beat")
+        return self
+
+
+class Metronome(StrictModel):
+    enabled: bool = False
+    volume_db: float = Field(default=-18, ge=-48, le=-6)
+    accent: bool = True
+
+
 class Arrangement(StrictModel):
     format: Literal["music-studio-arrangement"] = "music-studio-arrangement"
     version: Literal[1] = 1
@@ -89,7 +107,15 @@ class Arrangement(StrictModel):
     bpm: float = Field(default=108, ge=30, le=300)
     master_db: float = Field(default=-6, ge=-60, le=6)
     limiter: mix_effects.Limiter = Field(default_factory=mix_effects.Limiter)
+    loop: Loop = Field(default_factory=Loop)
+    metronome: Metronome = Field(default_factory=Metronome)
     tracks: list[Track] = Field(default_factory=list, max_length=32)
+
+    @model_validator(mode="after")
+    def timing_bounds(self):
+        if self.loop.end * 60 / self.bpm > 600 + 1e-9:
+            raise ValueError("Loop end exceeds the 10-minute timeline")
+        return self
 
 
 class Save(RevisionRequest):

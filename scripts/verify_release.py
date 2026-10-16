@@ -74,8 +74,16 @@ def verify_next():
     with tempfile.TemporaryDirectory(prefix="music-studio-next-release-") as temporary:
         with TestClient(create_app(Path(temporary)), base_url="http://127.0.0.1") as client:
             assert client.get("/next.html").status_code == 200
-            for asset in ("station.html", "station-recorder.js", "station-recorder-worklet.js",
-                          "station-recording-ui.js", "station-recording.css"):
+            for asset in (
+                "station.html",
+                "station-recorder.js",
+                "station-recorder-worklet.js",
+                "station-recording-ui.js",
+                "station-recording.css",
+                "station-timing.js",
+                "station-timing-ui.js",
+                "station-timing.css",
+            ):
                 assert client.get("/" + asset).status_code == 200
             for asset in ("next.js", "next.css", "transport.js", "comparison.js"):
                 assert client.get("/" + asset).status_code == 200
@@ -221,6 +229,14 @@ def verify_create():
             )
             assert updated.status_code == 200, updated.text
             state = updated.json()
+            state["content"]["loop"] = {"enabled": True, "start": 2, "end": 6}
+            state["content"]["metronome"] = {"enabled": True, "volume_db": -24, "accent": True}
+            timing = client.put(
+                prefix, json={"revision": state["revision"], "content": state["content"]}
+            )
+            assert timing.status_code == 200, timing.text
+            state = timing.json()
+            assert client.get(prefix).json()["content"]["loop"]["end"] == 6
             output = client.post(prefix + "/export/wav", json={"revision": state["revision"]})
             assert output.status_code == 200, output.text
             processed, rate = sf.read(io.BytesIO(client.get(output.json()["url"]).content))
@@ -228,8 +244,12 @@ def verify_create():
             assert np.isfinite(processed).all()
             assert np.abs(processed).max() <= 10 ** (-3 / 20) + 2e-7
             undo = client.post(prefix + "/history/undo", json={"revision": state["revision"]})
+            assert not undo.json()["content"]["loop"]["enabled"]
+            undo = client.post(prefix + "/history/undo", json={"revision": undo.json()["revision"]})
             assert not undo.json()["content"]["limiter"]["enabled"]
-    print("PASS: Create installed UI, 23 samples, groove, effects/tails/limiter/history and WAV")
+    print(
+        "PASS: Create installed UI, samples, groove, timing, effects/tails/limiter/history and WAV"
+    )
 
 
 if __name__ == "__main__":

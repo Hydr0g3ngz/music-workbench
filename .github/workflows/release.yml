@@ -28,7 +28,7 @@ jobs:
           assert os.environ['GITHUB_REF_NAME'] == f'v{__version__}'
       - run: python -m ruff check .
       - run: python -m pytest -q
-      - run: node --test tests/ui_playback.test.cjs tests/ui_i18n.test.cjs tests/ui_transport.test.cjs tests/ui_comparison.test.cjs tests/ui_station.test.cjs tests/ui_creation.test.cjs tests/ui_recording.test.cjs
+      - run: node --test tests/ui_playback.test.cjs tests/ui_i18n.test.cjs tests/ui_transport.test.cjs tests/ui_comparison.test.cjs tests/ui_station.test.cjs tests/ui_creation.test.cjs tests/ui_recording.test.cjs tests/ui_timing.test.cjs
       - run: python scripts/package_release.py
       - name: Verify installed wheel without Torch models or downloaded weights
         shell: pwsh

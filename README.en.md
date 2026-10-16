@@ -23,6 +23,8 @@ Default port: 8920. Project directory: `outputs/workbench`. Existing projects ar
 
 New: **local recording → audition → adoption at the playhead**, with input devices, meter, WAV download and undo. [Usage and limits](docs/recording.en.md).
 
+**Refine a section**: custom loop bars, a selected-clip range shortcut, and a metronome with adjustable level and bar accents. Settings persist; exports contain the complete piece. [Loop and metronome](docs/timing.en.md).
+
 ## Available
 
 - Sample instruments, grooves, MIDI import, note editing and reversible multitrack arrangement.

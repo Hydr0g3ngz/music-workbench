@@ -6,7 +6,7 @@
     previewEngine = new StationEngine(),
     generationAudio = new Audio(),
     colors = ["#b69aff", "#86c9bc", "#e7b985", "#8cabed", "#d592b5"];
-  let recordingPanel;
+  let recordingPanel, timingPanel;
   const s = {
     session: null,
     track: null,
@@ -15,7 +15,6 @@
     dock: "mixer",
     zoom: 38,
     position: 0,
-    loop: false,
     dirty: false,
     change: 0,
     saving: null,
@@ -36,6 +35,23 @@
   let generationAudioKey = null,
     generationSubmitting = false;
   const words = {
+    cancel: "Cancel",
+    timingTitle: "Loop and metronome",
+    timingCopy:
+      "Focus on a section. The loop follows your tempo; the metronome keeps you in time.",
+    timingLoop: "Enable range loop",
+    timingStart: "Start bar",
+    timingEnd: "End bar (exclusive)",
+    timingBars:
+      "For example, 1 → 5 repeats bars 1–4. Use decimals for beat positions. Minimum length: 1/4 beat.",
+    timingClip: "Use selected clip",
+    timingWhole: "Whole arrangement",
+    timingClick: "Enable metronome during playback",
+    timingVolume: "Click volume",
+    timingAccent: "Accent the first beat of each bar (4/4)",
+    timingListen:
+      "The metronome is for listening. Exports contain the full arrangement, without clicks or loop repetitions.",
+    timingApply: "Apply settings",
     recording: "Record your sound",
     recordingCopy:
       "Connect a microphone or instrument input. Check the level, record and audition, then add your take to the session.",
@@ -217,6 +233,7 @@
     });
     $("language").textContent = s.lang === "zh" ? "EN" : "中文";
     recordingPanel?.render();
+    timingPanel?.render();
     $("asset-search").placeholder = tr("搜索素材…", "Search assets…");
     $("generation-prompt").placeholder = tr(
       "例如：温暖的爵士钢琴、轻鼓点和木贝斯，适合夜晚写作",
@@ -407,8 +424,13 @@
       `<p class="empty-assets">${tr("音频素材会出现在这里；MIDI 直接加入轨道", "Audio appears here; MIDI goes directly to tracks")}</p>`;
   }
   function renderTracks() {
-    const bar = beatSeconds() * 4,
-      end = Math.max(bar * 12, Math.ceil(duration(content()) / bar + 2) * bar),
+    const loop = { ...StationTiming.loopDefaults(), ...content().loop },
+      bar = beatSeconds() * 4,
+      end = Math.max(
+        bar * 12,
+        loop.enabled ? loop.end * beatSeconds() + bar : 0,
+        Math.ceil(duration(content()) / bar + 2) * bar,
+      ),
       width = Math.ceil(end * s.zoom);
     $("arrangement-content").style.width = `${width + headWidth()}px`;
     $("arrangement-content").style.setProperty(
@@ -419,6 +441,11 @@
       { length: Math.ceil(end / bar) },
       (_, i) => `<span style="left:${i * bar * s.zoom}px">${i + 1}</span>`,
     ).join("");
+    if (loop.enabled)
+      $("ruler-ticks").insertAdjacentHTML(
+        "beforeend",
+        `<div class="loop-band" aria-hidden="true" style="left:${loop.start * beatSeconds() * s.zoom}px;width:${(loop.end - loop.start) * beatSeconds() * s.zoom}px"></div>`,
+      );
     $("track-list").innerHTML = content()
       .tracks.map(
         (t, i) =>
@@ -905,14 +932,18 @@
       pause();
       return;
     }
-    if (!duration(content()))
+    if (!duration(content()) && !content().metronome?.enabled)
       return toast(
         tr("先添加音频或 MIDI 片段", "Add an audio or MIDI clip first"),
       );
     starting = true;
     $("audio-status").textContent = tr("准备音频…", "Preparing audio…");
     try {
-      if (s.position >= duration(content())) s.position = 0;
+      s.position = StationTiming.range(
+        content(),
+        duration(content()),
+        s.position,
+      ).at;
       const ok = await engine.play(
         content(),
         s.session.assets,
@@ -920,6 +951,7 @@
         s.position,
       );
       if (ok) {
+        s.position = engine.position;
         $("play").textContent = "Ⅱ";
         $("audio-status").textContent = tr("正在播放", "Playing");
       }
@@ -935,7 +967,8 @@
   function seek(at) {
     const was = engine.playing;
     pause();
-    s.position = Math.max(0, Math.min(at, duration(content()) || at));
+    const end = StationTiming.range(content(), duration(content())).end;
+    s.position = Math.max(0, Math.min(at, end || at));
     engine.position = s.position;
     if (was) guarded(play)();
   }
@@ -1290,6 +1323,7 @@
       return ($("bpm").value = content().bpm);
     const ratio = content().bpm / bpm;
     if (
+      (content().loop && (content().loop.end * 60) / bpm > 600 + 1e-9) ||
       content().tracks.some(
         (t) =>
           t.kind === "midi" &&
@@ -1302,8 +1336,8 @@
       $("bpm").value = content().bpm;
       return toast(
         tr(
-          "调速后的 MIDI 超出 10 分钟范围，请先缩短工程",
-          "The MIDI would exceed 10 minutes; shorten the session first",
+          "调速后的 MIDI 或循环区间超出 10 分钟范围，请先缩短工程",
+          "MIDI or loop range would exceed 10 minutes; shorten the session first",
         ),
         true,
       );
@@ -1425,11 +1459,6 @@
     s.position = engine.position = 0;
   };
   $("rewind").onclick = () => seek(0);
-  $("loop").onclick = () => {
-    s.loop = !s.loop;
-    $("loop").classList.toggle("active", s.loop);
-    $("loop").setAttribute("aria-pressed", s.loop);
-  };
   $("split").onclick = guarded(() => {
     const c = selectedClip();
     if (!c) return;
@@ -2132,10 +2161,9 @@
     if (s.session) {
       if (engine.playing) {
         s.position = Math.max(0, engine.current());
-        if (s.position >= duration(content())) {
+        if (!engine.playRange.loop && s.position >= engine.playRange.end) {
           pause();
           s.position = engine.position = 0;
-          if (s.loop) guarded(play)();
         }
       }
       $("time-display").textContent = seconds(s.position);
@@ -2172,6 +2200,44 @@
     }
     requestAnimationFrame(animate);
   }
+  let timingBusy = false;
+  async function applyTiming(settings) {
+    if (timingBusy) return;
+    timingBusy = true;
+    const controls = ["loop", "metronome", "timing-settings"].map($);
+    controls.forEach((button) => (button.disabled = true));
+    try {
+      await flush();
+      const oldLoop = { ...StationTiming.loopDefaults(), ...content().loop },
+        restart = JSON.stringify(oldLoop) !== JSON.stringify(settings.loop),
+        wasPlaying = engine.playing || starting;
+      mutate(() => Object.assign(content(), settings), { live: !restart });
+      await flush();
+      if (restart && wasPlaying) await play();
+    } finally {
+      timingBusy = false;
+      controls.forEach((button) => (button.disabled = false));
+    }
+  }
+  timingPanel = StationTimingUI.mount({
+    $,
+    tr,
+    content: () => s.session?.content,
+    selectedClip,
+    duration,
+    apply: applyTiming,
+    toggle: guarded(async (kind) => {
+      const settings = {
+        loop: { ...StationTiming.loopDefaults(), ...content().loop },
+        metronome: {
+          ...StationTiming.metronomeDefaults(),
+          ...content().metronome,
+        },
+      };
+      settings[kind].enabled = !settings[kind].enabled;
+      await applyTiming(settings);
+    }),
+  });
   recordingPanel = StationRecording.mount({
     $,
     tr,

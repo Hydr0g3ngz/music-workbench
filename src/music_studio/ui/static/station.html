@@ -9,10 +9,13 @@
     <link rel="stylesheet" href="/station-library.css" />
     <link rel="stylesheet" href="/station-effects.css" />
     <link rel="stylesheet" href="/station-recording.css" />
+    <link rel="stylesheet" href="/station-timing.css" />
     <script src="/effects-dsp.js" defer></script>
+    <script src="/station-timing.js" defer></script>
     <script src="/station-engine.js" defer></script>
     <script src="/station-recorder.js" defer></script>
     <script src="/station-recording-ui.js" defer></script>
+    <script src="/station-timing-ui.js" defer></script>
     <script src="/station.js" defer></script>
   </head>
   <body>
@@ -258,9 +261,19 @@
             id="loop"
             class="icon-button"
             aria-pressed="false"
-            title="循环工程 / Loop session"
+            title="循环区间 / Loop range"
           >
-            ↻
+            ↻</button
+          ><button
+            id="metronome"
+            class="icon-button"
+            aria-pressed="false"
+            title="节拍器 / Metronome"
+            aria-label="节拍器 / Metronome"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 20h12L15 4h-3L8 20Zm-4-9 9 6m0 0 5-12" />
+            </svg>
           </button>
         </div>
         <div class="transport-time">
@@ -319,6 +332,14 @@
           </button>
         </div>
         <div class="grid-controls">
+          <button
+            id="timing-settings"
+            class="timing-settings"
+            title="循环与节拍器 / Loop and metronome"
+          >
+            <span aria-hidden="true">↻</span>
+            <span id="timing-range">1 → 5</span>
+          </button>
           <label
             ><input id="snap" type="checkbox" checked /><span data-t="snap"
               >吸附</span
@@ -663,6 +684,95 @@
       <p class="record-note" data-t="recordNote">
         单声道录音，无需安装模型；输入不会外放。录制时编排暂停，不提供同步叠录或延迟补偿。页面关闭前请加入工程或下载录音。
       </p>
+    </dialog>
+    <dialog
+      id="timing-dialog"
+      class="timing-dialog"
+      aria-labelledby="timing-title"
+    >
+      <div class="dialog-heading">
+        <h2 id="timing-title" data-t="timingTitle">循环与节拍器</h2>
+        <button class="icon-button close-dialog" aria-label="关闭 / Close">
+          ×
+        </button>
+      </div>
+      <div class="timing-body">
+        <p class="panel-copy" data-t="timingCopy">
+          选一段反复打磨。循环区间跟随工程速度，节拍器帮助你找到节奏。
+        </p>
+        <section class="timing-section">
+          <label class="timing-toggle"
+            ><input id="timing-loop" type="checkbox" /><span data-t="timingLoop"
+              >启用区间循环</span
+            ></label
+          >
+          <div class="timing-range-inputs">
+            <label
+              ><span data-t="timingStart">开始小节</span
+              ><input
+                id="timing-start"
+                type="number"
+                min="1"
+                step="any"
+                value="1"
+                required
+            /></label>
+            <span aria-hidden="true">→</span>
+            <label
+              ><span data-t="timingEnd">结束小节（不含）</span
+              ><input
+                id="timing-end"
+                type="number"
+                min="1"
+                step="any"
+                value="5"
+                required
+            /></label>
+          </div>
+          <p class="panel-copy" data-t="timingBars">
+            例如 1 → 5 会重复第 1–4 小节；可用小数指定拍点。最短为 1/4 拍。
+          </p>
+          <div class="timing-presets">
+            <button id="timing-clip" data-t="timingClip">使用所选片段</button
+            ><button id="timing-whole" data-t="timingWhole">整个编排</button>
+          </div>
+        </section>
+        <section class="timing-section">
+          <label class="timing-toggle"
+            ><input id="timing-click" type="checkbox" /><span
+              data-t="timingClick"
+              >播放时开启节拍器</span
+            ></label
+          >
+          <label class="timing-volume"
+            ><span data-t="timingVolume">节拍器音量</span
+            ><input
+              id="timing-volume"
+              type="range"
+              min="-48"
+              max="-6"
+              step="1"
+              value="-18"
+            /><output id="timing-db">−18 dB</output></label
+          >
+          <label class="timing-toggle"
+            ><input id="timing-accent" type="checkbox" checked /><span
+              data-t="timingAccent"
+              >强调每小节第一拍（4/4）</span
+            ></label
+          >
+        </section>
+        <p class="panel-copy" data-t="timingListen">
+          节拍器仅用于监听。导出仍为完整编排，不含节拍声或循环重复。
+        </p>
+        <p id="timing-error" role="alert"></p>
+      </div>
+      <div class="dialog-actions">
+        <button class="close-dialog" data-t="cancel">取消</button
+        ><button id="timing-apply" class="primary" data-t="timingApply">
+          应用设置
+        </button>
+      </div>
     </dialog>
     <button
       id="panel-shade"

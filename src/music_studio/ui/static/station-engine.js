@@ -4,6 +4,10 @@
     typeof module !== "undefined" && module.exports
       ? require("./effects-dsp.js")
       : root.StationEffects;
+  const Timing =
+    typeof module !== "undefined" && module.exports
+      ? require("./station-timing.js")
+      : root.StationTiming;
   const uid = () =>
     typeof crypto !== "undefined"
       ? crypto.randomUUID().replaceAll("-", "").slice(0, 16)
@@ -172,14 +176,28 @@
       return this.ctx;
     }
     current() {
-      return this.playing
-        ? this.position + this.ctx.currentTime - this.started
-        : this.position;
+      if (!this.playing) return this.position;
+      const raw =
+        this.position + Math.max(0, this.ctx.currentTime - this.started);
+      if (this.playRange?.loop && raw >= this.playRange.end)
+        return (
+          this.playRange.start +
+          ((raw - this.playRange.end) %
+            (this.playRange.end - this.playRange.start))
+        );
+      return raw;
     }
     pause() {
       this.position = this.current();
       this.playing = false;
       this.epoch++;
+      clearInterval(this.timingTimer);
+      this.timingTimer = null;
+      this.clickGain?.disconnect();
+      this.clickGain = null;
+      this.playRange = null;
+      this.playContent = null;
+      this.playBuffers = null;
       for (const node of this.nodes) {
         try {
           node.stop();
@@ -199,6 +217,7 @@
         this.master.connect(this.masterAnalyser);
       }
       this.nodes = [];
+      this.clickNodes = [];
       this.graphs.clear();
     }
     reset() {
@@ -379,6 +398,32 @@
     }
     update(content) {
       if (!this.ctx) return;
+      const metronome = { ...Timing.metronomeDefaults(), ...content.metronome };
+      if (
+        this.metronome?.enabled !== metronome.enabled ||
+        this.metronome?.accent !== metronome.accent
+      ) {
+        for (const node of this.clickNodes || []) {
+          try {
+            node.stop();
+          } catch (_) {}
+          node.disconnect();
+        }
+        const clicks = new Set(this.clickNodes || []);
+        this.nodes = this.nodes.filter((node) => !clicks.has(node));
+        this.clickNodes = [];
+        this.lastClick = -Infinity;
+      }
+      this.metronome = metronome;
+      if (this.playing && this.metronome.enabled && !this.clickGain) {
+        this.clickGain = this.ctx.createGain();
+        this.clickGain.connect(this.ctx.destination);
+      }
+      this.clickGain?.gain.setTargetAtTime(
+        this.metronome.enabled ? gain(this.metronome.volume_db) : 0,
+        this.ctx.currentTime,
+        0.005,
+      );
       this.master.gain.setTargetAtTime(
         gain(content.master_db),
         this.ctx.currentTime,
@@ -485,7 +530,8 @@
             buffers.set(clip.id, await this.cache.get(key));
           }
       if (epoch !== this.epoch) return false;
-      this.position = at;
+      this.playRange = Timing.range(content, duration(content), at);
+      at = this.position = this.playRange.at;
       this.started = ctx.currentTime + 0.04;
       if (this.workletsReady) {
         this.masterEffect = this.effectNode(
@@ -506,30 +552,60 @@
           track.pan > 0 ? Math.cos((track.pan * Math.PI) / 2) : 1;
         graph.right.gain.value =
           track.pan < 0 ? Math.cos((-track.pan * Math.PI) / 2) : 1;
+      }
+      this.playContent = structuredClone(content);
+      this.playBuffers = buffers;
+      this.scheduleWindow(at, this.playRange.end, this.started);
+      this.nextCycle = this.started + this.playRange.end - at;
+      this.lastClick = -Infinity;
+      this.playing = true;
+      this.update(content);
+      this.scheduleTiming();
+      this.timingTimer = setInterval(() => {
+        try {
+          if (this.playing) this.scheduleTiming();
+        } catch (error) {
+          this.pause();
+          this.onerror?.(error);
+        }
+      }, 100);
+      this.timingTimer.unref?.();
+      return true;
+    }
+    scheduleWindow(from, to, when) {
+      const ctx = this.ctx;
+      for (const track of this.playContent.tracks) {
+        const graph = this.graphs.get(track.id);
         for (const clip of track.clips) {
-          const skip = Math.max(0, at - clip.start),
-            length = clip.duration - skip;
+          const start = Math.max(from, clip.start),
+            skip = start - clip.start,
+            length = Math.min(clip.start + clip.duration, to) - start;
           if (length <= 0) continue;
+          if (this.nodes.length >= 16384)
+            throw Error(
+              "Too many simultaneous loop sources; use a longer loop or fewer clips.",
+            );
           const source = ctx.createBufferSource(),
             level = ctx.createGain();
-          source.buffer = buffers.get(clip.asset || clip.id);
+          source.buffer = this.playBuffers.get(clip.asset || clip.id);
           source.connect(level);
           level.connect(graph.input);
           source.onended = () => {
             source.disconnect();
             level.disconnect();
+            this.nodes = this.nodes.filter((n) => n !== source);
           };
-          const when = this.started + Math.max(0, clip.start - at),
+          const begins = when + start - from,
             amp = gain(clip.gain_db);
           const points = [
             ...new Set([
               skip,
-              clip.duration,
+              skip + length,
               Math.max(skip, clip.fade_in),
               Math.max(skip, clip.duration - clip.fade_out),
             ]),
           ]
-            .filter((s) => s >= skip && s <= clip.duration)
+            .filter((s) => s >= skip && s <= skip + length)
             .sort((a, b) => a - b);
           const envelope = (s) =>
             Math.max(
@@ -540,16 +616,76 @@
                   clip.fade_out ? (clip.duration - s) / clip.fade_out : 1,
                 ),
             ) * amp;
-          level.gain.setValueAtTime(envelope(skip), when);
+          level.gain.setValueAtTime(envelope(skip), begins);
           for (const s of points.slice(1))
-            level.gain.linearRampToValueAtTime(envelope(s), when + s - skip);
-          source.start(when, clip.offset + skip, length);
+            level.gain.linearRampToValueAtTime(envelope(s), begins + s - skip);
+          source.start(begins, clip.offset + skip, length);
           this.nodes.push(source);
         }
       }
-      this.playing = true;
-      this.update(content);
-      return true;
+    }
+    scheduleTiming() {
+      const ctx = this.ctx,
+        now = ctx.currentTime,
+        horizon = now + 1.5,
+        r = this.playRange;
+      if (r.loop) {
+        const length = r.end - r.start;
+        if (this.nextCycle + length <= now)
+          this.nextCycle +=
+            Math.floor((now - this.nextCycle) / length) * length;
+        while (this.nextCycle < horizon) {
+          const when = Math.max(this.nextCycle, now + 0.005),
+            skip = when - this.nextCycle;
+          if (skip < length) this.scheduleWindow(r.start + skip, r.end, when);
+          this.nextCycle += length;
+        }
+      }
+      if (!this.metronome.enabled || !this.clickGain) return;
+      for (const event of Timing.beatEvents(
+        {
+          ...r,
+          at: this.position,
+          started: this.started,
+          bpm: this.playContent.bpm || 108,
+        },
+        Math.max(now + 0.005, this.lastClick + 1e-6),
+        horizon,
+      )) {
+        const source = ctx.createBufferSource();
+        source.buffer = this.clickBuffer(
+          this.metronome.accent && event.beat % 4 === 0,
+        );
+        source.connect(this.clickGain);
+        source.onended = () => {
+          source.disconnect();
+          this.nodes = this.nodes.filter((n) => n !== source);
+          this.clickNodes = this.clickNodes.filter((n) => n !== source);
+        };
+        source.start(event.time);
+        this.nodes.push(source);
+        (this.clickNodes ||= []).push(source);
+        this.lastClick = event.time;
+      }
+    }
+    clickBuffer(accent) {
+      this.clickBuffers ||= new Map();
+      if (!this.clickBuffers.has(accent)) {
+        const rate = this.ctx.sampleRate,
+          size = Math.ceil(0.035 * rate),
+          buffer = this.ctx.createBuffer(1, size, rate),
+          data = buffer.getChannelData(0);
+        for (let i = 0; i < size; i++) {
+          const time = i / rate;
+          data[i] =
+            0.5 *
+            Math.sin(2 * Math.PI * (accent ? 1600 : 1000) * time) *
+            Math.exp(-time * 150) *
+            Math.min(1, time / 0.001);
+        }
+        this.clickBuffers.set(accent, buffer);
+      }
+      return this.clickBuffers.get(accent);
     }
     meter(id) {
       const graph = this.graphs.get(id);

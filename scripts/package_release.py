@@ -35,6 +35,14 @@ def package(root: Path, dist: Path, *, build=True):
         output.write(wheel, f"{prefix}/packages/{wheel.name}")
     for required in (
         "Start-Music-Workbench.cmd",
+        "src/music_studio/ui/static/station-timing.js",
+        "src/music_studio/ui/static/station-timing-ui.js",
+        "src/music_studio/ui/static/station-timing.css",
+        "docs/timing.md",
+        "docs/timing.en.md",
+        "docs/timing-validation.md",
+        "docs/images/timing-zh.png",
+        "docs/images/timing-en.png",
         "src/music_studio/ui/static/station-recorder.js",
         "src/music_studio/ui/static/station-recorder-worklet.js",
         "src/music_studio/ui/static/station-recording-ui.js",
