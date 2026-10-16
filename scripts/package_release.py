@@ -16,10 +16,10 @@ def package(root: Path, dist: Path, *, build=True):
     dist.mkdir(parents=True, exist_ok=True)
     if build:
         subprocess.run([sys.executable, "-m", "build", "--outdir", str(dist)], cwd=root, check=True)
-    wheel = dist / f"music_studio_local-{__version__}-py3-none-any.whl"
-    source = dist / f"music_studio_local-{__version__}.tar.gz"
-    archive = dist / f"Music-Studio-{__version__}-Windows.zip"
-    prefix = f"Music-Studio-{__version__}"
+    wheel = dist / f"music_workbench_local-{__version__}-py3-none-any.whl"
+    source = dist / f"music_workbench_local-{__version__}.tar.gz"
+    archive = dist / f"Music-Workbench-{__version__}-Windows.zip"
+    prefix = f"Music-Workbench-{__version__}"
     with (
         tarfile.open(source) as tar,
         zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as output,
@@ -34,6 +34,7 @@ def package(root: Path, dist: Path, *, build=True):
             output.writestr(f"{prefix}/{relative}", data)
         output.write(wheel, f"{prefix}/packages/{wheel.name}")
     for required in (
+        "Start-Music-Workbench.cmd",
         "Start-Music-Studio.cmd",
         "QUICKSTART.md",
         "scripts/launch.ps1",

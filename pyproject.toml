@@ -3,9 +3,9 @@ requires = ["hatchling>=1.26,<2"]
 build-backend = "hatchling.build"
 
 [project]
-name = "music-studio-local"
+name = "music-workbench-local"
 version = "0.2.0.dev5"
-description = "Local audio AI workbench: reversible editing, speech cleanup, loudness and shared agent tools."
+description = "Local music workstation: composition, arrangement, mixing and open audio models."
 keywords = ["audio", "music", "speech-enhancement", "transcription", "midi", "mcp", "local-first"]
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
@@ -43,13 +43,14 @@ inference = [
 dev = ["pytest>=8.3,<9", "ruff>=0.11,<1", "build>=1.2,<2", "httpx>=0.27,<1", "av>=14,<17", "librosa==0.11.0", "scipy>=1.13,<2", "pyebur128==0.1.1"]
 
 [project.scripts]
+music-workbench = "music_studio.workbench_cli:main"
 music-studio = "music_studio.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/Hydr0g3ngz/music-studio"
-Repository = "https://github.com/Hydr0g3ngz/music-studio"
-Issues = "https://github.com/Hydr0g3ngz/music-studio/issues"
-Changelog = "https://github.com/Hydr0g3ngz/music-studio/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/Hydr0g3ngz/music-workbench"
+Repository = "https://github.com/Hydr0g3ngz/music-workbench"
+Issues = "https://github.com/Hydr0g3ngz/music-workbench/issues"
+Changelog = "https://github.com/Hydr0g3ngz/music-workbench/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/music_studio"]

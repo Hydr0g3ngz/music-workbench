@@ -69,7 +69,7 @@ if (-not $InferencePython) {
 if ($InferencePython) { $nextArguments += @("--inference-python", $InferencePython) }
 if (-not $NoBrowser) { $nextArguments += "--open" }
 $nextEntry = if ($Interface -eq 'create') { 'station.html' } else { 'next.html' }
-Write-Host "Music Studio: http://127.0.0.1:$nextPort/$nextEntry"
+Write-Host "Music Workbench: http://127.0.0.1:$nextPort/$nextEntry"
 Write-Host "Workspace: $Workspace"
 & $nextPython @nextArguments
 exit $LASTEXITCODE

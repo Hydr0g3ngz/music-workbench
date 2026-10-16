@@ -948,7 +948,7 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
 
 
 def serve(
-    workspace: Path, settings: Settings, port: int, open_browser: bool, interface: str = "classic"
+    workspace: Path, settings: Settings, port: int, open_browser: bool, interface: str = "create"
 ):
     import uvicorn
 

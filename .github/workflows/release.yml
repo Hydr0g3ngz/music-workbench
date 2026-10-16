@@ -57,4 +57,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_TAG" dist/* --verify-tag --prerelease --title "Music Studio $RELEASE_TAG · Preview" --notes-file "docs/releases/$RELEASE_TAG.md"
+        run: gh release create "$RELEASE_TAG" dist/* --verify-tag --prerelease --title "Music Workbench $RELEASE_TAG · Preview" --notes-file "docs/releases/$RELEASE_TAG.md"
