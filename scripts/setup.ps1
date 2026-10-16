@@ -29,7 +29,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'PyTorch installation failed' }
     }
     $extras = if ($Mode -eq 'full') { 'ui,inference' } else { 'ui' }
-    $wheel = Get-ChildItem -LiteralPath (Join-Path $projectRoot 'packages') -Filter 'music_studio_local-*.whl' -ErrorAction SilentlyContinue | Select-Object -First 1
+    $wheel = Get-ChildItem -LiteralPath (Join-Path $projectRoot 'packages') -Filter 'music_workbench_local-*.whl' -ErrorAction SilentlyContinue | Select-Object -First 1
     $package = if ($wheel) { "$($wheel.FullName)[$extras]" } else { ".[$extras]" }
     & $projectPython -m pip install $package
     if ($LASTEXITCODE -ne 0) { throw 'Music Studio installation failed' }
