@@ -210,7 +210,10 @@ def test_silence_falls_back_to_raw_and_peak_headroom_never_amplifies(tmp_path):
         matched = client.post(prefix + "/comparisons", json={**payload, "b": a}).json()
         assert matched["matching_available"]
         assert matched["a"]["gain_db"] < 0 and matched["a"]["matched_gain"] < 1
-        assert matched["a"]["measurement"]["true_peak_dbtp"] + matched["a"]["gain_db"] <= -1
+        # libebur128/platform rounding can put the sum a few ulps above -1 dBTP.
+        # A billionth of a dB is far below measurement precision and audio significance.
+        peak_after_gain = matched["a"]["measurement"]["true_peak_dbtp"] + matched["a"]["gain_db"]
+        assert peak_after_gain <= -1 + 1e-9
         # Preview computation never mutates the imported source.
         assert (
             sha256(
