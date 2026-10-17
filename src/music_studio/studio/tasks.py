@@ -10,12 +10,14 @@ import uuid
 
 from filelock import FileLock, Timeout
 
-from ..io import read_json, sha256, write_json
+from ..io import fingerprint, read_json, sha256, write_json
 from ..lyric_models import MODELS
 from . import dsp
 from .process import TaskStopped, log_tail, run_owned
 from .registry import ModelRegistry, child_environment
 from .service import StudioError
+from .task_range import stable_wav_header
+from .warm_worker import IDLE_SECONDS, REUSABLE, WarmWorker
 
 PENDING = ("queued", "checking", "running", "cancelling")
 
@@ -26,6 +28,8 @@ class TaskManager:
         self.registry = ModelRegistry(service, settings)
         self.stopping = threading.Event()
         self.wake = threading.Event()
+        self.worker = None
+        self.worker_input = None
         self.thread = threading.Thread(target=self._pump, daemon=True, name="studio-local-tasks")
         lock = service.root / ".studio-tasks.lock"
         if lock.is_symlink():
@@ -98,23 +102,65 @@ class TaskManager:
             import soundfile as sf
 
             info = sf.info(source)
-            if spec["stage"] == "transform" and info.duration / request.time_ratio > 600:
+            first, last = 0, info.frames
+            if request.range is not None:
+                first = round(request.range.start * info.samplerate)
+                last = round(request.range.end * info.samplerate)
+                if first >= info.frames or last > info.frames + 1 or last <= first:
+                    raise StudioError("Processing range is outside the source audio")
+                last = min(last, info.frames)
+            duration = (last - first) / info.samplerate
+            if spec["stage"] == "transform" and duration / request.time_ratio > 600:
                 raise StudioError("Transformed source would exceed the 10-minute limit")
             limit = self.registry.describe(request.model)["max_duration_seconds"]
-            if info.duration > limit:
+            if duration > limit:
                 raise StudioError(
                     f"This capability supports {limit}s per task; trim a shorter clip first"
                 )
             key = uuid.uuid4().hex[:16]
             directory = self.service.studio_dir(project, f"tasks/{key}")
-            required_bytes = info.frames * info.channels * 4 * 4 + 128 * 1024**2
+            required_bytes = (last - first) * info.channels * 4 * 4 + 128 * 1024**2
             if shutil.disk_usage(directory).free < required_bytes:
                 raise StudioError("Insufficient free disk space for a pinned input and outputs")
             source_hash = sha256(source)
             snapshot = directory / "input.wav"
-            shutil.copyfile(source, snapshot)
-            if sha256(snapshot) != source_hash or sha256(source) != source_hash:
+            if request.range is None:
+                shutil.copyfile(source, snapshot)
+            else:
+                with (
+                    sf.SoundFile(source) as audio,
+                    sf.SoundFile(
+                        snapshot,
+                        "w",
+                        samplerate=info.samplerate,
+                        channels=info.channels,
+                        subtype="FLOAT",
+                    ) as pinned,
+                ):
+                    audio.seek(first)
+                    remaining = last - first
+                    while remaining:
+                        block = audio.read(min(65536, remaining), dtype="float32", always_2d=True)
+                        if not len(block):
+                            raise StudioError("Input changed while pinning its range", 409)
+                        pinned.write(block)
+                        remaining -= len(block)
+                stable_wav_header(snapshot)
+            input_hash = sha256(snapshot)
+            if (request.range is None and input_hash != source_hash) or sha256(
+                source
+            ) != source_hash:
                 raise StudioError("Input changed while creating a task; try again", 409)
+            source_range = {
+                "scope": "clip" if request.range is not None else "asset",
+                "start_frame": first,
+                "end_frame": last,
+                "sample_rate": info.samplerate,
+                "start": first / info.samplerate,
+                "end": last / info.samplerate,
+                "source_frames": info.frames,
+                "source_sha256": source_hash,
+            }
             config = self.registry.settings.model_dump()
             device = self.registry.settings.device if request.device == "auto" else request.device
             if spec.get("device") == "cpu":
@@ -146,7 +192,8 @@ class TaskManager:
                 "stage": spec["stage"],
                 "revision": request.revision,
                 "source_asset": asset,
-                "input_sha256": source_hash,
+                "input_sha256": input_hash,
+                "source_range": source_range,
                 "actor": actor,
                 "created_at": time.time(),
                 "device": device,
@@ -164,7 +211,8 @@ class TaskManager:
                     "model": request.model,
                     "stage": spec["stage"],
                     "input": str(snapshot),
-                    "input_sha256": source_hash,
+                    "input_sha256": input_hash,
+                    "source_range": source_range,
                     "output": str(directory / "output"),
                     "settings": config,
                     "owner_pid": os.getpid(),
@@ -250,17 +298,23 @@ class TaskManager:
 
     def _run(self, task):
         key, project = task["id"], task["project"]
+        invocation_started = time.monotonic()
         try:
             self.service.project_dir(project)
             self._status(key, "checking", started_at=time.time())
+            directory = self.service.studio_dir(project, f"tasks/{key}")
+            request_file = directory / "request.json"
+            request = read_json(request_file)
+            input_identity = fingerprint({"model": task["model"], "settings": request["settings"]})
+            if self.worker_input != input_identity or (
+                self.worker and self.worker.process.poll() is not None
+            ):
+                self._retire_worker()
             spec = self.registry.require(
                 task["model"], cancelled=lambda: self._cancelled(key), device=task["device"]
             )
             if self._cancelled(key):
                 raise TaskStopped("Task cancelled")
-            directory = self.service.studio_dir(project, f"tasks/{key}")
-            request_file = directory / "request.json"
-            request = read_json(request_file)
             request["settings"].update(
                 self.registry.environment_settings(task["model"], task["device"])
             )
@@ -271,19 +325,33 @@ class TaskManager:
                 "running",
                 runtime=self.registry.describe(task["model"], device=task["device"])["health"],
             )
-            code = run_owned(
-                [
-                    self.registry.python(spec, task["device"]),
-                    "-X",
-                    "utf8",
-                    "-m",
-                    "music_studio.studio.task_worker",
-                    str(request_file),
-                ],
-                directory / "worker.log",
-                child_environment(request["settings"]["model_dir"]),
-                cancelled=lambda: self._cancelled(key),
+            python = self.registry.python(spec, task["device"])
+            environment = child_environment(request["settings"]["model_dir"])
+            identity = fingerprint(
+                {"model": task["model"], "python": python, "settings": request["settings"]}
             )
+            if self.worker and self.worker.identity != identity:
+                self._retire_worker()
+            # The base runtime remains a one-shot subprocess (including test/tool fixtures).
+            if task["model"] in REUSABLE and spec["runtime"] != "base":
+                if not self.worker:
+                    self.worker = WarmWorker(python, environment, directory, identity)
+                    self.worker_input = input_identity
+                code = self.worker.run(request_file, cancelled=lambda: self._cancelled(key))
+            else:
+                code = run_owned(
+                    [
+                        python,
+                        "-X",
+                        "utf8",
+                        "-m",
+                        "music_studio.studio.task_worker",
+                        str(request_file),
+                    ],
+                    directory / "worker.log",
+                    environment,
+                    cancelled=lambda: self._cancelled(key),
+                )
             if code:
                 raise StudioError(
                     f"Local model exited {code}. " + log_tail(directory / "worker.log")
@@ -291,6 +359,9 @@ class TaskManager:
             if self._cancelled(key):
                 raise TaskStopped("Task cancelled")
             result = read_json(directory / "output/result.json")
+            result["metrics"]["invocation_seconds"] = round(
+                time.monotonic() - invocation_started, 3
+            )
             folder = self.service.project_dir(project)
             artifacts = []
             if task["stage"] == "denoise":
@@ -369,12 +440,14 @@ class TaskManager:
                     {"task": key, "model": task["model"], "assets": [a["id"] for a in artifacts]},
                 )
         except TaskStopped:
+            self._retire_worker()
             self._status(
                 key,
                 "interrupted" if self.stopping.is_set() else "cancelled",
                 finished_at=time.time(),
             )
         except Exception as error:
+            self._retire_worker()
             self._status(
                 key,
                 "cancelled" if self._cancelled(key) else "failed",
@@ -382,19 +455,51 @@ class TaskManager:
                 finished_at=time.time(),
             )
 
+    def _retire_worker(self):
+        if self.worker:
+            self.worker.close()
+            self.worker = None
+        self.worker_input = None
+
+    def _generation_waiting(self):
+        with self.service.connection() as db:
+            exists = db.execute(
+                "SELECT 1 FROM sqlite_master WHERE name='creation_tasks'"
+            ).fetchone()
+            return bool(
+                exists
+                and db.execute(
+                    "SELECT 1 FROM creation_tasks WHERE status='queued' LIMIT 1"
+                ).fetchone()
+            )
+
     def _pump(self):
         while not self.stopping.is_set():
             try:
                 with self.lock:
-                    self._recover()
-                    while not self.stopping.is_set():
-                        with self.service.connection() as db:
-                            row = db.execute(
-                                "SELECT * FROM tasks WHERE status='queued' ORDER BY created LIMIT 1"
-                            ).fetchone()
-                        if row is None:
-                            break
-                        self._run(self._decode(row))
+                    try:
+                        self._recover()
+                        while not self.stopping.is_set():
+                            # Release GPU memory and the shared lock before ACE-Step starts.
+                            if self.worker and self._generation_waiting():
+                                break
+                            with self.service.connection() as db:
+                                row = db.execute(
+                                    "SELECT * FROM tasks WHERE status='queued' "
+                                    "ORDER BY created LIMIT 1"
+                                ).fetchone()
+                            if row is None:
+                                if (
+                                    not self.worker
+                                    or time.monotonic() - self.worker.last_used >= IDLE_SECONDS
+                                ):
+                                    break
+                                self.wake.wait(0.2)
+                                self.wake.clear()
+                                continue
+                            self._run(self._decode(row))
+                    finally:
+                        self._retire_worker()
             except Timeout:
                 pass
             except Exception:
@@ -415,6 +520,14 @@ class TaskManager:
             raise StudioError("Asset does not exist", 404)
         record = json.loads(row["data"])
         return self.service.safe_file(folder, record["file"]), record
+
+    def input_path(self, project, identity):
+        task = self.get(project, identity)
+        directory = self.service.studio_dir(project, f"tasks/{task['id']}")
+        path = self.service.safe_file(directory, "input.wav")
+        if sha256(path) != task["input_sha256"]:
+            raise StudioError("Pinned task input changed", 409)
+        return path
 
     def close(self):
         self.stopping.set()

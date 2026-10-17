@@ -10,11 +10,11 @@ Separate imported/generated audio into vocals and backing, audition and adopt al
 
 1. Select an audio clip, open **Models**, check either separator, then run it.
 2. Cancel from **Tasks** if needed. Processing does not change the arrangement.
-3. Audition vocals or backing. Linked auditions start at the original clip's source offset and stop after its duration.
+3. Audition vocals or backing. Auditions cover the clip range captured when the task was submitted.
 4. **Replace clip with stems** adds both aligned tracks and removes the original clip in one reversible edit, avoiding doubled playback.
 5. Continue arranging, mixing and exporting WAV. One Undo restores the original clip; Redo restores both stems.
 
-The whole source asset is processed. Replacement preserves clip position, source offset, duration, gain and fades.
+From dev18, only the selected clip is processed. Replacement preserves session position, duration, gain and fades; its new source offset starts at zero. Older whole-asset tasks retain their original offset.
 New tracks copy the original track's gain, pan, mute, solo and effects. Nonlinear effects such as compression can sound different when applied to separate stems.
 If the source clip changes or disappears, replacement is rejected. Undo those changes or add individual results instead.
 Individual **Add track** inserts the full result at the current playhead without replacing anything.

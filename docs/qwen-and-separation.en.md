@@ -18,7 +18,9 @@ Both use CUDA 12.8 and require NVIDIA driver 570 or newer. Inference checks at l
 3. For songs, try transcribing the separated vocal with Qwen. Separation does not guarantee better recognition on every song; audition first. Specify the language or detect it automatically.
 4. **Word timing** defaults to the pack recommendation: transcribe, then align words. Choose **Coarse paragraphs** for a faster text result. Open **Details and editing**, save corrected text and download TXT, LRC or SRT.
 
-Processing still uses the full source asset; trimming the timeline clip does not reduce computation. Detailed text correction opens the single-asset editor.
+From dev18, only the selected timeline clip is processed. Audio, lyric and MIDI exports start at zero within that clip; adopting stems or melody retains its session position. Detailed text correction opens the single-asset editor.
+
+RoFormer, Demucs and Whisper reuse their model across consecutive tasks with identical tool settings. Memory is released after 30 idle seconds, a tool change, cancellation, shutdown or a waiting music-generation task. Qwen keeps sequential recognizer/aligner loading.
 
 ## What alignment means
 

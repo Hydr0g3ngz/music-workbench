@@ -108,7 +108,7 @@
     instrumentNote:
       "VCSL sampled instruments, CC0. Audition and WAV export use the same samples. Original synth sounds remain available.",
     modelCopy:
-      "Process the selected clip’s full source audio. Add results directly as new tracks.",
+      "Process only the selected clip. Audition results, then add them as new tracks.",
     comingModels: "Creation models · Planned",
     notIntegrated: "Not integrated; cannot run yet.",
     generationCopy:
@@ -1179,7 +1179,8 @@
       generationAudioKey = key;
     }
     const task = s.tasks.find((t) => t.artifacts.some((a) => a.id === id));
-    generationAudio.currentTime = task?.source_clip?.offset || 0;
+    const window = StationModelControls.clipWindow(task);
+    generationAudio.currentTime = window.offset;
     renderTasks();
     try {
       await generationAudio.play();
@@ -1188,7 +1189,7 @@
       throw error;
     }
     if (task?.source_clip)
-      previewTimer = setTimeout(stopPreview, task.source_clip.duration * 1000);
+      previewTimer = setTimeout(stopPreview, window.duration * 1000);
   }
   const modelOptions = {};
   function renderModels() {
@@ -1281,7 +1282,7 @@
         s.tasks
           .map(
             (t) =>
-              `<div class="task-row"><span><strong>${esc(t.model)}</strong><small>${esc(t.error || taskLabel(t.status))}</small>${t.metrics ? `<small>${esc(t.metrics.device.toUpperCase())} · ${t.metrics.seconds.toFixed(1)}s${t.metrics.realtime_factor == null ? "" : " · " + t.metrics.realtime_factor.toFixed(2) + "× " + tr("音频时长", "audio duration")}</small>` : ""}${timingNotice(t.metrics?.timing_method) ? `<small>${esc(timingNotice(t.metrics.timing_method))}</small>` : ""}${t.source_clip ? `<small>${esc(t.source_clip.name)} · ${t.source_clip.start.toFixed(2)}s · ${tr("完整素材处理，采用时保留片段范围", "Full source processed; clip bounds retained on adoption")}</small>` : ""}</span>${t.status === "complete" && ["separate", "transform"].includes(t.stage) && t.source_clip ? `<button data-adopt-stems="${t.id}" ${canReplaceStems(t) ? "" : "disabled"} title="${tr("源片段更改或移除后，需要先撤销再替换", "Undo source clip changes or removal before replacing")}">${t.stage === "transform" ? tr("采用适配结果", "Adopt fitted result") : tr("用分轨替换片段", "Replace clip with stems")}</button>` : ""}${t.status === "complete" && t.stage === "melody" && t.source_clip ? `<button data-adopt-melody="${t.id}">${tr("旋律加入乐器轨", "Add melody as notes")}</button>` : ""}${
+              `<div class="task-row"><span><strong>${esc(t.model)}</strong><small>${esc(t.error || taskLabel(t.status))}</small>${t.metrics ? `<small>${esc(t.metrics.device.toUpperCase())} · ${t.metrics.seconds.toFixed(1)}s${t.metrics.model_reused ? " · " + tr("已复用模型", "Model reused") : ""}${t.metrics.realtime_factor == null ? "" : " · " + t.metrics.realtime_factor.toFixed(2) + "× " + tr("音频时长", "audio duration")}</small>` : ""}${timingNotice(t.metrics?.timing_method) ? `<small>${esc(timingNotice(t.metrics.timing_method))}</small>` : ""}${t.source_clip ? `<small>${esc(t.source_clip.name)} · ${t.source_clip.start.toFixed(2)}s · ${t.source_range?.scope === "clip" ? tr(`处理片段 ${t.source_range.start.toFixed(2)}–${t.source_range.end.toFixed(2)} s · 导出时间从 0 开始`, `Clip ${t.source_range.start.toFixed(2)}–${t.source_range.end.toFixed(2)} s · exports start at 0`) : tr("完整素材处理，采用时保留片段范围", "Full source processed; clip bounds retained on adoption")}</small>` : ""}</span>${t.status === "complete" && ["separate", "transform"].includes(t.stage) && t.source_clip ? `<button data-adopt-stems="${t.id}" ${canReplaceStems(t) ? "" : "disabled"} title="${tr("源片段更改或移除后，需要先撤销再替换", "Undo source clip changes or removal before replacing")}">${t.stage === "transform" ? tr("采用适配结果", "Adopt fitted result") : tr("用分轨替换片段", "Replace clip with stems")}</button>` : ""}${t.status === "complete" && t.stage === "melody" && t.source_clip ? `<button data-adopt-melody="${t.id}">${tr("旋律加入乐器轨", "Add melody as notes")}</button>` : ""}${
                 t.artifacts
                   .map((a) =>
                     a.kind === "audio"

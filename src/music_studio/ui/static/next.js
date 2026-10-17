@@ -1647,6 +1647,10 @@ function renderLocalTasks() {
         "subtle",
       ),
     );
+    if (task.source_range?.scope === "clip")
+      card.append(element("p", language === "zh"
+        ? `源片段 ${task.source_range.start.toFixed(2)}–${task.source_range.end.toFixed(2)} s；结果时间从 0 开始。`
+        : `Source clip ${task.source_range.start.toFixed(2)}–${task.source_range.end.toFixed(2)} s; result times start at zero.`, "subtle"));
     if (task.error)
       card.append(
         element(
@@ -1800,6 +1804,23 @@ async function openTranscriptEditor(project, artifact) {
   );
   const fields = [],
     body = [element("p", t("transcriptHelp"))];
+  const task = S.localTasks.find((task) => task.id === artifact.task);
+  if (task) {
+    audio.pause();
+    const preview = element("audio");
+    preview.controls = true;
+    preview.preload = "metadata";
+    preview.src = `/api/projects/${project}/studio/tasks/${task.id}/input`;
+    preview.setAttribute("aria-label", language === "zh" ? "转写对应的音频片段" : "Audio used for this transcript");
+    body.push(preview, element("p", language === "zh"
+      ? "试听的是提交时的音频片段。下方时间从此片段的 0 秒开始。"
+      : "Audition the captured task input. Times below start at zero within this audio.", "subtle"));
+    $("modal").addEventListener("close", () => {
+      preview.pause();
+      preview.removeAttribute("src");
+      preview.load();
+    }, {once: true});
+  }
   for (const line of result.segments) {
     const label = element("label", undefined, "transcript-line");
     const input = element("textarea");

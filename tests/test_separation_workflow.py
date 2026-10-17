@@ -94,7 +94,7 @@ def test_stem_replacement_is_aligned_atomic_reversible_and_durable(workflow):
     assert len(after["assets"]) == 3
     for track in after["content"]["tracks"]:
         clip = track["clips"][0]
-        assert (clip["start"], clip["offset"], clip["duration"]) == (2.5, 0.2, 0.6)
+        assert (clip["start"], clip["offset"], clip["duration"]) == (2.5, 0, 0.6)
         assert (clip["fade_in"], clip["fade_out"], clip["gain_db"]) == (0.05, 0.1, -2)
         assert (track["gain_db"], track["pan"]) == (-3, 0.25)
         assert clip["origin"]["author"] == "Example artist"
@@ -113,6 +113,46 @@ def test_stem_replacement_is_aligned_atomic_reversible_and_durable(workflow):
     redo = client.post(base + "/history/redo", json={"revision": undo["revision"]}).json()
     assert redo["content"] == after["content"]
     assert client.get(base + "/processing").json()[0]["source_clip"] == task["source_clip"]
+
+
+def test_only_trimmed_frames_reach_model_and_comparison_uses_output_origin(workflow):
+    client, service, base, state, task, identity = workflow
+    directory = service.studio_dir(task["source_project"], f"tasks/{identity}")
+    pinned, rate = sf.read(directory / "input.wav", dtype="float32", always_2d=True)
+    source, _ = sf.read(
+        service.asset_path(task["source_project"], "source"), dtype="float32", always_2d=True
+    )
+    np.testing.assert_array_equal(pinned, source[8820:35280])
+    assert task["source_range"]["start_frame"] == 8820
+    assert task["input_audio"]["frames"] == 26460 and rate == 44100
+    url = f"/api/projects/{task['source_project']}/studio/tasks/{identity}/input"
+    preview = client.get(url)
+    assert preview.status_code == 200
+    assert sf.info(io.BytesIO(preview.content)).frames == 26460
+    assert client.get(url, headers={"Range": "bytes=0-63"}).status_code == 206
+    assert client.get(url.replace(task["source_project"], state["id"])).status_code == 404
+    # Compare the cropped model output to the corresponding source window.
+    artifact = next(a for a in task["artifacts"] if a["role"] == "vocals")
+    comparison = client.post(
+        base + "/comparisons",
+        json={
+            "revision": state["revision"],
+            "a": "clip:" + task["source_clip"]["id"],
+            "b": f"processing:{identity}:{artifact['id']}",
+            "duration": 0.5,
+        },
+    )
+    assert comparison.status_code == 200, comparison.text
+    assert comparison.json()["a"]["offset_frames"] == 8820
+    assert comparison.json()["b"]["offset_frames"] == 0
+
+
+def test_task_input_preview_refuses_a_changed_snapshot(workflow):
+    client, service, _, _, task, identity = workflow
+    path = service.tasks.input_path(task["source_project"], identity)
+    path.write_bytes(b"changed")
+    response = client.get(f"/api/projects/{task['source_project']}/studio/tasks/{identity}/input")
+    assert response.status_code == 409
 
 
 @pytest.mark.parametrize("failure", ["stale", "edited", "tampered", "missing", "track-limit"])

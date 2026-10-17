@@ -1,7 +1,7 @@
 """Measure actual isolated workstation tasks. Bundled samples; no network or downloads.
 
 This is a speed/resource benchmark, not an audio-quality evaluation. Each case starts a
-new worker, matching the workstation queue. OS file caches are not flushed. Model load,
+new worker, measuring cold worker startup without workstation model reuse. OS file caches are not flushed. Model load,
 inference and artifact writing remain included in worker time.
 """
 

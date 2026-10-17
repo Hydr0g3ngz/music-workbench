@@ -79,10 +79,10 @@ network access. Release packages do not redistribute model weights.
 ## Queue, assets and text corrections
 
 - One on-demand Next task runs at a time **per workspace**, including separate UI and MCP
-  processes. Each task uses an isolated process and releases its GPU models on exit.
+  processes. RoFormer, Demucs and Whisper can reuse one isolated worker with identical settings for up to 30 idle seconds. Tool changes, cancellation, shutdown or waiting generation jobs release it; other capabilities exit after each task.
   Other workspaces and applications can still compete for memory.
   Classic full-song analysis retains its own pipeline; avoid overlapping GPU work there too.
-- A task captures the **entire auditioned track**, its hash and edit revision. To
+- The single-asset editor captures the **entire auditioned track**, its hash and edit revision. The multitrack workstation instead captures the selected clip. To
   analyze a selection, render a trimmed preview and select it first. Completion
   never adopts an output, changes the auditioned track or resets playback time.
 - Model tasks currently accept up to 600 seconds per clip; levels and loudness accept 7200

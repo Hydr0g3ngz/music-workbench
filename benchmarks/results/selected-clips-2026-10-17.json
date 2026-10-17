@@ -1,0 +1,465 @@
+{
+  "schema": 1,
+  "version": "0.2.0.dev18",
+  "date": "2026-10-17",
+  "hardware": {
+    "os": "Windows x64",
+    "cpu": "Core Ultra 9 185H",
+    "gpu": "RTX 4070 Laptop 8 GB",
+    "ram_gb": 32
+  },
+  "protocol": "Dedicated HTTP workspace; fixed source ranges; cold worker then immediate same-model repeat. OS caches are warm. No network/model downloads. Environment checks are included in invocation and observed times.",
+  "limitations": [
+    "Single trials on one computer, with background activity. Not a universal speed guarantee.",
+    "Worker seconds include imports, model loading, inference and writing; invocation adds checks and Python startup; observed adds HTTP and polling.",
+    "Valid word spans and MIDI placement are structural checks, not transcription/alignment/melody accuracy.",
+    "Model reuse applies to RoFormer, Demucs and Whisper with identical settings; Qwen remains sequential and exits after each task.",
+    "Generation handoff is covered by queue lifecycle fixtures; an additional real ACE generation was not run."
+  ],
+  "roformer_workflow": {
+    "measurements": [
+      {
+        "model": "mel-band-roformer-kj",
+        "input_sha256": "60d5ae0deffad700c9881dd3630fdf6fe9e0d25e22f06daa99b088e9e1742b4e",
+        "source_range": {
+          "scope": "clip",
+          "start_frame": 0,
+          "end_frame": 1984500,
+          "sample_rate": 44100,
+          "start": 0.0,
+          "end": 45.0,
+          "source_frames": 1984500,
+          "source_sha256": "6f731fc1611c200b6b3f8d49595689a5ce7e59b3e9d44f66ad56e2eb03cd26ca"
+        },
+        "metrics": {
+          "timing_method": null,
+          "seconds": 16.898,
+          "audio_seconds": 45.0,
+          "realtime_factor": 0.376,
+          "device": "cuda",
+          "compute_type": "autocast-fp16",
+          "torch_peak_mb": 2041.39,
+          "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+          "worker_reused": false,
+          "model_reused": false,
+          "worker_pid": 52188,
+          "invocation_seconds": 26.969
+        },
+        "observed_seconds": 27.642,
+        "task": "74deb487d83f43b4"
+      },
+      {
+        "model": "inspect",
+        "input_sha256": "60d5ae0deffad700c9881dd3630fdf6fe9e0d25e22f06daa99b088e9e1742b4e",
+        "source_range": {
+          "scope": "clip",
+          "start_frame": 0,
+          "end_frame": 1984500,
+          "sample_rate": 44100,
+          "start": 0.0,
+          "end": 45.0,
+          "source_frames": 1984500,
+          "source_sha256": "6f731fc1611c200b6b3f8d49595689a5ce7e59b3e9d44f66ad56e2eb03cd26ca"
+        },
+        "metrics": {
+          "timing_method": null,
+          "seconds": 0.347,
+          "audio_seconds": 45.0,
+          "realtime_factor": 0.008,
+          "device": "cpu",
+          "compute_type": null,
+          "torch_peak_mb": null,
+          "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+          "worker_reused": false,
+          "model_reused": false,
+          "worker_pid": 58112,
+          "invocation_seconds": 2.36
+        },
+        "observed_seconds": 2.805,
+        "task": "4929c245df8349df"
+      },
+      {
+        "model": "mel-band-roformer-kj",
+        "input_sha256": "80cad9ae41fa0016b4f3ea194d395a340c2b4ee502f0b580e5f1ff0195e1f949",
+        "source_range": {
+          "scope": "clip",
+          "start_frame": 143325,
+          "end_frame": 672525,
+          "sample_rate": 44100,
+          "start": 3.25,
+          "end": 15.25,
+          "source_frames": 1984500,
+          "source_sha256": "6f731fc1611c200b6b3f8d49595689a5ce7e59b3e9d44f66ad56e2eb03cd26ca"
+        },
+        "metrics": {
+          "timing_method": null,
+          "seconds": 12.349,
+          "audio_seconds": 12.0,
+          "realtime_factor": 1.029,
+          "device": "cuda",
+          "compute_type": "autocast-fp16",
+          "torch_peak_mb": 2013.88,
+          "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+          "worker_reused": false,
+          "model_reused": false,
+          "worker_pid": 27592,
+          "invocation_seconds": 13.375
+        },
+        "observed_seconds": 13.828,
+        "task": "40c43aa426544f9d"
+      },
+      {
+        "model": "mel-band-roformer-kj",
+        "input_sha256": "80cad9ae41fa0016b4f3ea194d395a340c2b4ee502f0b580e5f1ff0195e1f949",
+        "source_range": {
+          "scope": "clip",
+          "start_frame": 143325,
+          "end_frame": 672525,
+          "sample_rate": 44100,
+          "start": 3.25,
+          "end": 15.25,
+          "source_frames": 1984500,
+          "source_sha256": "6f731fc1611c200b6b3f8d49595689a5ce7e59b3e9d44f66ad56e2eb03cd26ca"
+        },
+        "metrics": {
+          "timing_method": null,
+          "seconds": 3.453,
+          "audio_seconds": 12.0,
+          "realtime_factor": 0.288,
+          "device": "cuda",
+          "compute_type": "autocast-fp16",
+          "torch_peak_mb": 2013.88,
+          "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+          "worker_reused": true,
+          "model_reused": true,
+          "worker_pid": 27592,
+          "invocation_seconds": 4.547
+        },
+        "observed_seconds": 5.026,
+        "task": "7cb7850ba8d14078"
+      }
+    ],
+    "limits": "Single host, warm OS cache. Execution and timing checks are not model quality scores.",
+    "project": "bcc6339a66d4414c",
+    "checks": {
+      "exact_selected_samples": true,
+      "aligned_adopt_reopen_export_undo": true,
+      "candidate_comparison_origin": true,
+      "different_tool_releases_process": true,
+      "idle_worker_retired": true
+    }
+  },
+  "whisper_reuse": {
+    "schema": 1,
+    "project": "79a24282ed44449e",
+    "model": "whisper-small",
+    "runs": [
+      {
+        "task": "e8624a36b3174e03",
+        "input_sha256": "25188efb589abe779a45ef20630a771c4d621513adf06ce0403e220f2087d979",
+        "source_range": {
+          "scope": "clip",
+          "start_frame": 176400,
+          "end_frame": 705600,
+          "sample_rate": 44100,
+          "start": 4.0,
+          "end": 16.0,
+          "source_frames": 1019223,
+          "source_sha256": "ff6a74e8da2de2604893f2d5e2639e910ec08b9cb29b0446c06438d47a944e9a"
+        },
+        "input_audio": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "frames": 529200,
+          "duration": 12.0,
+          "peak": 0.517696738243103,
+          "peak_dbfs": -5.718491425782398,
+          "rms_dbfs": -24.067646940536726,
+          "samples_at_or_above_full_scale": 0,
+          "dc_offset": [
+            -0.00027287205117991584,
+            -0.00027287205117991584
+          ],
+          "measurement": "Sample peak and full-file RMS; not LUFS or true peak"
+        },
+        "metrics": {
+          "timing_method": "whisper_word_timestamps",
+          "seconds": 13.928,
+          "audio_seconds": 12.0,
+          "realtime_factor": 1.161,
+          "device": "cuda",
+          "compute_type": "int8_float16",
+          "torch_peak_mb": null,
+          "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+          "worker_reused": false,
+          "model_reused": false,
+          "worker_pid": 33048,
+          "invocation_seconds": 23.078
+        },
+        "observed_seconds": 23.587
+      },
+      {
+        "task": "5660470aa6a34c5d",
+        "input_sha256": "25188efb589abe779a45ef20630a771c4d621513adf06ce0403e220f2087d979",
+        "source_range": {
+          "scope": "clip",
+          "start_frame": 176400,
+          "end_frame": 705600,
+          "sample_rate": 44100,
+          "start": 4.0,
+          "end": 16.0,
+          "source_frames": 1019223,
+          "source_sha256": "ff6a74e8da2de2604893f2d5e2639e910ec08b9cb29b0446c06438d47a944e9a"
+        },
+        "input_audio": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "frames": 529200,
+          "duration": 12.0,
+          "peak": 0.517696738243103,
+          "peak_dbfs": -5.718491425782398,
+          "rms_dbfs": -24.067646940536726,
+          "samples_at_or_above_full_scale": 0,
+          "dc_offset": [
+            -0.00027287205117991584,
+            -0.00027287205117991584
+          ],
+          "measurement": "Sample peak and full-file RMS; not LUFS or true peak"
+        },
+        "metrics": {
+          "timing_method": "whisper_word_timestamps",
+          "seconds": 0.812,
+          "audio_seconds": 12.0,
+          "realtime_factor": 0.068,
+          "device": "cuda",
+          "compute_type": "int8_float16",
+          "torch_peak_mb": null,
+          "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+          "worker_reused": true,
+          "model_reused": true,
+          "worker_pid": 33048,
+          "invocation_seconds": 1.141
+        },
+        "observed_seconds": 1.786
+      }
+    ],
+    "limits": "Single host; OS caches are not flushed. Not a quality evaluation."
+  },
+  "demucs_reuse": {
+    "schema": 1,
+    "project": "3775364c7e4e4570",
+    "model": "demucs-htdemucs",
+    "runs": [
+      {
+        "task": "eb97250d15aa4e00",
+        "input_sha256": "80cad9ae41fa0016b4f3ea194d395a340c2b4ee502f0b580e5f1ff0195e1f949",
+        "source_range": {
+          "scope": "clip",
+          "start_frame": 143325,
+          "end_frame": 672525,
+          "sample_rate": 44100,
+          "start": 3.25,
+          "end": 15.25,
+          "source_frames": 1984500,
+          "source_sha256": "bb9680161a868f05408775dfb3f38d9de984cbb3eb5fdaae71003049a7e4a09b"
+        },
+        "input_audio": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "frames": 529200,
+          "duration": 12.0,
+          "peak": 0.9950059652328491,
+          "peak_dbfs": -0.043486311518779845,
+          "rms_dbfs": -16.953307843574883,
+          "samples_at_or_above_full_scale": 0,
+          "dc_offset": [
+            -0.00016467363614650957,
+            -3.698314124652067e-05
+          ],
+          "measurement": "Sample peak and full-file RMS; not LUFS or true peak"
+        },
+        "metrics": {
+          "timing_method": null,
+          "seconds": 6.021,
+          "audio_seconds": 12.0,
+          "realtime_factor": 0.502,
+          "device": "cuda",
+          "compute_type": null,
+          "torch_peak_mb": 553.06,
+          "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+          "worker_reused": false,
+          "model_reused": false,
+          "worker_pid": 16284,
+          "invocation_seconds": 14.672
+        },
+        "observed_seconds": 15.093
+      },
+      {
+        "task": "1b5d9556b49a47f3",
+        "input_sha256": "80cad9ae41fa0016b4f3ea194d395a340c2b4ee502f0b580e5f1ff0195e1f949",
+        "source_range": {
+          "scope": "clip",
+          "start_frame": 143325,
+          "end_frame": 672525,
+          "sample_rate": 44100,
+          "start": 3.25,
+          "end": 15.25,
+          "source_frames": 1984500,
+          "source_sha256": "bb9680161a868f05408775dfb3f38d9de984cbb3eb5fdaae71003049a7e4a09b"
+        },
+        "input_audio": {
+          "sample_rate": 44100,
+          "channels": 2,
+          "frames": 529200,
+          "duration": 12.0,
+          "peak": 0.9950059652328491,
+          "peak_dbfs": -0.043486311518779845,
+          "rms_dbfs": -16.953307843574883,
+          "samples_at_or_above_full_scale": 0,
+          "dc_offset": [
+            -0.00016467363614650957,
+            -3.698314124652067e-05
+          ],
+          "measurement": "Sample peak and full-file RMS; not LUFS or true peak"
+        },
+        "metrics": {
+          "timing_method": null,
+          "seconds": 0.415,
+          "audio_seconds": 12.0,
+          "realtime_factor": 0.035,
+          "device": "cuda",
+          "compute_type": null,
+          "torch_peak_mb": 553.06,
+          "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+          "worker_reused": true,
+          "model_reused": true,
+          "worker_pid": 16284,
+          "invocation_seconds": 1.016
+        },
+        "observed_seconds": 1.766
+      }
+    ],
+    "limits": "Single host; OS caches are not flushed. Not a quality evaluation."
+  },
+  "qwen_melody_transform": {
+    "qwen": {
+      "project": "8f82537768b24db6",
+      "task": "7782761bc8ad4a75",
+      "source_range": {
+        "scope": "clip",
+        "start_frame": 176400,
+        "end_frame": 705600,
+        "sample_rate": 44100,
+        "start": 4.0,
+        "end": 16.0,
+        "source_frames": 1019223,
+        "source_sha256": "dcaa6391ec733f2501d81d3c7b855de44cae184e87015fe14c8df71617a1ba76"
+      },
+      "metrics": {
+        "timing_method": "qwen_forced_alignment",
+        "seconds": 36.052,
+        "audio_seconds": 12.0,
+        "realtime_factor": 3.004,
+        "device": "cuda",
+        "compute_type": "bfloat16",
+        "torch_peak_mb": 4480.88,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+        "worker_reused": false,
+        "model_reused": false,
+        "worker_pid": 26780,
+        "invocation_seconds": 75.297
+      },
+      "words": 36,
+      "lines": 3,
+      "review_lines": 0,
+      "times_within_cropped_input": true,
+      "not_a_quality_score": true
+    },
+    "melody_and_transform": {
+      "project": "57b9d82d563b4462",
+      "melody_metrics": {
+        "timing_method": null,
+        "seconds": 21.89,
+        "audio_seconds": 4.0,
+        "realtime_factor": 5.472,
+        "device": "cuda",
+        "compute_type": null,
+        "torch_peak_mb": 725.86,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+        "worker_reused": false,
+        "model_reused": false,
+        "worker_pid": 49392,
+        "invocation_seconds": 95.437
+      },
+      "source_range": {
+        "scope": "clip",
+        "start_frame": 88200,
+        "end_frame": 264600,
+        "sample_rate": 44100,
+        "start": 2.0,
+        "end": 6.0,
+        "source_frames": 441000,
+        "source_sha256": "fa43c463925861ebd23ab5b4c1f5d79c8c5c7b9ebd8061662e74d34995dbcfe7"
+      },
+      "notes": 3,
+      "midi_first_start": 0.5129999999999999,
+      "transform_metrics": {
+        "timing_method": null,
+        "seconds": 20.519,
+        "audio_seconds": 4.0,
+        "realtime_factor": 5.13,
+        "device": "cpu",
+        "compute_type": null,
+        "torch_peak_mb": null,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+        "worker_reused": false,
+        "model_reused": false,
+        "worker_pid": 55548,
+        "invocation_seconds": 23.89
+      },
+      "midi_adoption_position": true,
+      "transform_offset_and_length": true,
+      "not_a_quality_score": true
+    }
+  },
+  "equivalence_and_cancellation": {
+    "roformer": {
+      "same_input_hash": true,
+      "output_comparison": {
+        "vocals": 0.0,
+        "instrumental": 0.0
+      }
+    },
+    "whisper": {
+      "same_input_hash": true,
+      "output_comparison": {
+        "lyrics": "identical transcript"
+      }
+    },
+    "demucs": {
+      "same_input_hash": true,
+      "output_comparison": {
+        "vocals": 0.0,
+        "instrumental": 0.0
+      }
+    },
+    "cancellation": {
+      "status": "cancelled",
+      "no_published_outputs": true,
+      "project_unchanged": true
+    }
+  },
+  "browser": {
+    "bilingual_range_and_cache_notice": true,
+    "cropped_preview_start": 0,
+    "screenshot": "Local QA screenshot; not part of the installer.",
+    "transcript_preview_seconds": 12,
+    "transcript_preview_close_stops_and_releases": true
+  },
+  "checks": {
+    "backend_tests": 69,
+    "frontend_tests": 38,
+    "changed_markdown_links": 9,
+    "fractional_trim_transform_and_envelope_endpoints": true
+  }
+}

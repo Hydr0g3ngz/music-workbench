@@ -616,7 +616,7 @@ window.StationWorkflow = {
         "Make this material fit",
       );
       $("material-body").innerHTML =
-        `<p class="panel-copy">${esc(c.name)} · ${tr("处理完整素材，采用时保留当前片段范围。分析是 DSP 估计，不是模型保证。", "Full source is processed; current trim is retained on adoption. Analysis uses DSP estimates, not model guarantees.")}</p>
+        `<p class="panel-copy">${esc(c.name)} · ${tr("只处理当前片段；采用时放回工程原位置。速度和调性分析使用 DSP 估计。", "Only the selected clip is processed; adoption retains its session position. Tempo and key analysis uses DSP estimates.")}</p>
         <div class="workflow-models"><button data-workflow-model="musical-analysis">${tr("分析速度 / 调性 / 电平", "Analyze tempo / key / levels")}<small>librosa · DSP</small></button>
         <button data-workflow-model="demucs-four-stems">${tr("拆成鼓 / 贝斯 / 人声 / 其他", "Separate drums / bass / vocals / other")}<small>Demucs · AI</small></button>
         <button data-workflow-model="crepe-rest">${tr("提取可编辑旋律 MIDI", "Extract editable melody MIDI")}<small>CREPE · AI · ${tr("单旋律实验", "monophonic, experimental")}</small></button></div>
@@ -661,7 +661,8 @@ window.StationWorkflow = {
       );
       const matchingClip = content()
         .tracks.flatMap((t) => t.clips)
-        .find((c) => c.asset && c.asset === task?.source_clip?.asset);
+        .find((c) => c.asset && c.id === task?.source_clip?.id &&
+          JSON.stringify(c) === JSON.stringify(task.source_clip));
       if (matchingClip) {
         $("material-body").insertAdjacentHTML(
           "beforeend",
@@ -669,7 +670,7 @@ window.StationWorkflow = {
         );
         $("report-beat-fit").onclick = guarded(() => {
           material.close();
-          return api.openBeatFit(r, matchingClip);
+          return api.openBeatFit(StationModelControls.sourceReport(task, r), matchingClip);
         });
       }
       if (!material.open) material.showModal();

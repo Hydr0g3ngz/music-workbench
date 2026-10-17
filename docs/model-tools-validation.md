@@ -1,5 +1,57 @@
 # Local tool pack validation / 本地工具包验证
 
+## dev18: selected clips and model reuse / 片段处理与模型复用
+
+Workstation tools now pin only the selected clip, with exact source frame bounds and
+SHA-256 provenance. Identical selected samples produce identical input WAV hashes.
+Audio/lyric/MIDI exports use clip-relative time; adoption restores the session position.
+Old whole-source tasks retain their original mapping. Transcript correction can audition
+the pinned task input instead of matching its times against an unrelated full-length track.
+
+工作台只处理选中的片段，结果从片段内 0 秒开始。已验证非零素材偏移、分轨替换、A/B、
+MIDI 回填、变速、重开、WAV 导出和撤销。歌词编辑器提供提交时音频片段的试听。
+
+Same Windows host as dev17. Each pair below uses identical input hashes, a new worker,
+then an immediate repeat. OS caches were warm; these are single trials with background
+activity. Worker time includes imports, weights, inference and writing. Invocation time
+also includes environment checks and Python startup; HTTP time includes polling.
+
+| Tool / 工具 | Input / 输入 | First worker → reused / 模型阶段 | First invocation → reused / 含检查与启动 |
+| --- | --- | --- | --- |
+| RoFormer | 12 s song window | 12.349 → 3.453 s | 13.375 → 4.547 s |
+| Demucs htdemucs | Same 12 s song window | 6.021 → 0.415 s | 14.672 → 1.016 s |
+| Whisper small, CUDA INT8/FP16 | 12 s noisy speech window | 13.928 → 0.812 s | 23.078 → 1.141 s |
+
+Repeated separator outputs were sample-identical; Whisper returned an identical
+transcript. One resident capability is retained for at most 30 idle seconds; tool or
+settings changes, cancellation, shutdown and queued generation retire it. Real RoFormer
+idle exit and cancellation passed. Timeout, shutdown and generation handoff use a tiny
+process/queue fixture; a new ACE generation was not included in this round.
+
+Qwen still releases recognition before loading its aligner. A 12 s cropped speech test
+produced 36 structurally valid word spans in three lines, with no timing review flags:
+36.052 s worker time, 75.297 s including the initial environment check. CREPE on a 4 s
+synthetic monophonic window took 21.890 s in the worker and placed 3 extracted notes back
+at the correct project time. The 4 s DSP time/pitch task took 20.519 s; startup/import
+costs remain substantial. These checks do **not** establish recognition or music quality.
+
+上述数值来自单台电脑的单次测试，不能作为普遍性能承诺。裁短片段会减少上下文，可能影响
+识别、分轨和节拍质量；需试听比较。Qwen 字词数量、时间边界与 MIDI 位置检查不代表准确率。
+
+[Raw measurements / 原始记录](../benchmarks/results/selected-clips-2026-10-17.json).
+For reproduction, start a dedicated QA server, then run:
+
+```powershell
+python -m music_studio ui --interface create --workspace .artifacts/clip-benchmark --port 8933 --offline
+# In a second terminal, using the same installed source environment:
+python scripts/benchmark_workstation_clips.py src/music_studio/ui/demo/audio/source.ogg --start 3.25 --duration 12 --model mel-band-roformer-kj --output .artifacts/roformer-clips.json
+```
+
+Prepare the model pack first. The script creates a new QA project and never downloads
+models or edits existing projects. Repeat with `--model demucs-htdemucs`, or use the
+bundled speech fixture with `--model whisper-small`. For isolated cold-worker comparisons,
+keep using `scripts/benchmark_local_models.py`.
+
 ## dev17: managed RoFormer and Qwen / 自动分轨与转写工具包
 
 Windows x64, Core Ultra 9 185H, RTX 4070 Laptop 8 GB, 32 GB RAM, Python 3.12.10,

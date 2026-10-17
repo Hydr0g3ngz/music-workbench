@@ -92,13 +92,14 @@ window.StationFitUI = {
           (t) =>
             t.status === "complete" &&
             t.model === "musical-analysis" &&
-            t.source_clip?.asset === clip.asset,
+            t.source_clip?.id === clip.id &&
+            JSON.stringify(t.source_clip) === JSON.stringify(clip),
         );
         const a = row?.artifacts.find((a) => a.role === "musical-analysis");
         if (a)
-          report = await request(
+          report = StationModelControls.sourceReport(row, await request(
             `/api/projects/${row.source_project}/studio/artifacts/${a.id}`,
-          );
+          ));
         if (s.session.id !== snapshot.project) return;
       }
       $("fit-heading").textContent = tr(

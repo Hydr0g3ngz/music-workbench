@@ -114,6 +114,48 @@ def test_cpu_capabilities_reject_cuda_and_wrong_cleanup_options(local_project):
     assert service.tasks.list(project) == []
 
 
+def test_task_range_is_frame_exact_and_old_full_source_tasks_still_map(local_project):
+    from pydantic import ValidationError
+
+    from music_studio.studio.task_range import clip_window
+
+    service, project = local_project
+    for value in ({"start": 0.3, "end": 0.2}, {"start": float("nan"), "end": 1}):
+        with pytest.raises(ValidationError):
+            LocalTaskRequest(revision=0, model="inspect", range=value)
+    for value in ({"start": 1.1, "end": 1.2}, {"start": 0.2, "end": 2}, {"start": 0, "end": 1e-8}):
+        with pytest.raises(StudioError, match="range"):
+            service.tasks.submit(
+                project, LocalTaskRequest(revision=0, model="inspect", range=value)
+            )
+    job = service.tasks.submit(
+        project,
+        LocalTaskRequest(
+            revision=0,
+            model="inspect",
+            range={"start": 0.123456, "end": 0.765432},
+        ),
+    )
+    done = wait_for(
+        lambda: (
+            r
+            if (r := service.tasks.get(project, job["id"]))["status"] in ("complete", "failed")
+            else None
+        )
+    )
+    assert done["status"] == "complete", done
+    assert done["input_audio"]["frames"] == round(0.765432 * 44100) - round(0.123456 * 44100)
+    assert done["source_range"]["source_sha256"] != done["input_sha256"]
+    repeated = service.tasks.submit(
+        project,
+        LocalTaskRequest(revision=0, model="inspect", range={"start": 0.123456, "end": 0.765432}),
+    )
+    assert repeated["input_sha256"] == done["input_sha256"]
+    legacy = {"source_clip": {"offset": 3, "duration": 4}, "stage": "transform", "time_ratio": 2}
+    assert clip_window(legacy) == (1.5, 2)
+    assert clip_window({**legacy, "source_range": {"start": 3}}) == (0, 2)
+
+
 @pytest.mark.parametrize("rate,channels", [(48000, 2), (44100, 1)])
 def test_task_outputs_must_preserve_rate_and_channels(local_project, monkeypatch, rate, channels):
     service, project = local_project

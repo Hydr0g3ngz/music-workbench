@@ -79,6 +79,10 @@ def router(service: StudioService) -> APIRouter:
     def cancel_task(project: str, task: str):
         return call(service.tasks.cancel, project, task)
 
+    @api.get("/tasks/{task}/input")
+    def task_input(project: str, task: str):
+        return FileResponse(call(service.tasks.input_path, project, task), media_type="audio/wav")
+
     @api.get("/artifacts/{asset}")
     def artifact(project: str, asset: str, download: bool = False):
         path, record = call(service.tasks.artifact_path, project, asset)

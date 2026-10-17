@@ -24,8 +24,9 @@ from .composition import Blueprint, Role
 from .envelope import VolumePoint
 from .envelope import envelope as clip_envelope
 from .fitting import FitOptions
-from .models import LocalTaskRequest, RevisionRequest, StrictModel
+from .models import AudioRange, LocalTaskRequest, RevisionRequest, StrictModel
 from .service import StudioError
+from .task_range import clip_window
 
 RATE = 44100
 ID = r"^[a-f0-9]{16}$"
@@ -423,6 +424,7 @@ class ArrangementService:
                 revision=self.studio.session(source_project)["revision"],
                 model=request.model,
                 asset=asset["source_asset"],
+                range=AudioRange(start=clip["offset"], end=clip["offset"] + clip["duration"]),
                 time_ratio=request.time_ratio,
                 pitch_shift=request.pitch_shift,
                 device=request.device,
@@ -550,13 +552,22 @@ class ArrangementService:
             )
             replacement = clip.model_copy(deep=True)
             replacement.id, replacement.asset, replacement.name = uid(), identity, role
+            replacement.offset, replacement.duration = clip_window(task)
+            scale = 1 / ratio
+            replacement.fade_in *= scale
+            replacement.fade_out *= scale
+            # A rounded audio boundary may be up to one sample shorter than the UI trim.
+            if replacement.fade_in + replacement.fade_out > replacement.duration:
+                fade_scale = replacement.duration / (replacement.fade_in + replacement.fade_out)
+                replacement.fade_in *= fade_scale
+                replacement.fade_out = replacement.duration - replacement.fade_in
+            for point in replacement.volume_points:
+                point.time = (
+                    replacement.duration
+                    if point.time == clip.duration
+                    else min(replacement.duration, point.time * scale)
+                )
             if task["stage"] == "transform":
-                replacement.offset /= ratio
-                replacement.duration /= ratio
-                replacement.fade_in /= ratio
-                replacement.fade_out /= ratio
-                for point in replacement.volume_points:
-                    point.time /= ratio
                 replacement.name = clip.name + " · fitted"
                 if task.get("fit"):
                     replacement.start = task["fit"]["start"]
@@ -574,6 +585,11 @@ class ArrangementService:
                     + task_id
                     + "; source "
                     + task["input_sha256"]
+                    + (
+                        "; source range " + json.dumps(task["source_range"])
+                        if task.get("source_range")
+                        else ""
+                    )
                     + ("; beat fit " + json.dumps(task["fit"]) if task.get("fit") else "")
                     + (
                         ". Original attribution: " + clip.origin.model_dump_json()
@@ -765,17 +781,18 @@ class ArrangementService:
         if sha256(path) != record["sha256"]:
             raise StudioError("Melody checksum changed")
         source = Clip.model_validate(task["source_clip"])
+        offset, _ = clip_window(task)
         beat = 60 / state["content"]["bpm"]
         notes = []
         for n in read_json(path)["notes"]:
-            start = max(n["start"], source.offset)
-            end = min(n["end"], source.offset + source.duration)
+            start = max(n["start"], offset)
+            end = min(n["end"], offset + source.duration)
             if end <= start:
                 continue
             notes.append(
                 Note(
                     pitch=n["pitch"],
-                    start=(start - source.offset) / beat,
+                    start=(start - offset) / beat,
                     length=(end - start) / beat,
                     velocity=80,
                 )

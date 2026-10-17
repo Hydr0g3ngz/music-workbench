@@ -59,6 +59,8 @@ def test_main_workstation_passes_model_controls_to_task_queue(client, monkeypatc
     task = calls[0][1]
     assert task.device == "cpu" and task.language == "zh" and task.strength == 0.35
     assert task.asset != "current"  # Always use the selected clip's original asset.
+    assert task.range.start == clip["offset"]
+    assert task.range.end == clip["offset"] + clip["duration"]
     response = client.post(
         f"/api/workstation/projects/{state['id']}/process",
         json={

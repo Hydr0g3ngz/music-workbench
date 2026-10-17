@@ -49,7 +49,10 @@ def test_constant_tempo_fit_preserves_pickup_and_places_anchor_exactly():
         )
 
 
-def test_fitted_result_has_fixed_timing_rejects_changed_bpm_and_undoes(tmp_path, monkeypatch):
+@pytest.mark.parametrize("offset,duration", [(0.1, 1.8), (0.100007, 1.800007)])
+def test_fitted_result_has_fixed_timing_rejects_changed_bpm_and_undoes(
+    tmp_path, monkeypatch, offset, duration
+):
     def worker(command, *args, **kwargs):
         request = read_json(Path(command[-1]))
         output = Path(request["output"])
@@ -57,7 +60,7 @@ def test_fitted_result_has_fixed_timing_rejects_changed_bpm_and_undoes(tmp_path,
         # Frame-count fixture; actual phase-vocoder timing is verified in the real browser run.
         sf.write(
             output / "transformed.wav",
-            np.zeros((round(44100 * 2 / 1.2), 2)),
+            np.zeros((round(sf.info(request["input"]).frames / 1.2), 2)),
             44100,
             subtype="FLOAT",
         )
@@ -87,7 +90,14 @@ def test_fitted_result_has_fixed_timing_rejects_changed_bpm_and_undoes(tmp_path,
         state = import_audio(client, prefix, 0, np.zeros(88200))
         clip = state["content"]["tracks"][0]["clips"][0]
         state["content"]["bpm"] = 120
-        clip.update(offset=0.1, duration=1.8)
+        clip.update(
+            offset=offset,
+            duration=duration,
+            volume_points=[
+                {"time": 0, "db": -3},
+                {"time": duration, "db": 0},
+            ],
+        )
         state = client.put(prefix, json={"revision": 1, "content": state["content"]}).json()
         payload = {
             "revision": 2,
@@ -119,9 +129,10 @@ def test_fitted_result_has_fixed_timing_rejects_changed_bpm_and_undoes(tmp_path,
         assert result.status_code == 200, result.text
         fitted = result.json()
         c = fitted["content"]["tracks"][0]["clips"][0]
-        assert c["start"] == pytest.approx(3.75)
-        assert c["offset"] == pytest.approx(0.1 / 1.2)
-        assert c["duration"] == pytest.approx(1.5)
+        assert c["start"] == pytest.approx(4 - (0.4 - offset) / 1.2)
+        assert c["offset"] == 0
+        assert c["duration"] == round(task["input_audio"]["frames"] / 1.2) / 44100
+        assert c["volume_points"][-1]["time"] == c["duration"]
         assert "beat fit" in c["origin"]["details"]
         comparison = client.post(
             prefix + "/comparisons",

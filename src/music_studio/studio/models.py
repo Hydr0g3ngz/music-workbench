@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class StrictModel(BaseModel):
@@ -90,6 +90,17 @@ class SelectionRequest(RevisionRequest):
     end: float = Field(gt=0)
 
 
+class AudioRange(StrictModel):
+    start: float = Field(ge=0)
+    end: float = Field(gt=0)
+
+    @model_validator(mode="after")
+    def ordered(self):
+        if self.end <= self.start:
+            raise ValueError("Audio range end must follow its start")
+        return self
+
+
 class LocalTaskRequest(RevisionRequest):
     model: str = Field(min_length=1, max_length=80)
     asset: str = Field(
@@ -100,6 +111,9 @@ class LocalTaskRequest(RevisionRequest):
         "Use asset:<id> for a completed task's audio output.",
     )
     device: Literal["auto", "cpu", "cuda"] = "auto"
+    range: AudioRange | None = Field(
+        default=None, description="Source seconds to process; omitted means the whole asset."
+    )
     alignment: Literal["auto", "native", "qwen"] = "auto"
     time_ratio: float = Field(default=1, ge=0.5, le=2)
     pitch_shift: int = Field(default=0, ge=-12, le=12)

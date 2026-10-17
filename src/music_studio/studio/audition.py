@@ -14,6 +14,7 @@ from pydantic import Field
 from ..io import fingerprint, read_json, sha256, write_json
 from .models import RevisionRequest
 from .service import StudioError
+from .task_range import clip_window
 
 REF = r"^(clip|generation):[a-f0-9]{16}$|^processing:[a-f0-9]{16}:[a-f0-9]{16}$"
 
@@ -70,9 +71,8 @@ def resolve(service, creation, state, reference):
             path, meta = service.studio.tasks.artifact_path(task["source_project"], artifact[0])
             if sha256(path) != meta["sha256"]:
                 raise StudioError("Candidate audio changed; prepare a new comparison", 409)
-            clip = task["source_clip"]
-            ratio = task.get("time_ratio", 1) if task["stage"] == "transform" else 1
-            return path, clip["offset"] / ratio, clip["duration"] / ratio, record["role"]
+            offset, duration = clip_window(task)
+            return path, offset, duration, record["role"]
     raise StudioError("Audio candidate is not available in this project", 404)
 
 

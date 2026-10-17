@@ -1,3 +1,3 @@
 """Local song analysis engine."""
 
-__version__ = "0.2.0.dev17"
+__version__ = "0.2.0.dev18"

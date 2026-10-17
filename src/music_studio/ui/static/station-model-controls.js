@@ -29,7 +29,21 @@
     }
     return values;
   }
-  const api = { controls, read };
+  function clipWindow(task) {
+    const clip = task?.source_clip;
+    const ratio = task?.stage === "transform" ? task.time_ratio || 1 : 1;
+    if (clip && task.source_range?.scope === "clip" && task.input_audio)
+      return {offset: 0, duration: Math.round(task.input_audio.frames / ratio) / task.input_audio.sample_rate};
+    return {
+      offset: Math.max(0, (clip?.offset || 0) - (task?.source_range?.start || 0)) / ratio,
+      duration: clip ? clip.duration / ratio : null,
+    };
+  }
+  function sourceReport(task, report) {
+    const origin = task?.source_range?.start || 0;
+    return { ...report, beats: report.beats?.map((time) => time + origin) };
+  }
+  const api = { controls, read, clipWindow, sourceReport };
   if (typeof module !== "undefined") module.exports = api;
   else root.StationModelControls = api;
 })(typeof window === "undefined" ? globalThis : window);

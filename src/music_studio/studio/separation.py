@@ -9,6 +9,7 @@ import numpy as np
 import soundfile as sf
 
 from ..audio import write_stem
+from ..inference_cache import inference_model
 from ..io import read_json, sha256
 
 SOURCE_REVISION = "6fdad13686bb7e84d029ec66f9dbe76e65c93ebf"
@@ -82,10 +83,14 @@ def separate(source, output, settings):
     config = ConfigDict(yaml.load((root / "profile.yaml").read_text(), Loader=yaml.FullLoader))
     config.inference.batch_size = 1
     config.training.use_amp = settings["device"] == "cuda"
-    model = MelBandRoformer(**config.model)
-    state = torch.load(root / "MelBandRoformer.ckpt", map_location="cpu", weights_only=True)
-    model.load_state_dict(state, strict=True)
-    model.eval().to(settings["device"])
+
+    def load_model():
+        model = MelBandRoformer(**config.model)
+        state = torch.load(root / "MelBandRoformer.ckpt", map_location="cpu", weights_only=True)
+        model.load_state_dict(state, strict=True)
+        return model.eval().to(settings["device"])
+
+    model = inference_model(("roformer", str(root), WEIGHT_SHA256, settings["device"]), load_model)
     data, rate = sf.read(source, dtype="float32", always_2d=True)
     if rate != 44100 or data.shape[1] != 2:
         raise ValueError("RoFormer requires canonical stereo 44.1 kHz audio")

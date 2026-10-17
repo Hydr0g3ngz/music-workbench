@@ -68,9 +68,7 @@ window.StationAudition = {
             .map((a) => ({
               id: `processing:${t.id}:${a.id}`,
               name: `${t.model} · ${a.role} · ${t.source_clip.name}`,
-              duration:
-                t.source_clip.duration /
-                (t.stage === "transform" ? t.time_ratio : 1),
+              duration: StationModelControls.clipWindow(t).duration,
               fit: t.fit,
               sourceClip: t.source_clip,
             })),

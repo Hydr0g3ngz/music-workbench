@@ -1,10 +1,13 @@
-"""One isolated capability invocation. Exiting releases its model and GPU memory."""
+"""Isolated invocation or a serial, queue-owned worker with bounded model reuse."""
 
+import contextlib
 import csv
+import json
 import os
 import sys
 import threading
 import time
+import traceback
 from pathlib import Path
 
 from ..io import read_json, sha256, write_json
@@ -65,6 +68,9 @@ def synthesize_notes(path, melody, duration, rate=44100):
 
 
 def execute(request):
+    from ..inference_cache import cache_hits
+
+    hits_before = cache_hits()
     source, output = Path(request["input"]), Path(request["output"])
     config = request["settings"]
     if sha256(source) != request["input_sha256"]:
@@ -99,7 +105,11 @@ def execute(request):
             if model == "qwen3-asr" and torch.cuda.get_device_capability()[0] < 8:
                 raise RuntimeError("Qwen BF16 inference needs an Ampere or newer GPU; choose CPU")
             minimum = {"qwen3-asr": 6000, "mel-band-roformer-kj": 3000}.get(model)
-            if minimum and torch.cuda.mem_get_info()[0] / 1024**2 < minimum:
+            if (
+                minimum
+                and not request.get("worker_reused")
+                and torch.cuda.mem_get_info()[0] / 1024**2 < minimum
+            ):
                 raise RuntimeError(
                     f"This tool needs {minimum / 1000:g} GB free VRAM; "
                     "close other GPU applications or choose CPU"
@@ -179,6 +189,8 @@ def execute(request):
         # even if the parent shell enabled reuse for an unrelated benchmark batch.
         os.environ.pop("MUSIC_STUDIO_REUSE_RECOGNIZER", None)
         os.environ.pop("MUSIC_STUDIO_REUSE_ALIGNER", None)
+        if model == "qwen3-asr":
+            os.environ.pop("MUSIC_WORKBENCH_REUSE_MODEL", None)
         from ..backends.lyrics import transcribe
         from .transcripts import write_text_exports
 
@@ -246,12 +258,50 @@ def execute(request):
             "compute_type": config.get("_compute_type"),
             "torch_peak_mb": peak,
             "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+            "worker_reused": request.get("worker_reused", False),
+            "model_reused": cache_hits() > hits_before,
+            "worker_pid": os.getpid(),
         },
     }
     write_json(output / "result.json", result)
 
 
+def serve(pid):
+    from .warm_worker import REUSABLE
+
+    threading.Thread(target=watch_owner, args=(pid,), daemon=True).start()
+    identity = None
+    count = 0
+    for line in sys.stdin:
+        request_file = Path(json.loads(line))
+        code = 0
+        with (request_file.parent / "worker.log").open("w", encoding="utf-8") as log:
+            with contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
+                try:
+                    request = read_json(request_file)
+                    current = (request["model"], request["settings"])
+                    if request["model"] not in REUSABLE or (identity and current != identity):
+                        raise ValueError(
+                            "Reusable worker received a different capability or settings"
+                        )
+                    if request["owner_pid"] != pid:
+                        raise ValueError("Reusable worker owner changed")
+                    identity = (current[0], current[1].copy())
+                    request["worker_reused"] = count > 0
+                    execute(request)
+                    count += 1
+                except Exception:
+                    traceback.print_exc()
+                    code = 1
+        write_json(request_file.parent / "worker-response.json", {"code": code})
+        if code:
+            return
+
+
 if __name__ == "__main__":
-    request = read_json(Path(sys.argv[1]))
-    threading.Thread(target=watch_owner, args=(request["owner_pid"],), daemon=True).start()
-    execute(request)
+    if sys.argv[1] == "--serve":
+        serve(int(sys.argv[2]))
+    else:
+        request = read_json(Path(sys.argv[1]))
+        threading.Thread(target=watch_owner, args=(request["owner_pid"],), daemon=True).start()
+        execute(request)
