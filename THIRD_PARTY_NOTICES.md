@@ -19,6 +19,9 @@ Music Workbench's application code is MIT licensed; shared engine code retains i
 | PyAV / FFmpeg | Audio decoding | [PyAV license](https://github.com/PyAV-Org/PyAV/blob/main/LICENSE.txt); FFmpeg and binary build terms remain applicable to the upstream distribution |
 | python-soundfile / libsndfile | Float WAV export | [SoundFile licensing](https://github.com/bastibe/python-soundfile#license) |
 | mido | MIDI export | [MIT](https://github.com/mido/mido/blob/main/LICENSE) |
+| Basic Pitch 0.4.0 | Optional polyphonic note extraction; source and ONNX from the hash-pinned official wheel | [Apache-2.0, Spotify](https://github.com/spotify/basic-pitch/blob/main/LICENSE); upstream LICENSE is retained in the managed pack |
+| ONNX Runtime 1.23.2 | Basic Pitch CPU inference | [MIT, Microsoft](https://github.com/microsoft/onnxruntime/blob/main/LICENSE) |
+| pretty_midi 0.2.11 | Basic Pitch note/MIDI processing | [MIT](https://github.com/craffel/pretty-midi/blob/main/LICENSE.txt) |
 | Sherpa-ONNX 1.13.8 | CPU speech enhancement runtime | [Apache-2.0](https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE) |
 | DPDFNet2 48 kHz HR | Optional speech cleanup weights | [Apache-2.0, Ceva](https://github.com/ceva-ip/DPDFNet); official Sherpa export pinned by SHA-256, not bundled |
 | GTCRN | Experimental optional speech cleanup weights | [MIT, Xiaobin Rong](https://github.com/Xiaobin-Rong/gtcrn); official Sherpa export pinned by SHA-256, not bundled |

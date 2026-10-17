@@ -957,7 +957,6 @@ small,
 .fader-row input {
   writing-mode: vertical-lr;
   direction: rtl;
-  appearance: slider-vertical;
   width: 18px;
   height: 70px;
   accent-color: #c3c0d2;

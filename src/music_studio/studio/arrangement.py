@@ -18,7 +18,7 @@ from fastapi.routing import APIRoute
 from pydantic import Field, model_validator
 
 from ..io import fingerprint
-from . import dsp, library, midi_import
+from . import dsp, library, midi_import, routing
 from . import effects as mix_effects
 from .composition import Blueprint, Role
 from .envelope import VolumePoint
@@ -55,6 +55,7 @@ class Origin(StrictModel):
 
 class Clip(StrictModel):
     id: str = Field(pattern=ID)
+    group: str | None = Field(default=None, pattern=ID)
     name: str = Field(min_length=1, max_length=150)
     asset: str | None = Field(default=None, pattern=ID)
     start: float = Field(default=0, ge=0, le=600)
@@ -91,6 +92,8 @@ class Track(StrictModel):
     solo: bool = False
     instrument: Literal["keys", "bass", "pad", "vcsl-piano", "vcsl-marimba", "vcsl-drums"] = "keys"
     effects: mix_effects.Effects = Field(default_factory=mix_effects.Effects)
+    output: str | None = Field(default=None, pattern=ID)
+    sends: list[routing.Send] = Field(default_factory=list, max_length=8)
     clips: list[Clip] = Field(default_factory=list, max_length=128)
 
 
@@ -141,9 +144,16 @@ class Arrangement(StrictModel):
     sections: list[Section] = Field(default_factory=list, max_length=64)
     blueprint: Blueprint = Field(default_factory=Blueprint)
     tracks: list[Track] = Field(default_factory=list, max_length=32)
+    buses: list[routing.Bus] = Field(default_factory=list, max_length=8)
 
     @model_validator(mode="after")
     def timing_bounds(self):
+        routing.validate(self.tracks, self.buses)
+        ids = [b.id for b in self.buses] + [
+            identity for t in self.tracks for identity in (t.id, *(c.id for c in t.clips))
+        ]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Track, clip and bus identifiers must be unique")
         if self.loop.end * 60 / self.bpm > 600 + 1e-9:
             raise ValueError("Loop end exceeds the 10-minute timeline")
         if any(s.end * 60 / self.bpm > 600 + 1e-9 for s in self.sections):
@@ -175,6 +185,9 @@ class PatternRequest(RevisionRequest):
 
 
 class ProcessClip(RevisionRequest):
+    note_onset: float = Field(default=0.5, ge=0.1, le=0.95)
+    note_frame: float = Field(default=0.3, ge=0.05, le=0.95)
+    note_min_ms: float = Field(default=127.7, ge=40, le=1000)
     clip: str = Field(pattern=ID)
     model: str = Field(min_length=1, max_length=80)
     time_ratio: float = Field(default=1, ge=0.5, le=2)
@@ -431,6 +444,9 @@ class ArrangementService:
                 alignment=request.alignment,
                 language=request.language,
                 strength=request.strength,
+                note_onset=request.note_onset,
+                note_frame=request.note_frame,
+                note_min_ms=request.note_min_ms,
             ),
         )
         with self.studio.transaction() as db:
@@ -794,7 +810,7 @@ class ArrangementService:
                     pitch=n["pitch"],
                     start=(start - offset) / beat,
                     length=(end - start) / beat,
-                    velocity=80,
+                    velocity=n.get("velocity", 80),
                 )
             )
         if not notes:
@@ -806,27 +822,27 @@ class ArrangementService:
         content.tracks.append(
             Track(
                 id=uid(),
-                name=source.name + " · melody",
+                name=source.name + " · notes",
                 kind="midi",
-                instrument="vcsl-marimba",
+                instrument="vcsl-piano" if task["model"] == "basic-pitch" else "vcsl-marimba",
                 gain_db=-9,
                 color=COLORS[len(content.tracks) % len(COLORS)],
                 clips=[
                     Clip(
                         id=uid(),
-                        name=source.name + " · melody",
+                        name=source.name + " · notes",
                         start=source.start,
                         duration=source.duration,
                         notes=notes,
                         origin=Origin(
-                            title=source.name + " · estimated melody",
+                            title=source.name + " · estimated notes",
                             author=source.origin.author if source.origin else "",
                             source_url=source.origin.source_url if source.origin else "",
                             sha256=record["sha256"],
                             license=source.origin.license if source.origin else "unspecified",
                             details=(
                                 f"{task['model']}; {spec['source']}; task {task_id}; "
-                                "monophonic estimates, not score ground truth. "
+                                "Estimated editable notes, not score ground truth. "
                                 + (source.origin.details if source.origin else "")
                             )[:3000],
                         ),
@@ -960,13 +976,12 @@ class ArrangementService:
         end = max((c.start + c.duration for t in content.tracks for c in t.clips), default=0)
         if not end:
             raise StudioError("Add a clip before exporting")
-        solo = any(t.solo for t in content.tracks)
-        active = [t for t in content.tracks if not t.mute and (not solo or t.solo)]
+        active = [t for t in content.tracks if routing.audible(t, content.tracks)]
         end = max(
             end,
             max(
                 (
-                    c.start + c.duration + mix_effects.tail(t.effects)
+                    c.start + c.duration + routing.tail(t, content.buses)
                     for t in active
                     for c in t.clips
                 ),
@@ -974,6 +989,7 @@ class ArrangementService:
             ),
         )
         racks = {t.id: mix_effects.Rack(t.effects, RATE) for t in active}
+        bus_racks = {b.id: mix_effects.Rack(b.effects, RATE) for b in content.buses}
         limiter = mix_effects.OutputLimiter(content.limiter, RATE)
         with ExitStack() as stack:
             assets = {
@@ -986,6 +1002,7 @@ class ArrangementService:
             for base in range(0, round(end * RATE), 16384):
                 count = min(16384, round(end * RATE) - base)
                 mixed = np.zeros((count, 2), dtype=np.float64)
+                buses = {b.id: np.zeros_like(mixed) for b in content.buses}
                 for track in active:
                     track_mix = np.zeros((count, 2), dtype=np.float64)
                     for clip in track.clips:
@@ -1012,9 +1029,19 @@ class ArrangementService:
                         envelope = clip_envelope(relative, clip)
                         track_mix[start - base : stop - base] += data * envelope[:, None]
                     track_mix = racks[track.id].process(track_mix)
-                    gain = 10 ** ((track.gain_db + content.master_db) / 20)
-                    mixed += dsp.balance(track_mix, track.pan) * gain
-                mixed = limiter.process(mixed)
+                    signal = dsp.balance(track_mix, track.pan) * 10 ** (track.gain_db / 20)
+                    if track.output:
+                        buses[track.output] += signal
+                    elif not any(b.solo for b in content.buses):
+                        mixed += signal
+                    for send in track.sends:
+                        if send.enabled:
+                            buses[send.bus] += signal * 10 ** (send.gain_db / 20)
+                for bus in content.buses:
+                    signal = bus_racks[bus.id].process(buses[bus.id])
+                    if routing.bus_audible(bus, content.buses):
+                        mixed += dsp.balance(signal, bus.pan) * 10 ** (bus.gain_db / 20)
+                mixed = limiter.process(mixed * 10 ** (content.master_db / 20))
                 if not np.isfinite(mixed).all() or np.max(np.abs(mixed), initial=0) >= 1:
                     raise StudioError(
                         "Master exceeds 0 dBFS; lower the master fader and export again"

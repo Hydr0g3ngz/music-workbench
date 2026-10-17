@@ -19,7 +19,7 @@
 | 综合音乐转谱 | [SheetSage2](https://huggingface.co/m-a-p/SheetSage2) | 旋律、和弦、节拍、调性、段落到 ABC/MIDI/事件；适合接入工程音乐结构 | 权重 CC BY-NC 4.0，依赖 MERT2；隔离环境、验证时间/音高与曲谱往返 |
 | 钢琴转录 | [Transkun](https://github.com/Yujia-Yan/Transkun) | 钢琴复音、力度与起止音的专用候选 | 代码 MIT；固定模型和许可，使用真实钢琴参考评测；钢琴结果不外推到完整混音 |
 | 多乐器转录 | [YourMT3+](https://github.com/mimbres/YourMT3) | 多乐器音频到带乐器信息的 MIDI | 仓库 GPL-3.0，README 指向预发布实现；先验证代码/权重可复现性与许可 |
-| 轻量音频转 MIDI | [Basic Pitch](https://github.com/spotify/basic-pitch) | 轻量对照、音高弯曲与单乐器素材，补充专用大模型 | 较早基线，不标为最新 SOTA；混合多乐器与起止音误差需单独测 |
+| 轻量音频转 MIDI | [Basic Pitch](https://github.com/spotify/basic-pitch) | dev20 已接入 ONNX CPU，多音结果可加入乐器轨修改 | 较早基线，不标为 SOTA；[实测](polyphony-benchmark.md)与[边界](polyphonic-notes.md)，弯音不进入钢琴卷帘 |
 | 可控歌声合成 | [OpenVPI DiffSinger](https://github.com/openvpi/DiffSinger) | 音符和歌词到歌声，控制音高与表现参数 | 代码 Apache-2.0；声库/声码器许可分别核查，验证中英音素、时长和调音参数 |
 | 歌声/音色转换 | [Seed-VC](https://github.com/Plachtaa/seed-vc) | 参考声音条件下的语音/歌声转换候选 | GPL-3.0，仓库已归档；可作基线或可替换适配器，不认定为当前最佳 |
 | 配音/声音设计 | [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS) | 0.6B/1.7B 系列，语音合成、声音设计与参考声音克隆 | 代码 Apache-2.0；按具体版本区分能力，测长文本、时延和权重许可 |

@@ -13,7 +13,8 @@
     envelopePanel,
     fitPanel,
     auditionPanel,
-    tutorialPanel;
+    tutorialPanel,
+    productionPanel;
   const s = {
     session: null,
     track: null,
@@ -428,6 +429,7 @@
     fitPanel?.render();
     auditionPanel?.render();
     tutorialPanel?.render();
+    productionPanel?.render();
     $("session-summary").textContent = tr(
       `${content().tracks.length} 轨道 · ${s.session.assets.length} 音频素材`,
       `${content().tracks.length} tracks · ${s.session.assets.length} audio assets`,
@@ -486,6 +488,7 @@
     fitPanel?.render();
     for (const t of content().tracks) for (const c of t.clips) drawClip(t, c);
     workflowPanel?.render();
+    productionPanel?.render();
   }
   function drawClip(t, c) {
     const canvas = document.querySelector(`[data-wave="${c.id}"]`);
@@ -542,6 +545,7 @@
         )
         .join("") +
       `<div class="channel master-channel"><span class="channel-name">MASTER</span><span class="channel-db">STEREO OUT</span><div class="fader-row"><input type="range" min="-60" max="6" step=".5" value="${content().master_db}" data-master aria-label="${tr("主输出音量", "Master output")}"><div class="vu"><span id="master-vu"></span></div></div><span class="channel-db" id="master-db">${content().master_db.toFixed(1)} dB</span><button class="channel-fx ${content().limiter?.enabled ? "active" : ""}" data-open-effects="master">${tr("峰值保护", "Peak guard")} ${content().limiter?.enabled ? "●" : "+"}</button></div>`;
+    productionPanel?.mixer();
   }
   function fxActive(track) {
     const fx = StationEffects.normalize(track.effects);
@@ -912,6 +916,17 @@
     });
   }
   function duplicate() {
+    const selection = productionPanel?.selection() || [];
+    if (selection.length > 1) {
+      const items = content()
+        .tracks.flatMap((t) => t.clips)
+        .filter((c) => selection.includes(c.id));
+      return productionPanel.apply(
+        "copy",
+        Math.max(...items.map((c) => c.start + c.duration)) -
+          Math.min(...items.map((c) => c.start)),
+      );
+    }
     const t = selectedTrack(),
       c = selectedClip();
     if (!c) return;
@@ -926,6 +941,8 @@
     });
   }
   function removeClip() {
+    if ((productionPanel?.selection() || []).length > 1)
+      return productionPanel.apply("delete");
     const t = selectedTrack();
     if (!t || !s.clip) return;
     mutate(() => {
@@ -1104,7 +1121,11 @@
       const profile = health.hardware?.recommended;
       $("generation-health").textContent += profile
         ? ` · ${tr("自动建议：", "Auto recommendation: ")}${profile.gpu.name} · ${profile.id} · ${profile.quantization ? "DiT INT8" : "BF16"}`
-        : " · " + tr("生成前会检查显存和兼容性", "VRAM and compatibility checked before generation");
+        : " · " +
+          tr(
+            "生成前会检查显存和兼容性",
+            "VRAM and compatibility checked before generation",
+          );
     }
     $("generation-health").title = health?.message || "";
     $("generation-bpm").textContent = s.session ? `${content().bpm} BPM` : "";
@@ -1195,12 +1216,16 @@
   const modelOptions = {};
   function renderModels() {
     for (const card of $("model-list").querySelectorAll("[data-model-card]")) {
-      try { modelOptions[card.dataset.modelCard] = StationModelControls.read(card); } catch { /* Keep last valid values. */ }
+      try {
+        modelOptions[card.dataset.modelCard] = StationModelControls.read(card);
+      } catch {
+        /* Keep last valid values. */
+      }
     }
     $("model-list").innerHTML = s.models
       .map(
         (m) =>
-          `<div class="model-card" data-model-card="${esc(m.id)}"><strong>${esc(m.title[s.lang === "zh" ? 0 : 1])}</strong><small>${esc(m.description[s.lang === "zh" ? 0 : 1])}</small>${StationModelControls.controls(m, modelOptions[m.id], s.lang)}<small>${m.execution_device === "cuda" ? tr("自动模式默认：NVIDIA GPU", "Automatic defaults to NVIDIA GPU") : m.execution_device === "cpu" ? (m.device === "cpu" ? tr("使用 CPU", "Runs on CPU") : tr("自动模式默认：CPU", "Automatic defaults to CPU")) : tr("检查后显示实际运行设备", "Check to see the runtime device")}${m.stage === "melody" ? tr(" · 请使用独唱、哼唱或单音乐器，CPU 提取可能较慢。", " · Use solo singing, humming or a monophonic instrument. CPU extraction can be slow.") : ""}</small>${m.setup_url && !m.runnable ? `<a class="model-setup-link" href="${esc(m.setup_url)}">${tr("安装此工具 →", "Set up this tool →")}</a>` : ""}<div class="model-actions"><span>${esc(({verified: tr("已验证", "Verified"), unchecked: tr("待检查", "Not checked"), missing: tr("缺少组件", "Missing components"), failed: tr("检查失败", "Check failed")})[m.health.state] || m.health.state)} · ${m.health.weights ? tr("权重已缓存", "weights cached") : tr("权重待检查", "check weights")}</span><button data-check-model="${m.id}">${tr("检查", "Check")}</button><button data-run-model="${m.id}" ${m.runnable ? "" : "disabled"}>${tr("运行", "Run")}</button></div></div>`,
+          `<div class="model-card" data-model-card="${esc(m.id)}"><strong>${esc(m.title[s.lang === "zh" ? 0 : 1])}</strong><small>${esc(m.description[s.lang === "zh" ? 0 : 1])}</small>${StationModelControls.controls(m, modelOptions[m.id], s.lang)}<small>${m.execution_device === "cuda" ? tr("自动模式默认：NVIDIA GPU", "Automatic defaults to NVIDIA GPU") : m.execution_device === "cpu" ? (m.device === "cpu" ? tr("使用 CPU", "Runs on CPU") : tr("自动模式默认：CPU", "Automatic defaults to CPU")) : tr("检查后显示实际运行设备", "Check to see the runtime device")}${m.stage === "melody" && m.id !== "basic-pitch" ? tr(" · 请使用独唱、哼唱或单音乐器，CPU 提取可能较慢。", " · Use solo singing, humming or a monophonic instrument. CPU extraction can be slow.") : ""}</small>${m.setup_url && !m.runnable ? `<a class="model-setup-link" href="${esc(m.setup_url)}">${tr("安装此工具 →", "Set up this tool →")}</a>` : ""}<div class="model-actions"><span>${esc({ verified: tr("已验证", "Verified"), unchecked: tr("待检查", "Not checked"), missing: tr("缺少组件", "Missing components"), failed: tr("检查失败", "Check failed") }[m.health.state] || m.health.state)} · ${m.health.weights ? tr("权重已缓存", "weights cached") : tr("权重待检查", "check weights")}</span><button data-check-model="${m.id}">${tr("检查", "Check")}</button><button data-run-model="${m.id}" ${m.runnable ? "" : "disabled"}>${tr("运行", "Run")}</button></div></div>`,
       )
       .join("");
   }
@@ -1254,6 +1279,9 @@
       failed: ["失败", "Failed"],
       vocals: ["人声", "Vocals"],
       instrumental: ["伴奏", "Backing"],
+      melody: ["音符数据", "Note data"],
+      midi: ["MIDI", "MIDI"],
+      "note-synthesis": ["音符合成试听", "Synthesized notes"],
       "separation-report": ["处理报告", "Separation report"],
     };
     return labels[value] ? tr(...labels[value]) : value;
@@ -1269,9 +1297,21 @@
   }
   function timingNotice(method) {
     if (!method) return "";
-    if (method.includes("fallback")) return tr("部分字词时间需复核 · 打开详细结果查看", "Some word times need review · open Details and editing");
-    if (method.includes("coarse")) return tr("粗略段落时间 · 可选择逐字对齐重新处理", "Coarse paragraph timing · choose word alignment to rerun");
-    if (method.endsWith("_forced_alignment")) return tr("已生成声学字词时间 · 请试听核对", "Acoustic word times generated · audition to verify");
+    if (method.includes("fallback"))
+      return tr(
+        "部分字词时间需复核 · 打开详细结果查看",
+        "Some word times need review · open Details and editing",
+      );
+    if (method.includes("coarse"))
+      return tr(
+        "粗略段落时间 · 可选择逐字对齐重新处理",
+        "Coarse paragraph timing · choose word alignment to rerun",
+      );
+    if (method.endsWith("_forced_alignment"))
+      return tr(
+        "已生成声学字词时间 · 请试听核对",
+        "Acoustic word times generated · audition to verify",
+      );
     return "";
   }
   function renderTasks() {
@@ -1283,7 +1323,7 @@
         s.tasks
           .map(
             (t) =>
-              `<div class="task-row"><span><strong>${esc(t.model)}</strong><small>${esc(t.error || taskLabel(t.status))}</small>${t.metrics ? `<small>${esc(t.metrics.device.toUpperCase())} · ${t.metrics.seconds.toFixed(1)}s${t.metrics.model_reused ? " · " + tr("已复用模型", "Model reused") : ""}${t.metrics.realtime_factor == null ? "" : " · " + t.metrics.realtime_factor.toFixed(2) + "× " + tr("音频时长", "audio duration")}</small>` : ""}${timingNotice(t.metrics?.timing_method) ? `<small>${esc(timingNotice(t.metrics.timing_method))}</small>` : ""}${t.source_clip ? `<small>${esc(t.source_clip.name)} · ${t.source_clip.start.toFixed(2)}s · ${t.source_range?.scope === "clip" ? tr(`处理片段 ${t.source_range.start.toFixed(2)}–${t.source_range.end.toFixed(2)} s · 导出时间从 0 开始`, `Clip ${t.source_range.start.toFixed(2)}–${t.source_range.end.toFixed(2)} s · exports start at 0`) : tr("完整素材处理，采用时保留片段范围", "Full source processed; clip bounds retained on adoption")}</small>` : ""}</span>${t.status === "complete" && ["separate", "transform"].includes(t.stage) && t.source_clip ? `<button data-adopt-stems="${t.id}" ${canReplaceStems(t) ? "" : "disabled"} title="${tr("源片段更改或移除后，需要先撤销再替换", "Undo source clip changes or removal before replacing")}">${t.stage === "transform" ? tr("采用适配结果", "Adopt fitted result") : tr("用分轨替换片段", "Replace clip with stems")}</button>` : ""}${t.status === "complete" && t.stage === "melody" && t.source_clip ? `<button data-adopt-melody="${t.id}">${tr("旋律加入乐器轨", "Add melody as notes")}</button>` : ""}${
+              `<div class="task-row"><span><strong>${esc(t.model)}</strong><small>${esc(t.error || taskLabel(t.status))}</small>${t.metrics ? `<small>${esc(t.metrics.device.toUpperCase())} · ${t.metrics.seconds.toFixed(1)}s${t.metrics.model_reused ? " · " + tr("已复用模型", "Model reused") : ""}${t.metrics.realtime_factor == null ? "" : " · " + t.metrics.realtime_factor.toFixed(2) + "× " + tr("音频时长", "audio duration")}</small>` : ""}${timingNotice(t.metrics?.timing_method) ? `<small>${esc(timingNotice(t.metrics.timing_method))}</small>` : ""}${t.source_clip ? `<small>${esc(t.source_clip.name)} · ${t.source_clip.start.toFixed(2)}s · ${t.source_range?.scope === "clip" ? tr(`处理片段 ${t.source_range.start.toFixed(2)}–${t.source_range.end.toFixed(2)} s · 导出时间从 0 开始`, `Clip ${t.source_range.start.toFixed(2)}–${t.source_range.end.toFixed(2)} s · exports start at 0`) : tr("完整素材处理，采用时保留片段范围", "Full source processed; clip bounds retained on adoption")}</small>` : ""}</span>${t.status === "complete" && ["separate", "transform"].includes(t.stage) && t.source_clip ? `<button data-adopt-stems="${t.id}" ${canReplaceStems(t) ? "" : "disabled"} title="${tr("源片段更改或移除后，需要先撤销再替换", "Undo source clip changes or removal before replacing")}">${t.stage === "transform" ? tr("采用适配结果", "Adopt fitted result") : tr("用分轨替换片段", "Replace clip with stems")}</button>` : ""}${t.status === "complete" && t.stage === "melody" && t.source_clip ? `<button data-adopt-melody="${t.id}">${tr("音符加入乐器轨", "Add notes to instrument track")}</button>` : ""}${
                 t.artifacts
                   .map((a) =>
                     a.kind === "audio"
@@ -1622,6 +1662,7 @@
     if (el && selectedTrack()?.kind === "midi") dock("piano");
   };
   $("track-list").onpointerdown = (e) => {
+    if (productionPanel?.pointer(e)) return;
     if (e.button !== 0) return;
     const el = e.target.closest("[data-clip]");
     if (!el) return;
@@ -2346,7 +2387,7 @@
       $("beat-display").textContent =
         `${Math.floor(beat / 4) + 1} . ${Math.floor(beat % 4) + 1} . ${Math.floor((beat % 1) * 4) + 1}`;
       $("playhead").style.left = `${headWidth() + s.position * s.zoom}px`;
-      for (const t of content().tracks) {
+      for (const t of [...content().tracks, ...(content().buses || [])]) {
         const level = engine.meter(t.id),
           el = document.querySelector(`[data-vu="${t.id}"]`);
         if (el)
@@ -2438,6 +2479,22 @@
         selectLast: true,
       });
     },
+  });
+  productionPanel = StationProduction.mount({
+    $,
+    s,
+    tr,
+    esc,
+    content,
+    uid,
+    mutate,
+    guarded,
+    renderAll,
+    selectedClip,
+    selectedTrack,
+    pause,
+    snap,
+    flush,
   });
   workflowPanel = StationWorkflow.mount({
     $,

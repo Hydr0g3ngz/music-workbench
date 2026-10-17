@@ -12,6 +12,10 @@
     typeof module !== "undefined" && module.exports
       ? require("./station-envelope.js")
       : root.StationEnvelope;
+  const Routing =
+    typeof module !== "undefined" && module.exports
+      ? require("./station-routing.js")
+      : root.StationRouting;
   const uid = () =>
     typeof crypto !== "undefined"
       ? crypto.randomUUID().replaceAll("-", "").slice(0, 16)
@@ -24,7 +28,7 @@
           (c) =>
             c.start +
             c.duration +
-            (audible(t, content.tracks) ? Effects.tail(t.effects) : 0),
+            (audible(t, content.tracks) ? Routing.tail(t, content.buses) : 0),
         ),
       ),
     );
@@ -303,7 +307,7 @@
       if (!ctx.audioWorklet) {
         if (
           content.limiter?.enabled ||
-          content.tracks.some((t) => {
+          [...content.tracks, ...(content.buses || [])].some((t) => {
             const s = Effects.normalize(t.effects);
             return (
               !s.bypass &&
@@ -441,12 +445,18 @@
         ...Effects.limiterDefaults(),
         ...content.limiter,
       });
-      for (const t of content.tracks) {
+      for (const t of [...content.tracks, ...(content.buses || [])]) {
         const g = this.graphs.get(t.id);
         if (!g) continue;
         this.configureEffect(g.effect, Effects.normalize(t.effects));
         g.level.gain.setTargetAtTime(
-          audible(t, content.tracks) ? gain(t.gain_db) : 0,
+          (
+            content.tracks.includes(t)
+              ? audible(t, content.tracks)
+              : Routing.busAudible(t, content.buses || [])
+          )
+            ? gain(t.gain_db)
+            : 0,
           this.ctx.currentTime,
           0.015,
         );
@@ -460,6 +470,21 @@
           this.ctx.currentTime,
           0.015,
         );
+        if (g.direct)
+          g.direct.gain.setTargetAtTime(
+            !t.output && (content.buses || []).some((b) => b.solo) ? 0 : 1,
+            this.ctx.currentTime,
+            0.015,
+          );
+        for (const send of t.sends || []) {
+          g.sends
+            ?.get(send.bus)
+            ?.gain.setTargetAtTime(
+              send.enabled ? gain(send.gain_db) : 0,
+              this.ctx.currentTime,
+              0.015,
+            );
+        }
       }
     }
     async play(content, assets, project, at = this.position) {
@@ -560,6 +585,36 @@
           track.pan > 0 ? Math.cos((track.pan * Math.PI) / 2) : 1;
         graph.right.gain.value =
           track.pan < 0 ? Math.cos((-track.pan * Math.PI) / 2) : 1;
+      }
+      for (const bus of content.buses || []) {
+        const g = this.graph(bus);
+        g.level.gain.value = Routing.busAudible(bus, content.buses)
+          ? gain(bus.gain_db)
+          : 0;
+        g.left.gain.value = bus.pan > 0 ? Math.cos((bus.pan * Math.PI) / 2) : 1;
+        g.right.gain.value =
+          bus.pan < 0 ? Math.cos((-bus.pan * Math.PI) / 2) : 1;
+      }
+      for (const track of content.tracks) {
+        const g = this.graphs.get(track.id);
+        g.analyser.disconnect();
+        g.direct = ctx.createGain();
+        g.nodes.push(g.direct);
+        g.direct.gain.value =
+          !track.output && (content.buses || []).some((b) => b.solo) ? 0 : 1;
+        g.analyser.connect(g.direct);
+        g.direct.connect(
+          track.output ? this.graphs.get(track.output).input : this.master,
+        );
+        g.sends = new Map();
+        for (const send of track.sends || []) {
+          const level = ctx.createGain();
+          level.gain.value = send.enabled ? gain(send.gain_db) : 0;
+          g.analyser.connect(level);
+          level.connect(this.graphs.get(send.bus).input);
+          g.sends.set(send.bus, level);
+          g.nodes.push(level);
+        }
       }
       this.playContent = structuredClone(content);
       this.playBuffers = buffers;

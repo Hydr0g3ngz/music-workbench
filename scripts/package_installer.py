@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import zipfile
@@ -54,9 +55,14 @@ def compile_installer(root, payload, output, compiler, prerequisites, app_id=Non
         "-File", str(root / "scripts/verify-desktop-prerequisite.ps1"),
         "-Path", str(runtime.resolve()),
     ], check=True, env=environment)
+    version = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:\.dev(\d+))?", __version__)
+    if not version:
+        raise ValueError("Installer needs a release or .dev version")
+    file_version = ".".join(part or "0" for part in version.groups())
     arguments = [str(compiler.resolve()), "/Qp", "/DRepo=" + str(root),
                  "/DPayload=" + str(payload.resolve()), "/DDestination=" + str(output.resolve()),
                  "/DBuildVersion=" + __version__,
+                 "/DBuildFileVersion=" + file_version,
                  "/DChineseLanguage=" + str((prerequisites / "ChineseSimplified.isl").resolve()),
                  "/DWebViewInstaller=" + str(runtime.resolve())]
     if app_id:

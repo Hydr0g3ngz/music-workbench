@@ -19,6 +19,21 @@ from .process import TaskStopped, log_tail, run_owned
 from .service import StudioError
 
 CATALOG = {
+    "basic-pitch": {
+        "title": ["独奏乐器 → 多音 MIDI", "Solo instrument → polyphonic MIDI"],
+        "description": [
+            "Basic Pitch ONNX；提取和弦与旋律音符，可试听、修正并加入乐器轨。先分离复杂混音。",
+            "Basic Pitch ONNX: audition, edit and adopt chord/melody notes. "
+            "Separate complex mixtures first.",
+        ],
+        "runtime": "polyphony",
+        "imports": ["onnxruntime", "librosa", "pretty_midi", "mir_eval"],
+        "stage": "melody",
+        "device": "cpu",
+        "license": "Apache-2.0",
+        "weight_id": "Spotify/basic-pitch-0.4.0/icassp_2022/nmp.onnx",
+        "source": "https://github.com/spotify/basic-pitch",
+    },
     "musical-analysis": {
         "title": ["素材速度、调性与电平分析", "Material tempo, key & levels"],
         "description": [
@@ -366,6 +381,8 @@ elif spec['runtime'] == 'lyrics':
         alignment = root/'lyrics/aligner/c7cbfc2048c462b0d63a45797104fc9db3ad62b7'
         weights.extend(alignment/n for n in ('config.json','model.safetensors',
             'tokenizer_config.json','vocab.json','merges.txt','preprocessor_config.json'))
+elif spec['runtime'] == 'polyphony':
+    weights = [root/'basic-pitch-source/basic_pitch/saved_models/icassp_2022/nmp.onnx']
 elif stage == 'melody':
     package = importlib.util.find_spec('torchcrepe')
     weights = [pathlib.Path(package.origin).parent/'assets/full.pth'] if package else []

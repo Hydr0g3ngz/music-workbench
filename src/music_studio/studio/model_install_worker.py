@@ -162,6 +162,10 @@ for name in names:
                 for n in ("config.json", "model.bin", "tokenizer.json", "vocabulary.txt")
             ),
         ]
+    elif pack == "polyphonic-notes":
+        from .polyphony import install_assets
+
+        files = install_assets(root, cache)
     elif pack == "vocal-separation":
         from .model_assets import roformer_assets
 

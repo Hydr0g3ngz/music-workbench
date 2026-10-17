@@ -11,6 +11,22 @@ from .ai_setup import ACTIVE, AISetup, data_root
 from .service import StudioError
 
 PACKS = {
+    "polyphonic-notes": {
+        "title": ["多音音符 · Basic Pitch", "Polyphonic notes · Basic Pitch"],
+        "description": [
+            "Basic Pitch 多音转录，适合独奏乐器。试听音符后加入钢琴卷帘；整曲混音先分轨。",
+            "Basic Pitch polyphony for a solo instrument. Audition and edit notes; "
+            "separate mixtures first.",
+        ],
+        "models": ["basic-pitch"],
+        "device": "cpu",
+        "required_free_bytes": 2 * 1024**3,
+        "download_estimate": "150–350 MB",
+        "backend": "Spotify Basic Pitch 0.4.0 · ONNX CPU · 230 KB checkpoint",
+        "license": "Apache-2.0 (Spotify code and bundled model)",
+        "source": "https://github.com/spotify/basic-pitch",
+        "entry": "/station.html?tools=polyphonic-notes",
+    },
     "music-tools": {
         "title": ["分轨、旋律与转写", "Stems, melody & transcription"],
         "description": [

@@ -1,5 +1,18 @@
 # Changelog / 更新记录
 
+## 0.2.0.dev20 — Group, transcribe and route / 成组编排、多音音符与路由（本地开发版）
+
+Adds independent clip groups, separate history steps for group operations, eight
+one-level mix buses and post-fader sends shared by live/offline rendering. Basic Pitch
+0.4.0 runs in a managed ONNX CPU pack with typed thresholds, audition, editable MIDI
+adoption and exports. Fixes piano-roll pointer capture preventing double-click deletion.
+
+新增成组移动/复制、分组总线与共享湿声混响；Basic Pitch 多音结果能试听、换音色、编辑并导出。
+五首冻结 GuitarSet 开发评测支持保留默认阈值，不代表无偏模型排名。
+《窗灯》从空工程发展到 32 小节并验证 MWB 恢复；本版尚未公开发布到 GitHub。
+
+See [release notes / 版本说明](docs/releases/v0.2.0.dev20.md).
+
 ## 0.2.0.dev19 — Creation entry and product boundaries / 创作入口与产品边界（开发版）
 
 Workbench opens creation home at the root URL. Old asset bookmarks open its asset

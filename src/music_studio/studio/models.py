@@ -102,6 +102,9 @@ class AudioRange(StrictModel):
 
 
 class LocalTaskRequest(RevisionRequest):
+    note_onset: float = Field(default=0.5, ge=0.1, le=0.95)
+    note_frame: float = Field(default=0.3, ge=0.05, le=0.95)
+    note_min_ms: float = Field(default=127.7, ge=40, le=1000)
     model: str = Field(min_length=1, max_length=80)
     asset: str = Field(
         default="current",

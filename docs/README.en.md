@@ -18,6 +18,7 @@
 | Practice with a beat | [Loop and metronome](timing.en.md) |
 | Capture a microphone or audio input | [Recording](recording.en.md) |
 | Develop motifs and sections | [Creative blueprint and arranging methods](arranging-methods.md) |
+| Copy related parts and share effects | [Clip groups, buses and sends](groups-and-routing.en.md) |
 | Fit audio to the project | [Beat fitting and candidate comparison](material-fitting.md) |
 | Shape effects and levels | [Mixing](mixing.en.md) |
 | Fades, crossfades and region repaint | [Volume and transitions](volume-and-repaint.md) |
@@ -25,6 +26,8 @@
 ## Use local AI
 
 - [Supported models and setup](models.en.md): automatic setup, manual installation and research candidates.
+- [Single-instrument polyphonic MIDI](polyphonic-notes.en.md): transcribe, audition, adopt and edit notes.
+- [Windowlight case study](creations/windowlight.md): an empty project to 32 bars and portable recovery.
 - [Hardware and measured speed](model-hardware.en.md)
 - [Automatic RoFormer and Qwen setup](qwen-and-separation.en.md): vocals/backing, transcription and word timing.
 - [ACE-Step generation](music-generation.en.md): text, reference variations, settings and troubleshooting.

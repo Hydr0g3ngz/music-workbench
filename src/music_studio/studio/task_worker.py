@@ -89,7 +89,9 @@ def execute(request):
 
         random.seed(config["seed"])
         np.random.seed(config["seed"])
-    if stage not in ("inspect", "rhythm", "loudness", "denoise", "musical", "transform"):
+    if model != "basic-pitch" and stage not in (
+        "inspect", "rhythm", "loudness", "denoise", "musical", "transform"
+    ):
         import torch
 
         torch.manual_seed(config["seed"])
@@ -212,8 +214,13 @@ def execute(request):
         from ..export import write_midi
         from ..schema import Lyrics, Rhythm
 
-        config["melody_decoder"] = "rest" if model == "crepe-rest" else "stable"
-        melody = extract_melody(source, output, config)
+        if model == "basic-pitch":
+            from .polyphony import extract
+
+            melody = extract(source, output, config)
+        else:
+            config["melody_decoder"] = "rest" if model == "crepe-rest" else "stable"
+            melody = extract_melody(source, output, config)
         write_json(output / "melody.json", melody.model_dump())
         write_midi(
             output / "melody.mid",
@@ -225,7 +232,8 @@ def execute(request):
         artifact("melody", "json", "melody.json", "application/json")
         artifact("midi", "midi", "melody.mid", "audio/midi")
         artifact("note-synthesis", "audio", "melody-preview.wav", "audio/wav")
-        artifact("pitch", "json", "analysis/pitch.json", "application/json")
+        if model != "basic-pitch":
+            artifact("pitch", "json", "analysis/pitch.json", "application/json")
     elif stage == "rhythm":
         from ..backends.rhythm import estimate_rhythm
 
@@ -257,7 +265,11 @@ def execute(request):
             "device": config["device"],
             "compute_type": config.get("_compute_type"),
             "torch_peak_mb": peak,
-            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+            "memory_note": (
+                "ONNX memory is not measured."
+                if model == "basic-pitch"
+                else "Torch allocator only; excludes CUDA context and CTranslate2."
+            ),
             "worker_reused": request.get("worker_reused", False),
             "model_reused": cache_hits() > hits_before,
             "worker_pid": os.getpid(),

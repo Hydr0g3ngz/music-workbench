@@ -149,7 +149,7 @@ def test_new_audio_results_publish_adopt_reopen_and_undo(
         for role in roles:
             sf.write(
                 output / (role + ".wav"),
-                np.zeros((round(44100 / ratio), 2)),
+                np.zeros((round(sf.info(request["input"]).frames / ratio), 2)),
                 44100,
                 subtype="FLOAT",
             )
@@ -201,7 +201,8 @@ def test_new_audio_results_publish_adopt_reopen_and_undo(
         assert len(after["content"]["tracks"]) == len(roles)
         adopted = after["content"]["tracks"][0]["clips"][0]
         assert adopted["start"] == 3
-        assert adopted["offset"] == pytest.approx(0.2 / ratio)
+        assert adopted["offset"] == 0  # The worker received a cropped, zero-origin input.
+        assert published["source_range"]["start"] == pytest.approx(0.2)
         assert adopted["duration"] == pytest.approx(0.6 / ratio)
         assert adopted["fade_in"] == pytest.approx(0.05 / ratio)
         assert client.get(prefix).json() == after

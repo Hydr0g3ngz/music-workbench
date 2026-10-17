@@ -4,7 +4,7 @@
 
 Models are optional. Sampled instruments, MIDI, recording, arrangement, effects and exports work without neural weights.
 
-The tool packs below are part of **dev17 development builds**. The published dev14 installer automatically prepares ACE-Step only.
+These tools are part of **dev20 development builds**: six processing packs, plus separate ACE-Step setup. The published dev14 installer automatically prepares ACE-Step only.
 
 | Capability | Backend | Setup | Guide |
 | --- | --- | --- | --- |
@@ -12,6 +12,7 @@ The tool packs below are part of **dev17 development builds**. The published dev
 | Vocal/backing separation | Mel-Band RoFormer KJ | AI tools → Vocals & backing | [Setup and use](qwen-and-separation.en.md) · [Separation](separation.en.md) |
 | Two/four-part separation | Demucs htdemucs | AI tools → Stems, melody & transcription | [Workflow](ai-production-workflow.md) |
 | Monophonic MIDI | CREPE | Shared automatic tool pack with Demucs | [Workflow](ai-production-workflow.md) · [Evaluation](melody-next.en.md) |
+| Single-instrument polyphonic MIDI | Basic Pitch 0.4.0 ONNX CPU | AI tools → Polyphonic notes | [Use and limits](polyphonic-notes.en.md) · [Parameter comparison](polyphony-benchmark.md) |
 | Transcription and text correction | Whisper small | Stems, melody & transcription pack; detailed text editing in the asset editor | [Editor models](next-models.en.md) |
 | Transcription and word timing | Qwen3-ASR-1.7B + ForcedAligner-0.6B | AI tools → Speech, lyrics & word timing | [Setup and use](qwen-and-separation.en.md) |
 | Speech denoising | DPDFNet2, experimental GTCRN | AI tools → Clean speech recordings | [Speech cleanup](speech-cleanup.en.md) |
@@ -22,6 +23,7 @@ Open **AI tools** from Home or the workstation model panel. Choose a pack and cl
 
 - **Stems, melody & transcription**: CPU Torch 2.5.1, Demucs, CREPE and Whisper small; download estimate 1–2 GB, keep 6 GB free. Includes librosa tempo/key analysis and time/pitch processing, which are DSP.
 - **Clean speech recordings**: sherpa-onnx, DPDFNet2 and GTCRN; download estimate 150–300 MB, keep 1 GB free. Intended for speech; processing complete music may damage instruments.
+- **Polyphonic notes**: Basic Pitch ONNX in a private CPU environment; estimated download 150–350 MB, keep 2 GB free. Neither Torch nor TensorFlow is installed. Extracts overlapping chord notes for manual review.
 - **NVIDIA acceleration pack**: private Torch 2.10 / CUDA 12.8 runtime; estimated download 3–5 GB, keep 10 GB free. Requires Turing or newer, at least 4 GB VRAM and driver 570 or newer. Setup tests real CUDA inference.
 - **Vocals & backing · RoFormer**: private CUDA runtime; download estimate 4–6 GB, keep 12 GB disk space free. Requires Turing or newer NVIDIA GPU with at least 4 GB total VRAM.
 - **Speech, lyrics & word timing · Qwen**: ASR and alignment load sequentially in BF16; download estimate 10–13 GB, keep 24 GB disk space free. Requires Ampere or newer NVIDIA GPU with at least 8 GB total VRAM; tasks also check for about 6 GB free VRAM. Alignment does not fix recognition errors. See the [guide](qwen-and-separation.en.md).
@@ -49,6 +51,6 @@ Existing manual RoFormer/Qwen3-ASR environments remain supported, and explicit i
 
 `next.html` is the retained single-asset editor for speech processing, transcription and detailed results. Its Next runtime instructions are not prerequisites for the installed app's basic features.
 
-Beat This, Basic Pitch, Transkun, DiffSinger, CLAP and other research/evaluation candidates are not necessarily available from the workstation. See [model research and licenses](local-model-candidates.en.md).
+Basic Pitch is integrated into the workstation. Beat This, Transkun, DiffSinger, CLAP and other research/evaluation candidates are not necessarily available. See [model research and licenses](local-model-candidates.en.md).
 
 Code and weights have separate license terms. Individual guides record revisions, hashes and measurements. A runtime check or completed download does not establish output quality; audition and review results.

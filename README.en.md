@@ -10,6 +10,8 @@ Full-song analysis is a separate product, [Music Studio](https://github.com/Hydr
 
 Windows 10 22H2 / 11 x64 · English / 中文 · Development preview; unsigned installer
 
+The GitHub download remains **dev14**. Current **dev20 source/local builds** add [clip groups, buses and sends](docs/groups-and-routing.en.md) and [editable Basic Pitch polyphonic notes](docs/polyphonic-notes.en.md). [Release notes](docs/releases/v0.2.0.dev20.md) distinguish verified capabilities and limits.
+
 ![Listen, edit notes, mix and export](docs/images/first-sketch-demo.gif)
 
 ## Start making music
@@ -45,7 +47,7 @@ Other models use their own setup guides. Audition candidates before adopting the
 
 ## Preview scope
 
-The current preview supports fixed 4/4 time, up to 32 tracks and ten-minute projects. VST, buses/sends, synchronized overdubbing, latency compensation and full workstation Agent control are not available yet. There is no automatic updater; save your work and close the app before updating. [Release notes and checksums](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14)
+Current source supports fixed 4/4 time, up to 32 tracks, eight buses and ten-minute projects. VST, effect-parameter automation, synchronized overdubbing, latency compensation and full workstation Agent control are not available yet. There is no automatic updater; save your work and close the app before updating. [Public dev14 release notes and checksums](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14)
 
 ## Run from source and contribute
 

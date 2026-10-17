@@ -2,7 +2,10 @@
   #error Payload is required
 #endif
 #ifndef BuildVersion
-  #define BuildVersion "0.2.0.dev14"
+  #define BuildVersion "0.2.0.dev20"
+#endif
+#ifndef BuildFileVersion
+  #define BuildFileVersion "0.2.0.20"
 #endif
 #ifndef BuildAppId
   #define BuildAppId "MusicWorkbench.Local.Workstation"
@@ -38,7 +41,7 @@ CloseApplications=no
 RestartApplications=no
 Uninstallable=yes
 UsePreviousAppDir=yes
-VersionInfoVersion=0.2.0.14
+VersionInfoVersion={#BuildFileVersion}
 VersionInfoProductName=Music Workbench
 
 [Languages]

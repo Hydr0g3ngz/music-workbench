@@ -27,7 +27,7 @@ class Compressor(StrictModel):
 
 class Reverb(StrictModel):
     enabled: bool = False
-    mix: float = Field(default=0.15, ge=0, le=0.5)
+    mix: float = Field(default=0.15, ge=0, le=1)
     decay: float = Field(default=1.2, ge=0.2, le=3)
 
 

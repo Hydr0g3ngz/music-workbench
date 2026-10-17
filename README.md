@@ -10,6 +10,8 @@
 
 Windows 10 22H2 / 11 x64 · 中文 / English · 开发预览版，安装器未签名
 
+GitHub 下载仍为 **dev14**。当前 **dev20 源码/本地构建**新增[成组编排、总线与发送](docs/groups-and-routing.md)，以及 [Basic Pitch 多音音符编辑](docs/polyphonic-notes.md)。[版本说明](docs/releases/v0.2.0.dev20.md)区分已验证能力与限制。
+
 ![试听、编辑音符、混音与导出](docs/images/first-sketch-demo.gif)
 
 ## 制作第一段音乐
@@ -45,7 +47,7 @@ Windows 10 22H2 / 11 x64 · 中文 / English · 开发预览版，安装器未�
 
 ## 版本范围
 
-当前预览支持固定 4/4 拍、最多 32 轨和 10 分钟工程。VST、总线/发送、同步叠录、延迟补偿和工作台全流程 Agent 操作尚未提供。安装器没有自动更新器；更新前请保存工程并关闭软件。[发布说明与校验](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14)
+当前源码支持固定 4/4 拍、最多 32 轨、8 条总线和 10 分钟工程。VST、效果参数自动化、同步叠录、延迟补偿和工作台全流程 Agent 操作尚未提供。安装器没有自动更新器；更新前请保存工程并关闭软件。[公开 dev14 发布说明与校验](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14)
 
 ## 从源码运行与参与贡献
 

@@ -267,9 +267,10 @@ window.StationWorkflow = {
         resize: !!e.target.closest(".note-resize"),
         moved: false,
         pointer: e.pointerId,
+        capture: note || grid,
         gridStep: step(),
       };
-      root.setPointerCapture(e.pointerId);
+      dragging.capture.setPointerCapture(e.pointerId);
       e.preventDefault();
     };
     root.onpointermove = (e) => {
@@ -348,8 +349,8 @@ window.StationWorkflow = {
       const d = dragging;
       dragging = null;
       if (!d) return;
-      if (root.hasPointerCapture(d.pointer))
-        root.releasePointerCapture(d.pointer);
+      if (d.capture.hasPointerCapture(d.pointer))
+        d.capture.releasePointerCapture(d.pointer);
       d.grid.querySelector(".note-marquee")?.remove();
       suppressClick = d.moved;
       setTimeout(() => {
@@ -619,7 +620,8 @@ window.StationWorkflow = {
         `<p class="panel-copy">${esc(c.name)} · ${tr("只处理当前片段；采用时放回工程原位置。速度和调性分析使用 DSP 估计。", "Only the selected clip is processed; adoption retains its session position. Tempo and key analysis uses DSP estimates.")}</p>
         <div class="workflow-models"><button data-workflow-model="musical-analysis">${tr("分析速度 / 调性 / 电平", "Analyze tempo / key / levels")}<small>librosa · DSP</small></button>
         <button data-workflow-model="demucs-four-stems">${tr("拆成鼓 / 贝斯 / 人声 / 其他", "Separate drums / bass / vocals / other")}<small>Demucs · AI</small></button>
-        <button data-workflow-model="crepe-rest">${tr("提取可编辑旋律 MIDI", "Extract editable melody MIDI")}<small>CREPE · AI · ${tr("单旋律实验", "monophonic, experimental")}</small></button></div>
+        <button data-workflow-model="crepe-rest">${tr("提取可编辑旋律 MIDI", "Extract editable melody MIDI")}<small>CREPE · AI · ${tr("单旋律实验", "monophonic, experimental")}</small></button>
+        <button data-workflow-model="basic-pitch">${tr("提取和弦与多音 MIDI", "Extract chords & polyphonic MIDI")}<small>Basic Pitch · ONNX CPU · ${tr("独奏乐器", "solo instrument")}</small></button></div>
         <h3>${tr("独立变速与变调", "Independent time & pitch")}</h3><p class="panel-copy">${tr("这是 DSP，保留原音；在任务中试听后替换。速度倍数大于 1 会缩短时长，不改变音高。", "DSP, with the original retained. Audition the task before replacement. Speed above 1 shortens duration without changing pitch.")}</p>
         <form id="transform-form"><div class="workflow-fields"><label>${tr("速度倍数", "Speed ratio")}<input id="transform-rate" type="number" min=".5" max="2" step=".001" value="1" required></label>
         <label>${tr("移调 · 半音", "Pitch · semitones")}<input id="transform-pitch" type="number" min="-12" max="12" step="1" value="0" required></label></div>
@@ -661,8 +663,12 @@ window.StationWorkflow = {
       );
       const matchingClip = content()
         .tracks.flatMap((t) => t.clips)
-        .find((c) => c.asset && c.id === task?.source_clip?.id &&
-          JSON.stringify(c) === JSON.stringify(task.source_clip));
+        .find(
+          (c) =>
+            c.asset &&
+            c.id === task?.source_clip?.id &&
+            JSON.stringify(c) === JSON.stringify(task.source_clip),
+        );
       if (matchingClip) {
         $("material-body").insertAdjacentHTML(
           "beforeend",
@@ -670,7 +676,10 @@ window.StationWorkflow = {
         );
         $("report-beat-fit").onclick = guarded(() => {
           material.close();
-          return api.openBeatFit(StationModelControls.sourceReport(task, r), matchingClip);
+          return api.openBeatFit(
+            StationModelControls.sourceReport(task, r),
+            matchingClip,
+          );
         });
       }
       if (!material.open) material.showModal();

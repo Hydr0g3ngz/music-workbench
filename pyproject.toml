@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "music-workbench-local"
-version = "0.2.0.dev19"
+version = "0.2.0.dev20"
 description = "Local music workstation: composition, arrangement, mixing and open audio models."
 keywords = ["audio", "music", "speech-enhancement", "transcription", "midi", "mcp", "local-first"]
 readme = "README.md"
@@ -41,7 +41,7 @@ inference = [
   "setuptools>=70,<81",
   "torchcrepe==0.0.24",
 ]
-dev = ["pytest>=8.3,<9", "ruff>=0.11,<1", "build>=1.2,<2", "httpx>=0.27,<1", "av>=14,<17", "librosa==0.11.0", "scipy>=1.13,<2", "pyebur128==0.1.1"]
+dev = ["pytest>=8.3,<9", "ruff>=0.11,<1", "build>=1.2,<2", "httpx>=0.27,<1", "av>=14,<17", "librosa==0.11.0", "scipy>=1.13,<2", "mir-eval>=0.8,<1", "pyebur128==0.1.1"]
 
 [project.scripts]
 music-workbench = "music_studio.workbench_cli:main"

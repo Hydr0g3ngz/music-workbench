@@ -139,7 +139,9 @@ def test_pack_api_cancel_cross_window_and_failure_never_publishes_runtime(isolat
     monkeypatch.setattr(ai_setup, "run_owned", waiting)
     app = create_app(isolated / "projects")
     with TestClient(app, base_url="http://127.0.0.1") as client:
-        assert len(client.get("/api/workstation/model-setup").json()) == 5
+        assert {item["id"] for item in client.get("/api/workstation/model-setup").json()} == set(
+            model_setup.PACKS
+        )
         assert client.post("/api/workstation/model-setup/not-a-pack/start").status_code == 404
         response = client.post("/api/workstation/model-setup/speech-cleanup/start")
         assert response.status_code == 200

@@ -1,0 +1,431 @@
+{
+  "suite": "workbench-polyphony-guitarset-dev-v1",
+  "model_sha256": "2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec",
+  "dataset": {
+    "record": "3371780",
+    "version": "1.1.0",
+    "url": "https://zenodo.org/records/3371780",
+    "license": "CC BY 4.0",
+    "archive_checksums": {
+      "annotation.zip": "md5:b39b78e63d3446f2e54ddb7a54df9b10",
+      "audio_mono-mic.zip": "md5:275966d6610ac34999b58426beb119c3"
+    }
+  },
+  "python": "3.12.10",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "profiles": {
+    "default": {
+      "note_onset": 0.5,
+      "note_frame": 0.3,
+      "note_min_ms": 127.7
+    },
+    "conservative": {
+      "note_onset": 0.6,
+      "note_frame": 0.35,
+      "note_min_ms": 150
+    },
+    "sensitive": {
+      "note_onset": 0.35,
+      "note_frame": 0.25,
+      "note_min_ms": 100
+    }
+  },
+  "cases": [
+    {
+      "case": "00_BN1-129-Eb_comp",
+      "profile": "default",
+      "input_sha256": "59e1e3c9bebdabd48afe28050a2c031e6cf36e5697268301cdf2e74bc66b71f1",
+      "reference_sha256": "cd79564c51d0dec7d04e010d31525e9f7d2b9d41cf6116118a66ac5a8c181007",
+      "reference_notes": 133,
+      "estimated_notes": 150,
+      "seconds": 5.788,
+      "scores": {
+        "onset": {
+          "precision": 0.6866666666666666,
+          "recall": 0.7744360902255639,
+          "f1": 0.7279151943462898,
+          "missing": 30,
+          "extra": 47
+        },
+        "onset_offset": {
+          "precision": 0.44666666666666666,
+          "recall": 0.5037593984962406,
+          "f1": 0.4734982332155477,
+          "missing": 66,
+          "extra": 83
+        }
+      }
+    },
+    {
+      "case": "00_BN1-129-Eb_comp",
+      "profile": "conservative",
+      "input_sha256": "59e1e3c9bebdabd48afe28050a2c031e6cf36e5697268301cdf2e74bc66b71f1",
+      "reference_sha256": "cd79564c51d0dec7d04e010d31525e9f7d2b9d41cf6116118a66ac5a8c181007",
+      "reference_notes": 133,
+      "estimated_notes": 121,
+      "seconds": 0.894,
+      "scores": {
+        "onset": {
+          "precision": 0.7851239669421488,
+          "recall": 0.7142857142857143,
+          "f1": 0.7480314960629922,
+          "missing": 38,
+          "extra": 26
+        },
+        "onset_offset": {
+          "precision": 0.5041322314049587,
+          "recall": 0.45864661654135336,
+          "f1": 0.48031496062992124,
+          "missing": 72,
+          "extra": 60
+        }
+      }
+    },
+    {
+      "case": "00_BN1-129-Eb_comp",
+      "profile": "sensitive",
+      "input_sha256": "59e1e3c9bebdabd48afe28050a2c031e6cf36e5697268301cdf2e74bc66b71f1",
+      "reference_sha256": "cd79564c51d0dec7d04e010d31525e9f7d2b9d41cf6116118a66ac5a8c181007",
+      "reference_notes": 133,
+      "estimated_notes": 233,
+      "seconds": 1.093,
+      "scores": {
+        "onset": {
+          "precision": 0.4721030042918455,
+          "recall": 0.8270676691729323,
+          "f1": 0.6010928961748633,
+          "missing": 23,
+          "extra": 123
+        },
+        "onset_offset": {
+          "precision": 0.2532188841201717,
+          "recall": 0.44360902255639095,
+          "f1": 0.3224043715846995,
+          "missing": 74,
+          "extra": 174
+        }
+      }
+    },
+    {
+      "case": "01_Funk1-114-Ab_comp",
+      "profile": "default",
+      "input_sha256": "9ee4888317faba89ba1a9929d6e3b044a3363eb925e6c432b2b30e4f3c83ab22",
+      "reference_sha256": "429e06078c84f38ae3d551bdf594d0cac75a58c43783b23e1d436363a9fbe97a",
+      "reference_notes": 232,
+      "estimated_notes": 140,
+      "seconds": 1.294,
+      "scores": {
+        "onset": {
+          "precision": 0.8142857142857143,
+          "recall": 0.49137931034482757,
+          "f1": 0.6129032258064516,
+          "missing": 118,
+          "extra": 26
+        },
+        "onset_offset": {
+          "precision": 0.40714285714285714,
+          "recall": 0.24568965517241378,
+          "f1": 0.3064516129032258,
+          "missing": 175,
+          "extra": 83
+        }
+      }
+    },
+    {
+      "case": "01_Funk1-114-Ab_comp",
+      "profile": "conservative",
+      "input_sha256": "9ee4888317faba89ba1a9929d6e3b044a3363eb925e6c432b2b30e4f3c83ab22",
+      "reference_sha256": "429e06078c84f38ae3d551bdf594d0cac75a58c43783b23e1d436363a9fbe97a",
+      "reference_notes": 232,
+      "estimated_notes": 88,
+      "seconds": 1.736,
+      "scores": {
+        "onset": {
+          "precision": 0.8863636363636364,
+          "recall": 0.33620689655172414,
+          "f1": 0.4875,
+          "missing": 154,
+          "extra": 10
+        },
+        "onset_offset": {
+          "precision": 0.3068181818181818,
+          "recall": 0.11637931034482758,
+          "f1": 0.16874999999999998,
+          "missing": 205,
+          "extra": 61
+        }
+      }
+    },
+    {
+      "case": "01_Funk1-114-Ab_comp",
+      "profile": "sensitive",
+      "input_sha256": "9ee4888317faba89ba1a9929d6e3b044a3363eb925e6c432b2b30e4f3c83ab22",
+      "reference_sha256": "429e06078c84f38ae3d551bdf594d0cac75a58c43783b23e1d436363a9fbe97a",
+      "reference_notes": 232,
+      "estimated_notes": 290,
+      "seconds": 0.67,
+      "scores": {
+        "onset": {
+          "precision": 0.6068965517241379,
+          "recall": 0.7586206896551724,
+          "f1": 0.6743295019157087,
+          "missing": 56,
+          "extra": 114
+        },
+        "onset_offset": {
+          "precision": 0.42758620689655175,
+          "recall": 0.5344827586206896,
+          "f1": 0.475095785440613,
+          "missing": 108,
+          "extra": 166
+        }
+      }
+    },
+    {
+      "case": "02_Jazz1-130-D_comp",
+      "profile": "default",
+      "input_sha256": "7b769c278bb3d44440420a79cba1e486119f823a33f78465aa9acdcdef277df5",
+      "reference_sha256": "e06bd1f4e088b0a0892366193a2d951420288cd9709bfaaacdafd320bf55489e",
+      "reference_notes": 203,
+      "estimated_notes": 202,
+      "seconds": 0.496,
+      "scores": {
+        "onset": {
+          "precision": 0.7079207920792079,
+          "recall": 0.7044334975369458,
+          "f1": 0.7061728395061728,
+          "missing": 60,
+          "extra": 59
+        },
+        "onset_offset": {
+          "precision": 0.3415841584158416,
+          "recall": 0.3399014778325123,
+          "f1": 0.34074074074074073,
+          "missing": 134,
+          "extra": 133
+        }
+      }
+    },
+    {
+      "case": "02_Jazz1-130-D_comp",
+      "profile": "conservative",
+      "input_sha256": "7b769c278bb3d44440420a79cba1e486119f823a33f78465aa9acdcdef277df5",
+      "reference_sha256": "e06bd1f4e088b0a0892366193a2d951420288cd9709bfaaacdafd320bf55489e",
+      "reference_notes": 203,
+      "estimated_notes": 166,
+      "seconds": 0.492,
+      "scores": {
+        "onset": {
+          "precision": 0.7469879518072289,
+          "recall": 0.6108374384236454,
+          "f1": 0.6720867208672087,
+          "missing": 79,
+          "extra": 42
+        },
+        "onset_offset": {
+          "precision": 0.3795180722891566,
+          "recall": 0.3103448275862069,
+          "f1": 0.34146341463414637,
+          "missing": 140,
+          "extra": 103
+        }
+      }
+    },
+    {
+      "case": "02_Jazz1-130-D_comp",
+      "profile": "sensitive",
+      "input_sha256": "7b769c278bb3d44440420a79cba1e486119f823a33f78465aa9acdcdef277df5",
+      "reference_sha256": "e06bd1f4e088b0a0892366193a2d951420288cd9709bfaaacdafd320bf55489e",
+      "reference_notes": 203,
+      "estimated_notes": 278,
+      "seconds": 0.473,
+      "scores": {
+        "onset": {
+          "precision": 0.5683453237410072,
+          "recall": 0.7783251231527094,
+          "f1": 0.6569646569646569,
+          "missing": 45,
+          "extra": 120
+        },
+        "onset_offset": {
+          "precision": 0.31654676258992803,
+          "recall": 0.43349753694581283,
+          "f1": 0.3659043659043659,
+          "missing": 115,
+          "extra": 190
+        }
+      }
+    },
+    {
+      "case": "03_Rock1-130-A_comp",
+      "profile": "default",
+      "input_sha256": "5e71387daf08213651f8b8f0d9b1db7d589cbc6b9fefd8e052e13a1f8f7286ca",
+      "reference_sha256": "502ab4f7788bad71bafe9572ba185e698b3cf82576be105acd6d4112b711f1fa",
+      "reference_notes": 212,
+      "estimated_notes": 214,
+      "seconds": 0.619,
+      "scores": {
+        "onset": {
+          "precision": 0.6495327102803738,
+          "recall": 0.6556603773584906,
+          "f1": 0.6525821596244131,
+          "missing": 73,
+          "extra": 75
+        },
+        "onset_offset": {
+          "precision": 0.32710280373831774,
+          "recall": 0.330188679245283,
+          "f1": 0.3286384976525822,
+          "missing": 142,
+          "extra": 144
+        }
+      }
+    },
+    {
+      "case": "03_Rock1-130-A_comp",
+      "profile": "conservative",
+      "input_sha256": "5e71387daf08213651f8b8f0d9b1db7d589cbc6b9fefd8e052e13a1f8f7286ca",
+      "reference_sha256": "502ab4f7788bad71bafe9572ba185e698b3cf82576be105acd6d4112b711f1fa",
+      "reference_notes": 212,
+      "estimated_notes": 172,
+      "seconds": 0.57,
+      "scores": {
+        "onset": {
+          "precision": 0.75,
+          "recall": 0.6084905660377359,
+          "f1": 0.6718749999999999,
+          "missing": 83,
+          "extra": 43
+        },
+        "onset_offset": {
+          "precision": 0.3430232558139535,
+          "recall": 0.2783018867924528,
+          "f1": 0.30729166666666663,
+          "missing": 153,
+          "extra": 113
+        }
+      }
+    },
+    {
+      "case": "03_Rock1-130-A_comp",
+      "profile": "sensitive",
+      "input_sha256": "5e71387daf08213651f8b8f0d9b1db7d589cbc6b9fefd8e052e13a1f8f7286ca",
+      "reference_sha256": "502ab4f7788bad71bafe9572ba185e698b3cf82576be105acd6d4112b711f1fa",
+      "reference_notes": 212,
+      "estimated_notes": 327,
+      "seconds": 0.529,
+      "scores": {
+        "onset": {
+          "precision": 0.47706422018348627,
+          "recall": 0.7358490566037735,
+          "f1": 0.5788497217068646,
+          "missing": 56,
+          "extra": 171
+        },
+        "onset_offset": {
+          "precision": 0.27217125382262997,
+          "recall": 0.419811320754717,
+          "f1": 0.33024118738404457,
+          "missing": 123,
+          "extra": 238
+        }
+      }
+    },
+    {
+      "case": "04_SS1-100-C#_comp",
+      "profile": "default",
+      "input_sha256": "39b592e5ab79e457a7901e865b4320e04014903465acdebd64235b4f44416650",
+      "reference_sha256": "9cee71992ad50e4aca49266702a4c92098a9299bc4051c3daf7aed160ec5914c",
+      "reference_notes": 162,
+      "estimated_notes": 266,
+      "seconds": 0.929,
+      "scores": {
+        "onset": {
+          "precision": 0.5300751879699248,
+          "recall": 0.8703703703703703,
+          "f1": 0.6588785046728971,
+          "missing": 21,
+          "extra": 125
+        },
+        "onset_offset": {
+          "precision": 0.17293233082706766,
+          "recall": 0.2839506172839506,
+          "f1": 0.21495327102803738,
+          "missing": 116,
+          "extra": 220
+        }
+      }
+    },
+    {
+      "case": "04_SS1-100-C#_comp",
+      "profile": "conservative",
+      "input_sha256": "39b592e5ab79e457a7901e865b4320e04014903465acdebd64235b4f44416650",
+      "reference_sha256": "9cee71992ad50e4aca49266702a4c92098a9299bc4051c3daf7aed160ec5914c",
+      "reference_notes": 162,
+      "estimated_notes": 201,
+      "seconds": 0.588,
+      "scores": {
+        "onset": {
+          "precision": 0.6318407960199005,
+          "recall": 0.7839506172839507,
+          "f1": 0.699724517906336,
+          "missing": 35,
+          "extra": 74
+        },
+        "onset_offset": {
+          "precision": 0.24875621890547264,
+          "recall": 0.30864197530864196,
+          "f1": 0.27548209366391185,
+          "missing": 112,
+          "extra": 151
+        }
+      }
+    },
+    {
+      "case": "04_SS1-100-C#_comp",
+      "profile": "sensitive",
+      "input_sha256": "39b592e5ab79e457a7901e865b4320e04014903465acdebd64235b4f44416650",
+      "reference_sha256": "9cee71992ad50e4aca49266702a4c92098a9299bc4051c3daf7aed160ec5914c",
+      "reference_notes": 162,
+      "estimated_notes": 423,
+      "seconds": 0.554,
+      "scores": {
+        "onset": {
+          "precision": 0.35224586288416077,
+          "recall": 0.9197530864197531,
+          "f1": 0.5094017094017094,
+          "missing": 13,
+          "extra": 274
+        },
+        "onset_offset": {
+          "precision": 0.0851063829787234,
+          "recall": 0.2222222222222222,
+          "f1": 0.12307692307692307,
+          "missing": 126,
+          "extra": 387
+        }
+      }
+    }
+  ],
+  "method": "All six note_midi string annotations; fractional MIDI rounded to nearest integer. 50 ms onset / 50 cents pitch; offsets 20% or 50 ms. Macro over cases.",
+  "limits": [
+    "Five frozen accompaniment takes, development suite, not a held-out leaderboard.",
+    "Basic Pitch training used GuitarSet: dataset overlap is possible.",
+    "No velocity or calibrated probability reference; no velocity accuracy claim.",
+    "CPU wall time includes adapter imports and model load per call; no peak RAM claim."
+  ],
+  "macro": {
+    "default": {
+      "onset": 0.6716903847912448,
+      "onset_offset": 0.33285647110802674
+    },
+    "conservative": {
+      "onset": 0.6558435469673073,
+      "onset_offset": 0.3146604271189292
+    },
+    "sensitive": {
+      "onset": 0.6041276972327605,
+      "onset_offset": 0.3233445266781292
+    }
+  }
+}

@@ -18,6 +18,7 @@
 | 循环练习与节拍 | [循环与节拍器](timing.md) |
 | 麦克风或声卡录音 | [本地录音](recording.md) |
 | 组织动机与段落 | [创作蓝图与编曲方法](arranging-methods.md) |
+| 成组复制、共享效果 | [成组编排、总线与发送](groups-and-routing.md) |
 | 让音频对齐工程 | [对拍、变速与候选比较](material-fitting.md) |
 | 效果器与电平 | [混音](mixing.md) |
 | 渐强、交叉淡化、局部重绘 | [音量与过渡](volume-and-repaint.md) |
@@ -25,6 +26,8 @@
 ## 使用本地 AI
 
 - [支持的模型与安装方式](models.md)：区分软件内自动配置、手动安装和研究候选。
+- [单乐器多音 MIDI](polyphonic-notes.md)：音频识别、试听、采用与音符编辑。
+- [《窗灯》制作案例](creations/windowlight.md)：从空工程完成 32 小节与便携恢复。
 - [硬件与实测速度](model-hardware.md)
 - [RoFormer 与 Qwen 自动配置](qwen-and-separation.md)：人声伴奏、转写与逐字时间。
 - [ACE-Step 音乐生成](music-generation.md)：文字、参考变奏、参数与故障排查。

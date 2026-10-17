@@ -65,6 +65,7 @@
     if (target + end - start > 600 + 1e-7)
       throw Error("Session limit is 10 minutes");
     let count = 0;
+    const groups = new Map();
     for (const track of next.tracks) {
       const additions = [];
       for (const c of track.clips) {
@@ -73,6 +74,10 @@
         if (right - left <= 1e-7) continue;
         const copy = clone(c);
         copy.id = uid();
+        if (copy.group) {
+          if (!groups.has(copy.group)) groups.set(copy.group, uid());
+          copy.group = groups.get(copy.group);
+        }
         copy.start = target + left - start;
         copy.offset += left - c.start;
         copy.duration = right - left;

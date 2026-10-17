@@ -1,0 +1,56 @@
+{
+  "title": "窗灯 · Windowlight",
+  "project": "5368dd3322314028",
+  "revision": 22,
+  "tracks": 3,
+  "clips": 7,
+  "buses": 2,
+  "bars": 32,
+  "bpm_requested": 120,
+  "key_requested": "C minor",
+  "not_a_model_quality_measurement": true,
+  "exports": {
+    "wav": {
+      "sha256": "6bdd709d822a8de51dcce929ce5b0874efe1558989f6cd6e035ac5f734f3d7d3",
+      "bytes": 17384264
+    },
+    "mid": {
+      "sha256": "d87ff808efe419c66f1ee88c842c4232a90292324a688b4aa3d6cffff29cc463",
+      "bytes": 585
+    },
+    "mwb": {
+      "sha256": "a1bdcbf28dbb8da599e8b1ab8cd6570139957a16f0e5f4a1e6e86d751f1e9361",
+      "bytes": 12729837
+    }
+  },
+  "audio": {
+    "frames": 2897370,
+    "sample_rate": 44100,
+    "seconds": 65.7,
+    "sample_peak_dbfs": -2.002040520389929,
+    "rms_dbfs": -22.99843985079495
+  },
+  "restored": "714c425d14634e37",
+  "portable_content_equal": true,
+  "restored_edit_undo": true,
+  "restored_wav_identical": true,
+  "loudness": {
+    "integrated_lufs": -19.960025981885657,
+    "true_peak_dbtp": -1.9976509270056066,
+    "sample_peak_dbfs": -2.002040520389929,
+    "loudness_range_lu": 8.700000000000006,
+    "loudness_range_stable": true,
+    "channel_true_peaks_dbtp": [
+      -5.846064245263492,
+      -1.9976509270056066
+    ],
+    "frames": 2897370,
+    "sample_rate": 44100,
+    "channels": 2,
+    "duration": 65.7,
+    "backend": "libebur128 1.2.6",
+    "algorithm": "ITU-R BS.1770 gated integrated loudness; libebur128 true peak",
+    "unmeasurable_reason": null,
+    "notes": []
+  }
+}

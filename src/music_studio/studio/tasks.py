@@ -180,6 +180,9 @@ class TaskManager:
                 cleanup_strength=request.strength,
                 time_ratio=request.time_ratio,
                 pitch_shift=request.pitch_shift,
+                note_onset=request.note_onset,
+                note_frame=request.note_frame,
+                note_min_ms=request.note_min_ms,
             )
             if request.model == "qwen3-asr":
                 config.update(
@@ -199,6 +202,13 @@ class TaskManager:
                 "device": device,
                 "alignment": request.alignment,
                 "strength": request.strength if spec["stage"] == "denoise" else None,
+                "note_settings": {
+                    "note_onset": request.note_onset,
+                    "note_frame": request.note_frame,
+                    "note_min_ms": request.note_min_ms,
+                }
+                if request.model == "basic-pitch"
+                else None,
                 "time_ratio": request.time_ratio,
                 "pitch_shift": request.pitch_shift,
                 "input_audio": dsp.inspect_audio(snapshot),

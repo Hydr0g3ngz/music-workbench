@@ -31,7 +31,7 @@ Presets are editable starting points, not automatic AI mastering.
 
 The limiter is **not a true-peak limiter**. There is no oversampling or lookahead; heavy reduction distorts.
 Reverb tails extend the export by nominal decay plus 0.1 s; EQ reserves at least 0.15 s.
-Built-in processors use a fixed order. Reorderable chains, buses/sends, effect-parameter automation, VST and full mastering remain planned. For clip volume curves, see [Volume & transitions](volume-and-repaint.md).
+Built-in processors use a fixed order. dev20 adds [buses and post-fader sends](groups-and-routing.en.md), with up to 100% wet bus reverb; track reverb controls remain at 0–50%. Reorderable chains, effect-parameter automation, VST and full mastering remain planned. For clip volume curves, see [Volume & transitions](volume-and-repaint.md).
 
 ## Playback, export and boundaries
 

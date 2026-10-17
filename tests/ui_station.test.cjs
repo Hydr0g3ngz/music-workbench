@@ -468,3 +468,101 @@ test("task/UI refresh and live mix updates never reload audio; pause cancels an 
     global.fetch = oldFetch;
   }
 });
+
+test("buses receive only routed post-fader paths; live sends/solo keep the same audio source", async () => {
+  const oldFetch = global.fetch;
+  let loads = 0;
+  global.fetch = async () => {
+    loads++;
+    return { ok: true, arrayBuffer: async () => new ArrayBuffer(4) };
+  };
+  const ctx = new FakeContext();
+  const originalNode = ctx.node.bind(ctx);
+  ctx.node = () => {
+    const node = originalNode();
+    node.connections = [];
+    node.connect = (target) => node.connections.push(target);
+    node.disconnect = () => {
+      node.connections = [];
+    };
+    node.gain.setTargetAtTime = (value) => {
+      node.gain.value = value;
+    };
+    return node;
+  };
+  const engine = new StationEngine(() => ctx);
+  try {
+    const track = {
+      id: "source",
+      kind: "audio",
+      gain_db: -6,
+      pan: 0,
+      output: "group",
+      sends: [{ bus: "return", enabled: true, gain_db: -12 }],
+      clips: [
+        {
+          id: "c",
+          asset: "a",
+          start: 0,
+          offset: 0,
+          duration: 1,
+          gain_db: 0,
+          fade_in: 0,
+          fade_out: 0,
+        },
+      ],
+    };
+    const bus = (id) => ({
+      id,
+      name: id,
+      gain_db: 0,
+      pan: 0,
+      mute: false,
+      solo: false,
+    });
+    const content = {
+      tracks: [track],
+      buses: [bus("group"), bus("return")],
+      master_db: -6,
+    };
+    await engine.play(content, [{ id: "a", duration: 1 }], "project");
+    const source = ctx.sources[0],
+      graph = engine.graphs.get("source"),
+      group = engine.graphs.get("group"),
+      wet = engine.graphs.get("return");
+    assert.deepEqual(graph.analyser.connections, [
+      graph.direct,
+      graph.sends.get("return"),
+    ]);
+    assert.deepEqual(graph.direct.connections, [group.input]);
+    assert.deepEqual(graph.sends.get("return").connections, [wet.input]);
+    assert.deepEqual(group.analyser.connections, [engine.master]);
+    assert.ok(
+      Math.abs(graph.sends.get("return").gain.value - 10 ** (-12 / 20)) < 1e-10,
+    );
+    for (let i = 0; i < 100; i++) {
+      content.buses[0].gain_db = -i / 10;
+      track.sends[0].gain_db = -i / 20;
+      engine.update(content);
+    }
+    track.sends[0].enabled = false;
+    content.buses[1].solo = true;
+    engine.update(content);
+    assert.equal(graph.sends.get("return").gain.value, 0);
+    assert.equal(group.level.gain.value, 0);
+    assert.equal(wet.level.gain.value, 1);
+    content.buses[1].mute = true;
+    engine.update(content);
+    assert.equal(wet.level.gain.value, 0);
+    assert.equal(loads, 1);
+    assert.equal(ctx.sources.length, 1);
+    assert.equal(ctx.sources[0], source);
+    engine.pause();
+    assert.equal(source.stopped, true);
+    for (const g of [graph, group, wet])
+      assert.ok(g.nodes.every((n) => !n.connections.length));
+  } finally {
+    engine.pause();
+    global.fetch = oldFetch;
+  }
+});

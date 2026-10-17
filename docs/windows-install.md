@@ -1,5 +1,9 @@
 # Windows 安装版 / Windows installer
 
+GitHub 公开下载目前为 dev14。若使用 dev20 本地构建，直接运行随包提供的 `Music-Workbench-0.2.0.dev20-Setup-x64.exe`，并使用同目录的 SHA-256 文件核对；无需先安装 dev14。dev20 的新增功能见[版本说明](releases/v0.2.0.dev20.md)。
+
+The public GitHub download remains dev14. For a local dev20 build, run its matching Setup executable and check the adjacent SHA-256 file. Installing dev14 first is unnecessary. See the dev20 release notes for added capabilities.
+
 下载 [`Music-Workbench-0.2.0.dev14-Setup-x64.exe`](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/Music-Workbench-0.2.0.dev14-Setup-x64.exe)，运行安装器，选择语言和安装目录。安装结束后从桌面或开始菜单打开 **Music Workbench**。工作台在自己的桌面窗口内显示，无需 Python、终端、端口或单独的浏览器窗口。
 
 Download and run the x64 Setup executable, choose language and installation directory, then open Music Workbench from the desktop or Start menu. The workspace opens in its own desktop window, without a separate Python installation, terminal, port selection or browser window.
@@ -28,7 +32,7 @@ AI files live separately in `%LOCALAPPDATA%\MusicWorkbench\AI`. The desktop uses
 
 Closing waits for project saves and protects unadopted recordings. Relaunch activates the existing window. Close the software before upgrading/uninstalling. Closing stops a backend owned by this window, while retaining a reused independent service.
 
-本预览安装器尚未签名，也没有自动更新器。可在 [发布页](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14) 核对 SHA-256 校验值。遇到启动问题时，从软件菜单打开诊断或查看 `%LOCALAPPDATA%\MusicWorkbench\Logs\startup.log`；反馈时提供系统、软件版本与错误信息。
+本预览安装器尚未签名，也没有自动更新器。公开 dev14 可在 [发布页](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14) 核对 SHA-256；本地 dev20 使用随包校验文件。遇到启动问题时，从软件菜单打开诊断或查看 `%LOCALAPPDATA%\MusicWorkbench\Logs\startup.log`；反馈时提供系统、软件版本与错误信息。
 
 The preview installer is unsigned and has no automatic updater. Verify the release checksums. For startup problems, open diagnostics or inspect `%LOCALAPPDATA%\MusicWorkbench\Logs\startup.log`; include the OS, app version and error when reporting a problem. Broader compatibility results are in the technical report below.
 

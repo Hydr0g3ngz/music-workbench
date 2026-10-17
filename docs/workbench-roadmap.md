@@ -16,7 +16,7 @@ Music Workbench 专注新作品的制作；整曲分析由独立 Music Studio �
 
 Music Workbench focuses on making new music. Full-song analysis belongs to the independent Music Studio product. Separation, transcription and note extraction should help users continue creating. See [product boundaries](product-boundaries.md) for entries, data and compatibility.
 
-## 当前可用 / Available in dev19 source builds
+## 当前可用 / Available in dev20 source builds
 
 GitHub 公开安装版仍为 dev14；以下包括后续本地开发版，按版本说明使用。The public GitHub installer remains dev14; the list includes subsequent local development builds.
 
@@ -27,6 +27,9 @@ GitHub 公开安装版仍为 dev14；以下包括后续本地开发版，按版�
 - Windows 安装器、独立窗口、ACE-Step 自动配置、五步跟练与离线手册。Windows installer/window, ACE-Step setup, guided lesson and offline handbook.
 - CPU/CUDA 工具包、RoFormer/Qwen 自动配置、逐片段处理、限时模型复用与工程位置还原；这些是可用性验证，不代表质量全面提升。CPU/CUDA packs, managed RoFormer/Qwen, selected-clip processing, bounded model reuse and timeline placement; execution checks do not establish across-the-board quality gains.
 - 独立创作入口、素材编辑器品牌、旧书签兼容与返回工程链接。Dedicated creation entry, asset-editor branding, old bookmark compatibility and return-to-arrangement links.
+- 跨轨片段成组、独立副本与历史；8 条一级总线、推子后发送和共享湿声混响。[使用方法 / Guide](groups-and-routing.md)。Clip groups, independent copies/history, eight one-level buses, post-fader sends and shared wet reverb.
+- Basic Pitch ONNX 多音识别、试听、加入乐器轨编辑与导出。[实测与限制 / Evidence and limits](polyphonic-notes.md)。Editable polyphonic note estimates with a managed CPU pack.
+- 《窗灯》32 小节创作、导出与 MWB 恢复验证。[案例 / Case study](creations/windowlight.md)。Windowlight: a 32-bar creation/export/restore case.
 
 ## 计划与验收 / Planned work and acceptance
 
@@ -34,10 +37,10 @@ GitHub 公开安装版仍为 dev14；以下包括后续本地开发版，按版�
 
 | 优先级 / Priority | 工作 / Work | 对用户的价值 / Value | 验证方式 / Validation |
 | --- | --- | --- | --- |
-| 下一步 / Next | 分组编排 / Grouped arrangement | 让相关鼓、贝斯、和声、旋律一起移动和复制，从 8 小节发展到 32 小节。Move/copy related drums, bass, harmony and melody; develop 8 bars into 32. | 仅用界面完成段落扩展；保留相对位置、源裁切、音符和淡变；验证撤销、重开、WAV/MIDI 与 MWB 恢复。UI-based form development preserving offsets, notes and fades, with undo/reopen/export/restore checks. |
-| P1 | 可编辑的 AI 声部 / Editable AI parts | 先评估单件乐器多音转录：Basic Pitch 作轻量对照、Transkun 作钢琴专用候选；把音频素材变成能修改的音符。Evaluate single-instrument polyphony: Basic Pitch baseline and Transkun piano candidate; turn audio into editable notes. | 同一输入测起音/音高/止音 F1、力度、人工修改量、资源与失败；实际接上试听、入轨、修改和导出后才列为可用。Paired note/velocity/correction/resource evaluation and full audition-to-edit/export integration before availability claims. |
-| P1 | 八小节创作闭环 / Eight-bar creation workflow | 录音或旋律 → 修正 → 伴奏候选 → 编排与混音 → 30–60 秒作品。Recording or melody → corrections → accompaniment candidates → arrangement/mix → a 30–60 second piece. | 记录完成耗时、人工修正、候选采用和中断点；规则伴奏与 AI 结果分别标明。Measure completion time, edits, adoption and blockers; label rule-based and AI results separately. |
-| P1 | 混音基础 / Mixing foundation | 轨道分组之后引入总线/发送，再扩展效果自动化；让分离和生成的声部方便混合。After track grouping, add buses/sends and then effect automation for generated and separated parts. | 同一编排实时与离线渲染对照，验证路由、尾音、旁路、保存与历史。Compare realtime/offline routing, tails, bypass, save and history. |
+| 基础已完成 / Foundation delivered | 分组与段落 / Groups and form | dev20 已从 8 小节扩展至 32 小节，独立分组复制、撤销与恢复。Independent groups, copy, undo and recovery. | [验证 / Validation](preagent-validation.md)；继续观察真实用户编辑复杂工程的卡点。Observe complex-project editing. |
+| 基础已完成，质量继续 / Baseline delivered, quality ongoing | 可编辑 AI 音符 / Editable AI notes | Basic Pitch ONNX 已贯通；Transkun 仍为未接入候选。Basic Pitch integrated; Transkun remains a candidate. | [五首参数对照 / Five-case comparison](polyphony-benchmark.md)；下一步独立钢琴集、力度和人工修改量，避免训练数据重叠。Next: held-out piano, velocity and correction effort. |
+| 案例已完成 / Case delivered | 创作闭环 / Creation workflow | 《窗灯》完成生成、转音符、段落对比、总线与交付。Windowlight validates generation, editable notes, contrast, routing and delivery. | 案例区分界面操作与脚本后期；仍需零基础用户试用与完成率数据。Distinguishes UI and scripted finishing; beginner completion rates remain unmeasured. |
+| 基础已完成 / Foundation delivered | 混音 / Mixing | dev20 已提供总线/发送；效果参数自动化、VST、同步叠录和延迟补偿仍未提供。Buses/sends delivered; FX automation, VST, overdubbing and latency compensation remain unavailable. | 路由数值、尾音、旁路、历史与实时音源不重载回归。Routing, tails, bypass, history and no-source-reload checks. |
 | P1 | 本地 AI 交付 / Local AI delivery | dev15–18 已完成自动工具包和首台 CUDA 验证；扩展硬件覆盖与冷启动体验。Managed packs and first CUDA-host checks landed in dev15–18; broaden hardware coverage and improve cold startup. | [安装与工程衔接验证 / Setup validation](model-tools-validation.md)，再扩展全新 Windows 与 GPU 配置。 |
 | P1 | 安装与首次创作可靠性 / Installation and first creation | 更多电脑能顺利完成安装、学习和导出；覆盖缺少 WebView2、受限网络、显示缩放与失败恢复。Broader hardware/network/display coverage and recovery. | 全新 Windows 环境与目标用户试用，记录卡点、完成率及恢复结果。Clean machines and observed user trials. |
 | P1 | 更可靠的节拍适配 / Better timing fit | 变速音乐的局部修正与强拍辅助，减少手动对齐。Local timing and downbeat assistance. | 扩展风格与真值，报告首尾漂移和人工修改量。Style-specific drift and correction effort. |

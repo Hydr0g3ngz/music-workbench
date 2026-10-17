@@ -16,6 +16,8 @@ This index is for contributors and experiment reproduction. Versions, devices, d
 
 ## 工作台版本验证 / Workstation verification
 
+- [dev20 编排、多音音符、路由与打包 / Arrangement, polyphony, routing and packaging](preagent-validation.md)
+- [多音参数开发评测 / Polyphonic parameter benchmark](polyphony-benchmark.md)
 - [dev19 入口与工程兼容 / Entry and project compatibility](workbench-entry-validation.md)
 - [教程、乐器、录音、混音与生成 / Lesson, instruments, recording, mixing and generation](feature-validation.md)
 - [Windows 安装与 AI 配置 / Windows setup](windows-validation.md)
