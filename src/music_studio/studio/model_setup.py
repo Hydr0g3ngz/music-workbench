@@ -61,6 +61,40 @@ PACKS["music-tools-cuda"] = {
     "download_estimate": "3–5 GB",
     "entry": "/station.html?tools=music-tools-cuda",
 }
+PACKS["vocal-separation"] = {
+    "title": ["人声与伴奏 · RoFormer", "Vocals & backing · RoFormer"],
+    "description": [
+        "分离人声与伴奏，试听后替换片段或加入新轨。准备独立 NVIDIA 环境。",
+        "Separate vocals and backing; audition, then replace a clip or add tracks. "
+        "Private NVIDIA runtime.",
+    ],
+    "models": ["mel-band-roformer-kj"],
+    "device": "cuda",
+    "required_free_bytes": 12 * 1024**3,
+    "download_estimate": "4–6 GB",
+    "backend": "Mel-Band RoFormer KJ · Torch CUDA 12.8",
+    "license": "MIT (code and model card)",
+    "source": "https://huggingface.co/KimberleyJSN/melbandroformer",
+    "entry": "/station.html?tools=vocal-separation",
+}
+PACKS["qwen-transcription"] = {
+    "title": ["语音、歌词与逐字定位 · Qwen", "Speech, lyrics & word timing · Qwen"],
+    "description": [
+        "Qwen 转写后用独立模型定位字词。可改错字、导出字幕；歌唱时间仍需试听核对。",
+        "Transcribe with Qwen, then locate words acoustically. Edit text and export subtitles; "
+        "check singing by ear.",
+    ],
+    "models": ["qwen3-asr"],
+    "device": "cuda",
+    "min_capability": 8.0,
+    "min_vram_mib": 8000,
+    "required_free_bytes": 24 * 1024**3,
+    "download_estimate": "10–13 GB",
+    "backend": "Qwen3-ASR-1.7B + Qwen3-ForcedAligner-0.6B · BF16 · sequential loading",
+    "license": "Apache-2.0",
+    "source": "https://github.com/QwenLM/Qwen3-ASR",
+    "entry": "/station.html?tools=qwen-transcription",
+}
 
 
 def packs_root():
@@ -82,7 +116,7 @@ def managed_runtime(model, device="auto"):
         if device == "cpu":
             return cpu or accelerated
         return accelerated or (cpu if device == "auto" else None)
-    if device == "cuda":
+    if device == "cuda" and PACKS[key].get("device") != "cuda":
         return None
     return published_runtime(packs_root() / key, key)
 
@@ -149,7 +183,12 @@ def preflight(root, pack):
         from .hardware import cuda128_supported, nvidia_gpus
 
         gpus = nvidia_gpus()["gpus"]
-        if not any(cuda128_supported(g) and g["memory_mib"] >= 4000 for g in gpus):
+        if not any(
+            cuda128_supported(g)
+            and g["capability"] >= spec.get("min_capability", 7.5)
+            and g["memory_mib"] >= spec.get("min_vram_mib", 4000)
+            for g in gpus
+        ):
             reasons.append("cuda-compatibility")
     return {
         "supported": not reasons,
@@ -159,6 +198,8 @@ def preflight(root, pack):
         "directory": str(root),
         "device": spec.get("device", "cpu"),
         "gpus": gpus,
+        "min_capability": spec.get("min_capability", 7.5),
+        "min_vram_mib": spec.get("min_vram_mib", 4000),
         "download_estimate": spec["download_estimate"],
     }
 

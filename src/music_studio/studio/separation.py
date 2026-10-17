@@ -26,10 +26,22 @@ def prepare_attention(attend):
     return "priority-sdpa" if attend._HAS_SDPA_KERNEL else "legacy-sdpa"
 
 
-def runtime(verify=False):
+def runtime(verify=False, config_file=None):
+    if config_file is None and "MUSIC_STUDIO_SEPARATION_CONFIG" not in os.environ:
+        from .model_setup import managed_runtime
+
+        managed = managed_runtime("mel-band-roformer-kj")
+        if managed:
+            config_file = managed.get("separation_config")
     path = Path(
-        os.environ.get("MUSIC_STUDIO_SEPARATION_CONFIG", ".artifacts/separation-runtime.json")
+        config_file
+        or os.environ.get("MUSIC_STUDIO_SEPARATION_CONFIG", ".artifacts/separation-runtime.json")
     )
+    if not path.is_file():
+        raise ValueError(
+            "RoFormer is unavailable. Install or repair Vocals & backing in AI setup, "
+            "or check your explicitly configured separation runtime."
+        )
     config = read_json(path)
     if (
         config.get("source_revision") != SOURCE_REVISION
@@ -58,7 +70,7 @@ def separate(source, output, settings):
     import yaml
     from ml_collections import ConfigDict
 
-    installed = runtime(verify=True)
+    installed = runtime(verify=True, config_file=settings.get("separation_config"))
     root = Path(installed["root"])
     sys.path.insert(0, str(root / "source"))
     from models.bs_roformer import attend

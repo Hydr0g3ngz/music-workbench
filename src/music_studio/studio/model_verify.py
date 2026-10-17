@@ -67,6 +67,10 @@ def verify(pack, root):
             "speech.wav" if CATALOG[model]["stage"] in ("lyrics", "denoise") else "music.wav"
         )
         settings = {**config.model_dump(), "cleanup_strength": 1, "time_ratio": 1, "pitch_shift": 0}
+        if pack == "vocal-separation":
+            settings["separation_config"] = str(root / "separation-runtime.json")
+        if pack == "qwen-transcription":
+            settings.update(managed_alignment="qwen", language="en", lyrics_alignment="qwen")
         settings["four_stems"] = model == "demucs-four-stems"
         execute(
             {
@@ -79,6 +83,13 @@ def verify(pack, root):
             }
         )
         result = read_json(folder / model / "result.json")
+        if pack == "qwen-transcription":
+            transcript = read_json(folder / model / "lyrics.json")
+            words = [w for line in transcript["segments"] for w in line["words"]]
+            if not words or transcript["timing_method"] != "qwen_forced_alignment":
+                raise ValueError("Qwen verification did not produce acoustic word timings")
+            if any(not 0 <= w["start"] < w["end"] <= len(speech) / 44100 for w in words):
+                raise ValueError("Qwen verification returned invalid word timings")
         if (
             PACKS[pack].get("device") == "cuda"
             and not CATALOG[model].get("device")

@@ -159,7 +159,7 @@ def test_optional_separation_missing_is_actionable_and_never_downloads(tmp_path,
         result = client.post("/api/studio/models/mel-band-roformer-kj/check").json()
         assert not result["runnable"]
         assert result["health"]["state"] == "missing"
-        assert "setup_separation.py" in result["health"]["error"]
+        assert "AI setup" in result["health"]["error"]
 
 
 def test_attention_adapter_preserves_upstream_fallback_on_older_torch():

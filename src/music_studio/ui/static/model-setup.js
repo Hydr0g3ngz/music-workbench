@@ -8,8 +8,8 @@
   const labels = {
     "tools-title": ["为你的下一步创作准备工具", "Tools for your next creative step"],
     "tools-intro": ["按需安装。语音清理和转写可使用 CPU；分轨、旋律提取推荐 NVIDIA 加速。首次下载后可离线处理。", "Install what you need. CPU works for speech cleanup and transcription; NVIDIA acceleration is recommended for stems and melody. Process offline after setup."],
-    "manual-title": ["其他已接入的模型", "Other integrated models"],
-    "manual-copy": ["Mel-Band RoFormer 与 Qwen3-ASR 目前需要单独手动配置。可在工作台的模型列表检查当前环境。", "Mel-Band RoFormer and Qwen3-ASR still need separate manual setup. Check existing environments in the workstation model list."],
+    "manual-title": ["安装后，在工作台使用", "Use installed tools in the workstation"],
+    "manual-copy": ["选择一个音频片段，再打开 AI 模型。Qwen 可选择逐字定位或较快的粗略时间；分离结果可试听后加入轨道。", "Select an audio clip and open AI Models. Choose acoustic word timing or faster coarse timing for Qwen; audition separated stems before adopting them."],
     "manual-link": ["打开工作台模型列表 →", "Open workstation models →"],
   };
   const stages = {
@@ -54,11 +54,11 @@
       field("title").textContent = tr(...row.title);
       field("description").textContent = tr(...row.description);
       field("state").textContent = active ? tr(...states[row.state]) : ready ? tr("可使用", "Available") : tr(...(states[row.state === "ready" ? "idle" : row.state] || states.idle));
-      field("resources").textContent = `${row.device === "cuda" ? "NVIDIA CUDA 12.8" : "CPU"} · ${tr("预计下载", "Download estimate")} ${row.download_estimate} · ${tr("需预留", "Keep free")} ${(row.required_free_bytes / 1024 ** 3).toFixed(0)} GB`;
+      field("resources").textContent = `${row.device === "cuda" ? "NVIDIA · " + ((row.preflight.min_vram_mib || 4000) / 1000).toFixed(0) + tr(" GB 显存及以上", " GB+ VRAM") : "CPU"} · ${tr("预计下载", "Download estimate")} ${row.download_estimate} · ${tr("磁盘预留", "Free disk")} ${(row.required_free_bytes / 1024 ** 3).toFixed(0)} GB`;
       field("progress-wrap").hidden = !active;
       field("stage").textContent = tr(...(stages[row.progress?.stage] || stages.preparing));
       card.querySelector("progress").value = row.progress?.fraction || 0;
-      const reason = (row.preflight.reasons || []).map((r) => r === "windows-x64" ? tr("自动安装需要 Windows 64 位。", "Automatic setup requires Windows x64.") : r === "cuda-compatibility" ? tr("需要 Turing 或更新的 NVIDIA 显卡、至少 4 GB 显存和 570 或更新驱动。", "Requires NVIDIA Turing or newer, at least 4 GB VRAM and driver 570 or newer.") : tr("磁盘空间不足，请释放空间后重试。", "Free disk space before retrying.")).join(" ");
+      const reason = (row.preflight.reasons || []).map((r) => r === "windows-x64" ? tr("自动安装需要 Windows 64 位。", "Automatic setup requires Windows x64.") : r === "cuda-compatibility" ? (row.preflight.min_capability >= 8 ? tr("需要 Ampere 或更新的 NVIDIA 显卡、至少 8 GB 显存和 570 或更新驱动。", "Requires NVIDIA Ampere or newer, at least 8 GB VRAM and driver 570 or newer.") : tr("需要 Turing 或更新的 NVIDIA 显卡、至少 4 GB 显存和 570 或更新驱动。", "Requires NVIDIA Turing or newer, at least 4 GB VRAM and driver 570 or newer.")) : tr("磁盘空间不足，请释放空间后重试。", "Free disk space before retrying.")).join(" ");
       const failed = row.capabilities?.find((m) => !m.runnable && m.health.state !== "unchecked");
       const diagnostic = failed ? `${tr(...failed.title)}: ${failed.health.error || tr("缺少运行组件或权重，请安装或修复工具包。", "Runtime components or weights are missing. Install or repair this pack.")}` : "";
       field("error").textContent = errors.get(row.id) || row.error || diagnostic || (!ready ? reason : "");

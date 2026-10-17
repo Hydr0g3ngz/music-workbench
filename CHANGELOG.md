@@ -1,5 +1,22 @@
 # Changelog / 更新记录
 
+## 0.2.0.dev17 — Vocal separation and word timing / 人声分离与逐字定位（开发版）
+
+Adds managed Windows CUDA packs for Mel-Band RoFormer KJ and Qwen3-ASR with
+ForcedAligner. Installation verifies pinned source and model files and executes
+offline sample inference before enabling tools. Qwen offers acoustic word timing
+or faster coarse paragraphs, with sequential model loading and explicit review
+markers when alignment cannot be trusted. Explicit manual environments retain priority.
+Task cards surface partial timing results; the bundled song workflow and its limitations
+are recorded in the validation report.
+
+新增 RoFormer、Qwen 转写与 ForcedAligner 自动工具包，无需系统 Python。
+工作台可选择逐字定位或粗略时间；安装验证检查实际 CUDA 推理与字词时间。
+复用已验证的官方 Torch 下载缓存，并明确区分显存与磁盘要求。
+真实歌曲流程暴露的部分字词时间会在任务卡提示复核，实测记录保留失败范围。
+
+See [workflow / 使用方法](docs/qwen-and-separation.md).
+
 ## 0.2.0.dev16 — GPU tools and model controls / GPU 工具与模型参数（开发版）
 
 Adds a separate, verified NVIDIA CUDA 12.8 tool pack for Demucs, CREPE and

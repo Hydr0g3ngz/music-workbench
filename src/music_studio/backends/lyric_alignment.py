@@ -334,7 +334,8 @@ def align_lyrics(source: Path, lyrics: Lyrics, config: dict) -> Lyrics:
     )
     result.warnings.append(
         f"Alignment: {alignment_model[0]}@{alignment_model[1]}; "
-        f"{failed} lines retained native times. Singing alignment needs listening verification."
+        f"{failed} lines need timing review (partial or original timings). "
+        "Singing alignment needs listening verification."
     )
     return Lyrics.model_validate(result.model_dump())
 

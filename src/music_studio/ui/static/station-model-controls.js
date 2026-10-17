@@ -12,6 +12,9 @@
     if (model.stage === "lyrics") {
       html += `<label>${tr("录音语言", "Audio language")}<select data-model-option="language">${[["", tr("自动识别", "Detect automatically")], ["zh", "中文"], ["en", "English"], ["ja", "日本語"], ["ko", "한국어"], ["es", "Español"], ["fr", "Français"], ["de", "Deutsch"]].map(([v, label]) => option(v, label, values.language || "")).join("")}</select></label>`;
     }
+    if (model.id === "qwen3-asr") {
+      html += `<label>${tr("时间精度", "Word timing")}<select data-model-option="alignment">${[["auto", tr("自动 · 使用工具包推荐", "Automatic · pack default")], ["qwen", tr("逐字对齐 · 较慢", "Acoustic word timing · slower")], ["native", tr("粗略段落 · 较快", "Coarse paragraphs · faster")]].map(([v, label]) => option(v, label, values.alignment || "auto")).join("")}</select></label>`;
+    }
     if (model.stage === "denoise") {
       html += `<label>${tr("降噪强度 · 0–1", "Cleanup strength · 0–1")}<input type="number" min="0" max="1" step="0.05" value="${esc(values.strength ?? 1)}" data-model-option="strength"></label>`;
     }

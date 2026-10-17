@@ -13,7 +13,9 @@ def file_hash(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def windows_wheel(package, python_tag, directory, *, version="2.10.0", flavor="cu128"):
+def windows_wheel(
+    package, python_tag, directory, *, version="2.10.0", flavor="cu128", reuse_directories=()
+):
     if (version, flavor) not in (("2.10.0", "cu128"), ("2.5.1", "cpu")):
         raise ValueError("Unsupported fixed Torch profile")
     name = f"{package}-{version}+{flavor}-{python_tag}-{python_tag}-win_amd64.whl"
@@ -38,6 +40,11 @@ def windows_wheel(package, python_tag, directory, *, version="2.10.0", flavor="c
     target = directory / name
     if target.is_file() and file_hash(target) == expected:
         return target
+    for folder in reuse_directories:
+        candidate = folder / name
+        if candidate.is_file() and file_hash(candidate) == expected:
+            print("Reusing verified official wheel: " + name, flush=True)
+            return candidate
     with urllib.request.urlopen(urllib.request.Request(url, method="HEAD"), timeout=30) as response:
         size = int(response.headers["Content-Length"])
     if not 0 < size < 5 * 1024**3:

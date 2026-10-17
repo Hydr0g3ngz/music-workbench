@@ -84,8 +84,8 @@ def install(pack, root):
     progress("runtime", 0.02)
     python, env = prepare_python(root, cache)
     progress("dependencies", 0.1)
-    if pack.startswith("music-tools"):
-        accelerated = pack == "music-tools-cuda"
+    if pack.startswith("music-tools") or PACKS[pack].get("device") == "cuda":
+        accelerated = PACKS[pack].get("device") == "cuda"
         wheels = [
             windows_wheel(
                 name,
@@ -93,6 +93,7 @@ def install(pack, root):
                 cache,
                 version="2.10.0" if accelerated else "2.5.1",
                 flavor="cu128" if accelerated else "cpu",
+                reuse_directories=[p for p in root.parent.glob("*/downloads") if p != cache],
             )
             for name in ("torch", "torchaudio")
         ]
@@ -114,6 +115,7 @@ def install(pack, root):
     progress("models", 0.5)
     models = root / "models"
     models.mkdir(exist_ok=True)
+    extra = {}
     if pack.startswith("music-tools"):
         checkpoint = models / "torch/hub/checkpoints/955717e8-8726e21a.th"
         checkpoint.parent.mkdir(parents=True, exist_ok=True)
@@ -160,6 +162,15 @@ for name in names:
                 for n in ("config.json", "model.bin", "tokenizer.json", "vocabulary.txt")
             ),
         ]
+    elif pack == "vocal-separation":
+        from .model_assets import roformer_assets
+
+        files, extra = roformer_assets(root, python, cache)
+    elif pack == "qwen-transcription":
+        from .model_assets import lyric_snapshot
+
+        files = [p for name in ("qwen", "aligner") for p in lyric_snapshot(name, models)]
+        extra = {"managed_alignment": "qwen"}
     else:
         from .cleanup import download
 
@@ -172,6 +183,8 @@ for name in names:
         "TRANSFORMERS_OFFLINE": "1",
         "TORCH_HOME": str(models / "torch"),
     }
+    if extra.get("separation_config"):
+        offline["MUSIC_STUDIO_SEPARATION_CONFIG"] = extra["separation_config"]
     boot.run(
         python,
         "-X",
@@ -198,6 +211,7 @@ for name in names:
             "device": PACKS[pack].get("device", "cpu"),
             "files": manifest,
             "verification": verification,
+            **extra,
         },
     )
     progress("complete", 1)

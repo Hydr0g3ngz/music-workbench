@@ -4,16 +4,16 @@
 
 模型是可选组件。采样乐器、MIDI、录音、编排、效果器与导出不需要神经网络权重。
 
-以下自动工具包属于 **dev16 开发版**；GitHub 已发布的 dev14 仅提供 ACE-Step 自动环境配置。
+以下自动工具包属于 **dev17 开发版**；GitHub 已发布的 dev14 仅提供 ACE-Step 自动环境配置。
 
 | 能力 | 当前后端 | 安装方式 | 使用入口 |
 | --- | --- | --- | --- |
 | 文字生成、参考变奏、局部重绘 | ACE-Step 1.5 Turbo | Windows 首页 **AI 自动配置**；源码也可用安装脚本 | [生成](music-generation.md) · [重绘](volume-and-repaint.md) |
-| 人声/伴奏分离 | Mel-Band RoFormer KJ | 手动安装独立环境 | [分轨指南](separation.md) |
+| 人声/伴奏分离 | Mel-Band RoFormer KJ | AI 工具管理 → 人声与伴奏 | [安装与使用](qwen-and-separation.md) · [分轨指南](separation.md) |
 | 两声部/四声部分离 | Demucs htdemucs | AI 工具管理 → 分轨、旋律与转写 | [工作流](ai-production-workflow.md) |
 | 单旋律 MIDI | CREPE | 与 Demucs 共用自动工具包 | [工作流](ai-production-workflow.md) · [评测](melody-next.md) |
 | 转写与歌词改字 | Whisper small | 分轨、旋律与转写工具包；详细改字在素材编辑器 | [素材编辑器模型](next-models.md) |
-| 转写 | Qwen3-ASR | 手动安装独立环境 | [素材编辑器模型](next-models.md) |
+| 转写与字词时间 | Qwen3-ASR-1.7B + ForcedAligner-0.6B | AI 工具管理 → 语音、歌词与逐字定位 | [安装与使用](qwen-and-separation.md) |
 | 讲话降噪 | DPDFNet2、实验性 GTCRN | AI 工具管理 → 清理讲话录音 | [语音清理](speech-cleanup.md) |
 
 ## 分轨、旋律、转写与语音清理
@@ -23,6 +23,8 @@
 - **分轨、旋律与转写**：CPU 版 Torch 2.5.1、Demucs、CREPE 与 Whisper small，预计下载 1–2 GB，预留 6 GB。还包含 librosa 速度/调性分析与变速变调；这些属于 DSP。
 - **清理讲话录音**：sherpa-onnx、DPDFNet2 与 GTCRN，预计下载 150–300 MB，预留 1 GB。用于讲话录音，处理完整音乐可能损伤乐器。
 - **NVIDIA 加速工具包**：独立的 Torch 2.10 / CUDA 12.8 环境，预计下载 3–5 GB，预留 10 GB。需要 Turing 或更新的 NVIDIA GPU、至少 4 GB 显存和 570 或更新驱动；安装逐项执行真实 CUDA 推理。
+- **人声与伴奏 · RoFormer**：独立 CUDA 环境，预计下载 4–6 GB，预留 12 GB 磁盘；需要 Turing 或更新的 NVIDIA GPU、至少 4 GB 总显存。
+- **语音、歌词与逐字定位 · Qwen**：ASR 与对齐模型按阶段加载，使用 BF16；预计下载 10–13 GB，预留 24 GB 磁盘。需要 Ampere 或更新的 NVIDIA GPU、至少 8 GB 总显存；运行前另检查至少约 6 GB 空闲显存。逐字定位不会修正识别错词，详见[使用指南](qwen-and-separation.md)。
 - CPU 与 CUDA 工具包支持 Windows x64，可以共存；工作台可选择设备，显式配置的解释器仍优先。降噪与 DSP 使用 CPU。ACE-Step 的 GPU 条件独立计算。
 - 安装可暂停、重试，保留已完成下载；关闭软件会停止它启动的安装子进程。存放于 `%LOCALAPPDATA%\MusicWorkbench\AI\tools`，与应用及工程分开。
 
@@ -41,9 +43,9 @@
 - 已验证的硬件为 RTX 4070 Laptop 8 GB、32 GB RAM；其他硬件的可用性与速度可能不同。
 - 暂停或失败后可重试，复用已校验缓存。模型和环境默认放在 `%LOCALAPPDATA%\MusicWorkbench\AI`。
 
-## 手动配置与兼容界面
+## 高级配置与兼容界面
 
-RoFormer 与 Qwen3-ASR 目前仍需手动安装，其脚本需要源码与 Python；请按对应指南操作，完成后重启工作台。不同模型使用隔离环境，不要合并不同版本的 Torch 依赖。
+已有 RoFormer 或 Qwen3-ASR 手动环境可以继续使用；显式配置的解释器或分轨配置优先。需要定制时可使用源码安装脚本。不同模型使用隔离环境，不要合并不同版本的 Torch 依赖。
 
 `next.html` 是保留的单素材编辑器，供语音处理、转写和详细结果操作使用；其模型文档中的 Next 环境不是 Windows 安装版基础功能的前置条件。
 

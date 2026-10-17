@@ -23,6 +23,8 @@
 
 ## 可选模型安装
 
+dev17 Windows 版可从 **AI 工具管理 → 人声与伴奏 · RoFormer** 自动安装，详见[安装与使用](qwen-and-separation.md)。以下为源码用户的高级配置方法。
+
 在仓库根目录、Python 3.11/3.12 中运行：
 
 ```powershell

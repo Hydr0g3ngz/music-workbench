@@ -40,7 +40,7 @@ def test_main_workstation_passes_model_controls_to_task_queue(client, monkeypatc
 
     def submit(project, request):
         calls.append((project, request))
-        return {"id": "0123456789abcdef", "status": "queued"}
+        return {"id": f"{len(calls):016x}", "status": "queued"}
 
     monkeypatch.setattr(client.app.state.studio.tasks, "submit", submit)
     response = client.post(
@@ -64,13 +64,25 @@ def test_main_workstation_passes_model_controls_to_task_queue(client, monkeypatc
         json={
             "revision": state["revision"],
             "clip": clip["id"],
+            "model": "qwen3-asr",
+            "alignment": "qwen",
+            "device": "cuda",
+        },
+    )
+    assert response.status_code == 202, response.text
+    assert calls[-1][1].alignment == "qwen"
+    response = client.post(
+        f"/api/workstation/projects/{state['id']}/process",
+        json={
+            "revision": state["revision"],
+            "clip": clip["id"],
             "model": "crepe-rest",
             "device": "cuda",
             "strength": 2,
         },
     )
     assert response.status_code == 422
-    assert len(calls) == 1
+    assert len(calls) == 2
 
 
 def test_demo_real_audio_midi_export_and_reopen(client, tmp_path):

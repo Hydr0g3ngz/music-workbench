@@ -38,7 +38,7 @@ def model_path(name: str, config: dict) -> str:
     except Exception as error:
         raise RuntimeError(
             f"Cannot load {repository}@{revision[:8]}. "
-            "Use scripts/setup_lyrics.ps1 to install the optional runtime and download weights."
+            "Install or repair this tool in AI setup, or configure its optional local runtime."
         ) from error
 
 

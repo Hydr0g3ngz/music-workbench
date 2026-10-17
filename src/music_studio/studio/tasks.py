@@ -72,6 +72,8 @@ class TaskManager:
         if self.stopping.is_set():
             raise StudioError("Task queue is closing", 503)
         spec = self.registry.spec(request.model)
+        if request.alignment != "auto" and request.model != "qwen3-asr":
+            raise StudioError("Independent Qwen timing is only available with the Qwen tool")
         if spec["stage"] != "transform" and (request.time_ratio != 1 or request.pitch_shift != 0):
             raise StudioError("Time/pitch parameters require the time-pitch capability")
         if spec["stage"] != "denoise" and request.strength != 1:
@@ -127,7 +129,7 @@ class TaskManager:
                 separation_model="htdemucs",
                 four_stems=request.model == "demucs-four-stems",
                 pitch_backend="crepe",
-                lyrics_alignment="native",
+                lyrics_alignment=request.alignment if request.model == "qwen3-asr" else "native",
                 language=request.language,
                 cleanup_strength=request.strength,
                 time_ratio=request.time_ratio,
@@ -148,6 +150,7 @@ class TaskManager:
                 "actor": actor,
                 "created_at": time.time(),
                 "device": device,
+                "alignment": request.alignment,
                 "strength": request.strength if spec["stage"] == "denoise" else None,
                 "time_ratio": request.time_ratio,
                 "pitch_shift": request.pitch_shift,

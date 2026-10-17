@@ -1,0 +1,293 @@
+{
+  "schema": 1,
+  "version": "0.2.0.dev17",
+  "date": "2026-10-17",
+  "host": {
+    "os": "Windows x64",
+    "cpu": "Intel Core Ultra 9 185H",
+    "ram_gb": 32,
+    "gpu": {
+      "index": 0,
+      "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+      "memory_mib": 8188,
+      "driver": "591.74",
+      "capability": 8.9
+    },
+    "python": "3.12.10",
+    "torch": "2.10.0+cu128",
+    "threads": 4
+  },
+  "revisions": {
+    "roformer_source": "6fdad13686bb7e84d029ec66f9dbe76e65c93ebf",
+    "roformer_model": "ac9b0614ab3cd7f77219e18ba494dfd93956c348",
+    "qwen_asr": "7278e1e70fe206f11671096ffdd38061171dd6e5",
+    "qwen_aligner": "c7cbfc2048c462b0d63a45797104fc9db3ad62b7"
+  },
+  "installation_verification": {
+    "vocal-separation": {
+      "mel-band-roformer-kj": {
+        "timing_method": null,
+        "seconds": 39.697,
+        "audio_seconds": 4.0,
+        "realtime_factor": 9.924,
+        "device": "cuda",
+        "compute_type": null,
+        "torch_peak_mb": 1599.74,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+        "offline": true,
+        "artifacts": 3
+      }
+    },
+    "qwen-transcription": {
+      "qwen3-asr": {
+        "timing_method": "qwen_forced_alignment",
+        "seconds": 101.923,
+        "audio_seconds": 5.0,
+        "realtime_factor": 20.385,
+        "device": "cuda",
+        "compute_type": "bfloat16",
+        "torch_peak_mb": 4480.88,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+        "offline": true,
+        "artifacts": 4
+      }
+    }
+  },
+  "workflow": {
+    "roformer": {
+      "metrics": {
+        "timing_method": null,
+        "seconds": 20.56,
+        "audio_seconds": 30.0,
+        "realtime_factor": 0.685,
+        "device": "cuda",
+        "compute_type": null,
+        "torch_peak_mb": 2027.88,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+      },
+      "source_sha256": "b367745a9c4df711dc4f60c178f8162338b1b5f0b461b681086a64bae3f1bb59",
+      "adopt_reopen_export_undo": true,
+      "tasks": [
+        {
+          "model": "mel-band-roformer-kj",
+          "device": "cuda",
+          "alignment": "auto",
+          "status": "complete",
+          "input_sha256": "7b38c3677baf9e0b3133da453f9ecdc9d1ff3f89881631196b13c47b8f6c7af3",
+          "metrics": {
+            "timing_method": null,
+            "seconds": 20.56,
+            "audio_seconds": 30.0,
+            "realtime_factor": 0.685,
+            "device": "cuda",
+            "compute_type": null,
+            "torch_peak_mb": 2027.88,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          }
+        }
+      ]
+    },
+    "qwen": {
+      "source_sha256": "0242b00b9ae817ffb5f6a5ade0308747501960f9007454182aa8158bf3774a01",
+      "native_metrics": {
+        "timing_method": "qwen_coarse_segments",
+        "seconds": 36.153,
+        "audio_seconds": 23.112,
+        "realtime_factor": 1.564,
+        "device": "cuda",
+        "compute_type": "bfloat16",
+        "torch_peak_mb": 4480.88,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+      },
+      "aligned_metrics": {
+        "timing_method": "qwen_with_native_fallback",
+        "seconds": 43.179,
+        "audio_seconds": 23.112,
+        "realtime_factor": 1.868,
+        "device": "cuda",
+        "compute_type": "bfloat16",
+        "torch_peak_mb": 4480.88,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+      },
+      "tokens_unchanged": true,
+      "recognized_tokens": 67,
+      "words": 64,
+      "text_exports": {
+        "lyrics-txt": true,
+        "lyrics-lrc": true,
+        "lyrics-srt": true
+      },
+      "timing_method": "qwen_with_native_fallback",
+      "fallback_lines": 3,
+      "word_samples": [
+        {
+          "start": 0.56,
+          "end": 0.96,
+          "id": "w00000",
+          "text": "Johnson ",
+          "score": null
+        },
+        {
+          "start": 0.96,
+          "end": 1.12,
+          "id": "w00001",
+          "text": "was ",
+          "score": null
+        },
+        {
+          "start": 1.12,
+          "end": 1.44,
+          "id": "w00002",
+          "text": "pretty ",
+          "score": null
+        },
+        {
+          "start": 1.44,
+          "end": 1.76,
+          "id": "w00003",
+          "text": "low, ",
+          "score": null
+        },
+        {
+          "start": 2.8,
+          "end": 2.88,
+          "id": "w00004",
+          "text": "but ",
+          "score": null
+        },
+        {
+          "start": 2.88,
+          "end": 3.12,
+          "id": "w00005",
+          "text": "they ",
+          "score": null
+        },
+        {
+          "start": 3.12,
+          "end": 3.2,
+          "id": "w00006",
+          "text": "are ",
+          "score": null
+        },
+        {
+          "start": 3.2,
+          "end": 3.52,
+          "id": "w00007",
+          "text": "still ",
+          "score": null
+        }
+      ],
+      "edited_line_times_cleared": true,
+      "tasks": [
+        {
+          "model": "qwen3-asr",
+          "device": "cuda",
+          "alignment": "native",
+          "status": "complete",
+          "input_sha256": "1178a49273bf0efed6555427e41475eb06d6b7476bd47f6d3b8144f39aa54127",
+          "metrics": {
+            "timing_method": "qwen_coarse_segments",
+            "seconds": 36.153,
+            "audio_seconds": 23.112,
+            "realtime_factor": 1.564,
+            "device": "cuda",
+            "compute_type": "bfloat16",
+            "torch_peak_mb": 4480.88,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          }
+        },
+        {
+          "model": "qwen3-asr",
+          "device": "cuda",
+          "alignment": "auto",
+          "status": "complete",
+          "input_sha256": "1178a49273bf0efed6555427e41475eb06d6b7476bd47f6d3b8144f39aa54127",
+          "metrics": {
+            "timing_method": "qwen_with_native_fallback",
+            "seconds": 43.179,
+            "audio_seconds": 23.112,
+            "realtime_factor": 1.868,
+            "device": "cuda",
+            "compute_type": "bfloat16",
+            "torch_peak_mb": 4480.88,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          }
+        }
+      ]
+    },
+    "song": {
+      "source_sha256": "83b97cd28134d96effae3626d4d3373cce1186aeed9694d1ef0900df09736650",
+      "separation_metrics": {
+        "timing_method": null,
+        "seconds": 19.826,
+        "audio_seconds": 45.0,
+        "realtime_factor": 0.441,
+        "device": "cuda",
+        "compute_type": "autocast-fp16",
+        "torch_peak_mb": 2041.39,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+      },
+      "transcription_metrics": {
+        "timing_method": "qwen_with_native_fallback",
+        "seconds": 34.851,
+        "audio_seconds": 45.0,
+        "realtime_factor": 0.774,
+        "device": "cuda",
+        "compute_type": "bfloat16",
+        "torch_peak_mb": 4480.88,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+      },
+      "timing_method": "qwen_with_native_fallback",
+      "words": 37,
+      "lines": 6,
+      "fallback_lines": 6,
+      "not_a_quality_score": true,
+      "tasks": [
+        {
+          "model": "mel-band-roformer-kj",
+          "device": "cuda",
+          "alignment": "auto",
+          "status": "complete",
+          "input_sha256": "c0b9cfb3d5366a6c41f1f3ffa21b0dc98f1994be65e686a31bf5e3d79e18dbd6",
+          "metrics": {
+            "timing_method": null,
+            "seconds": 19.826,
+            "audio_seconds": 45.0,
+            "realtime_factor": 0.441,
+            "device": "cuda",
+            "compute_type": "autocast-fp16",
+            "torch_peak_mb": 2041.39,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          }
+        },
+        {
+          "model": "qwen3-asr",
+          "device": "cuda",
+          "alignment": "auto",
+          "status": "complete",
+          "input_sha256": "0b53d106db2cd35538709c2e91f66d8339b3786e11aa5fadd09698c795f13e59",
+          "metrics": {
+            "timing_method": "qwen_with_native_fallback",
+            "seconds": 34.851,
+            "audio_seconds": 45.0,
+            "realtime_factor": 0.774,
+            "device": "cuda",
+            "compute_type": "bfloat16",
+            "torch_peak_mb": 4480.88,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          }
+        }
+      ],
+      "recognized_tokens": 66
+    }
+  },
+  "limits": [
+    "Execution and integration evidence, not recognition or alignment accuracy.",
+    "Single trials, no OS cache flush, background setup/check activity present.",
+    "Worker timed stages exclude queueing, registry probes and initial Python startup.",
+    "Torch allocation excludes CUDA context and other applications.",
+    "New embedded environments reused cached model files verified against pinned upstream hashes; complete remote weight download was not repeated.",
+    "Only RTX 4070 Laptop 8 GB tested; no new CPU or other-GPU validation.",
+    "The 45-second licensed song demo is not ground truth and is not a quality benchmark."
+  ]
+}

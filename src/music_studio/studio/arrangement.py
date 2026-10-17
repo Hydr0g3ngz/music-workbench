@@ -179,6 +179,7 @@ class ProcessClip(RevisionRequest):
     time_ratio: float = Field(default=1, ge=0.5, le=2)
     pitch_shift: int = Field(default=0, ge=-12, le=12)
     device: Literal["auto", "cpu", "cuda"] = "auto"
+    alignment: Literal["auto", "native", "qwen"] = "auto"
     language: str | None = Field(default=None, min_length=2, max_length=12, pattern=r"^[a-zA-Z-]+$")
     strength: float = Field(default=1, ge=0, le=1)
     fit: FitOptions | None = None
@@ -425,6 +426,7 @@ class ArrangementService:
                 time_ratio=request.time_ratio,
                 pitch_shift=request.pitch_shift,
                 device=request.device,
+                alignment=request.alignment,
                 language=request.language,
                 strength=request.strength,
             ),

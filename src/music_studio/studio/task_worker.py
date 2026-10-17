@@ -96,6 +96,14 @@ def execute(request):
         if config["device"] == "cuda" and not torch.cuda.is_available():
             raise RuntimeError("CUDA is unavailable; choose CPU or Auto")
         if config["device"] == "cuda":
+            if model == "qwen3-asr" and torch.cuda.get_device_capability()[0] < 8:
+                raise RuntimeError("Qwen BF16 inference needs an Ampere or newer GPU; choose CPU")
+            minimum = {"qwen3-asr": 6000, "mel-band-roformer-kj": 3000}.get(model)
+            if minimum and torch.cuda.mem_get_info()[0] / 1024**2 < minimum:
+                raise RuntimeError(
+                    f"This tool needs {minimum / 1000:g} GB free VRAM; "
+                    "close other GPU applications or choose CPU"
+                )
             # Catch unsupported architectures/driver kernels before loading weights.
             torch.ones(1, device="cuda").sum().item()
             torch.cuda.reset_peak_memory_stats()
@@ -155,6 +163,8 @@ def execute(request):
             from ..backends.separation import separate
 
         report = separate(source, output, config)
+        if model == "mel-band-roformer-kj":
+            config["_compute_type"] = report["precision"]
         write_json(output / "separation.json", report)
         artifact("separation-report", "json", "separation.json", "application/json")
         roles = (
@@ -165,12 +175,21 @@ def execute(request):
         for role in roles:
             artifact(role, "audio", f"audio/{role}.wav", "audio/wav")
     elif stage == "lyrics":
+        # Single-task workers must release the recognizer before loading the aligner,
+        # even if the parent shell enabled reuse for an unrelated benchmark batch.
+        os.environ.pop("MUSIC_STUDIO_REUSE_RECOGNIZER", None)
+        os.environ.pop("MUSIC_STUDIO_REUSE_ALIGNER", None)
         from ..backends.lyrics import transcribe
         from .transcripts import write_text_exports
 
+        alignment = config.get("lyrics_alignment", "native")
+        if alignment == "auto":
+            alignment = config.get("managed_alignment", "native")
         config.update(
-            asr_backend="qwen" if model == "qwen3-asr" else "whisper", lyrics_alignment="native"
+            asr_backend="qwen" if model == "qwen3-asr" else "whisper", lyrics_alignment=alignment
         )
+        if model == "qwen3-asr":
+            config["_compute_type"] = "bfloat16" if config["device"] == "cuda" else "float32"
         lyrics = transcribe(source, config)
         write_json(output / "lyrics.json", lyrics.model_dump())
         artifact("lyrics", "transcript", "lyrics.json", "application/json")
@@ -219,6 +238,7 @@ def execute(request):
     result = {
         "artifacts": artifacts,
         "metrics": {
+            "timing_method": lyrics.timing_method if stage == "lyrics" else None,
             "seconds": round(time.perf_counter() - started, 3),
             "audio_seconds": round(duration, 3),
             "realtime_factor": round((time.perf_counter() - started) / max(duration, 0.001), 3),

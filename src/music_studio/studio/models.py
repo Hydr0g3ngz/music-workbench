@@ -100,6 +100,7 @@ class LocalTaskRequest(RevisionRequest):
         "Use asset:<id> for a completed task's audio output.",
     )
     device: Literal["auto", "cpu", "cuda"] = "auto"
+    alignment: Literal["auto", "native", "qwen"] = "auto"
     time_ratio: float = Field(default=1, ge=0.5, le=2)
     pitch_shift: int = Field(default=0, ge=-12, le=12)
     language: str | None = Field(default=None, min_length=2, max_length=12, pattern=r"^[a-zA-Z-]+$")

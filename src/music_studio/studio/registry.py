@@ -66,8 +66,9 @@ CATALOG = {
             "Separate vocals & backing · Mel-Band RoFormer",
         ],
         "description": [
-            "可选本地模型，8 秒窗口、单批次。先试听结果，再加入编排。",
-            "Optional local model, 8 s windows, batch 1. Audition before adding stems.",
+            "可自动安装的本地人声分离。8 秒窗口、单批次。先试听结果，再加入编排。",
+            "Local vocal separation with automatic setup. 8 s windows, batch 1. "
+            "Audition before adding stems.",
         ],
         "runtime": "separation",
         "imports": ["torch", "librosa", "ml_collections", "rotary_embedding_torch", "beartype"],
@@ -173,8 +174,9 @@ CATALOG = {
     "qwen3-asr": {
         "title": ["Qwen 语音与歌词", "Qwen speech & lyrics"],
         "description": [
-            "独立 Qwen3-ASR-1.7B 环境；按需加载，不常驻显存。",
-            "Isolated Qwen3-ASR-1.7B runtime. Loaded only while its task runs.",
+            "转写后用 ForcedAligner 逐字定位；可选择较快的粗略时间。按阶段加载，不常驻显存。",
+            "Transcribe, then align words with ForcedAligner, or choose faster coarse timing. "
+            "Models load sequentially.",
         ],
         "runtime": "lyrics",
         "imports": ["torch", "qwen_asr", "transformers", "librosa"],
@@ -256,7 +258,7 @@ class ModelRegistry:
 
     def python(self, spec, device="auto"):
         slot = spec["runtime"]
-        if slot == "separation":
+        if slot == "separation" and not self.managed(spec, device):
             from .separation import runtime
 
             return runtime()["python"]
@@ -281,6 +283,10 @@ class ModelRegistry:
         # Explicit launch settings remain authoritative; installer users need no settings.
         if spec["runtime"] == "inference" and self.settings.inference_python:
             return None
+        if spec["runtime"] == "lyrics" and self.settings.lyrics_python:
+            return None
+        if spec["runtime"] == "separation" and os.environ.get("MUSIC_STUDIO_SEPARATION_CONFIG"):
+            return None
         from .model_setup import managed_runtime
 
         if device == "auto":
@@ -292,7 +298,13 @@ class ModelRegistry:
 
     def environment_settings(self, model, device="auto"):
         managed = self.managed(self.spec(model), device)
-        return {"model_dir": managed["model_dir"]} if managed else {}
+        if not managed:
+            return {}
+        return {
+            k: managed[k]
+            for k in ("model_dir", "separation_config", "managed_alignment")
+            if k in managed
+        }
 
     def spec(self, model):
         if model not in CATALOG:
@@ -311,7 +323,9 @@ class ModelRegistry:
             if spec["runtime"] == "separation":
                 from .separation import runtime
 
-                runtime(verify=deep)
+                runtime(
+                    verify=deep, config_file=managed.get("separation_config") if managed else None
+                )
         except (OSError, ValueError, KeyError) as error:
             return {
                 "state": "missing",
@@ -348,6 +362,10 @@ elif spec['runtime'] == 'lyrics':
       'model-00001-of-00002.safetensors', 'model-00002-of-00002.safetensors',
       'tokenizer_config.json', 'vocab.json', 'merges.txt', 'preprocessor_config.json')
     weights = [folder/n for n in names]
+    if (root/'lyrics/aligner').is_dir():
+        alignment = root/'lyrics/aligner/c7cbfc2048c462b0d63a45797104fc9db3ad62b7'
+        weights.extend(alignment/n for n in ('config.json','model.safetensors',
+            'tokenizer_config.json','vocab.json','merges.txt','preprocessor_config.json'))
 elif stage == 'melody':
     package = importlib.util.find_spec('torchcrepe')
     weights = [pathlib.Path(package.origin).parent/'assets/full.pth'] if package else []
@@ -420,7 +438,14 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
                     "install the NVIDIA tool pack or choose CPU",
                 )
             if spec["runtime"] == "separation":
-                checkpoint = Path(runtime()["root"]) / "MelBandRoformer.ckpt"
+                checkpoint = (
+                    Path(
+                        runtime(config_file=managed.get("separation_config") if managed else None)[
+                            "root"
+                        ]
+                    )
+                    / "MelBandRoformer.ckpt"
+                )
                 result.update(weight_files=1, weight_bytes=checkpoint.stat().st_size)
             return result
         except TaskStopped:

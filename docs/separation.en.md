@@ -21,6 +21,8 @@ Individual **Add track** inserts the full result at the current playhead without
 
 ## Optional setup
 
+dev17 Windows builds offer automatic setup in **AI tools → Vocals & backing · RoFormer**; see the [guide](qwen-and-separation.en.md). The following instructions are an advanced source setup option.
+
 From the repository root using Python 3.11/3.12:
 
 ```powershell

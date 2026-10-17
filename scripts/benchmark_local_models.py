@@ -66,6 +66,7 @@ def main(args):
         "device_requested": args.device,
         "python": str(args.python),
         "threads": 4,
+        "qwen_alignment": args.alignment,
         "cases": [],
         "notes": __doc__.strip(),
     }
@@ -83,6 +84,10 @@ def main(args):
         config.update(
             cleanup_strength=1, time_ratio=1, pitch_shift=0, four_stems=model == "demucs-four-stems"
         )
+        if model == "qwen3-asr":
+            config["lyrics_alignment"] = args.alignment
+        if model == "mel-band-roformer-kj" and args.separation_config:
+            config["separation_config"] = str(args.separation_config.resolve())
         request = case / "request.json"
         write_json(
             request,
@@ -160,6 +165,17 @@ if __name__ == "__main__":
     parser.add_argument("--device", choices=["cpu", "cuda"], required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--duration", type=int, default=30)
+    parser.add_argument(
+        "--alignment",
+        choices=["native", "qwen"],
+        default="native",
+        help="Qwen coarse recognition or independent acoustic word timing",
+    )
+    parser.add_argument(
+        "--separation-config",
+        type=Path,
+        help="Explicit RoFormer runtime configuration for reproducible runs",
+    )
     parser.add_argument(
         "--input-dir", type=Path, help="Reuse exact frozen WAV bytes for paired runs"
     )

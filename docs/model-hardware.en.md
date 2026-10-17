@@ -54,14 +54,14 @@ One new 12-second, 8-step instrumental generation completed in 94.7 s: 78.7 s in
 | --- | --- | --- |
 | ACE-Step | Text, reference variation, repaint → audition draft → adopt audio track → undo/export | Real generation; outputs audio rather than separately editable instrumental notes |
 | Demucs | Two/four stems → audition → aligned source replacement or additional tracks | Real CPU/CUDA inference; separation does not compose new performances |
-| Mel-Band RoFormer KJ | Vocals/backing → same aligned adoption workflow | Existing quality comparison; independent manual setup remains necessary |
+| Mel-Band RoFormer KJ | Vocals/backing → same aligned adoption workflow | Existing quality comparison; dev17 adds a managed CUDA tool pack |
 | CREPE | Solo singing/humming/monophonic instrument → pitch/MIDI → editable sampled instrument notes | Public annotated-data evaluations; not reliable polyphonic whole-song transcription |
 | Whisper small | Speech/lyrics → transcript → line corrections in detailed asset editor → TXT/LRC/SRT | Real CPU/CUDA execution; singing, backing and overlapping voices remain difficult |
-| Qwen3-ASR-1.7B | Optional speech/lyrics transcription → same correction workflow | Manual environment; this task entry produces coarse segment times and does not automatically call ForcedAligner |
+| Qwen3-ASR-1.7B + ForcedAligner-0.6B | Transcription → acoustic word timing → same correction workflow | Managed setup in dev17; choose coarse timing or alignment. Alignment preserves recognized text and cannot fix wrong words; failed lines retain original timing and review markers |
 | DPDFNet2 | Speech cleanup → original/processed audition → add new track | Measured CPU execution and adjustable strength; may damage music/ambience |
 | GTCRN | Lightweight speech cleanup → same adoption workflow | Measured CPU execution; internal 16 kHz limits high frequencies; experimental alternative |
 
-The main workstation now passes device, transcription language and cleanup strength into real tasks. Processing still covers the **whole source asset**; adoption preserves the clip range. Shortening a timeline clip does not reduce model computation automatically. Transcript correction still opens **Details and editing** in the asset editor rather than an inline multitrack editor.
+The main workstation now passes device, transcription language, Qwen timing mode and cleanup strength into real tasks. Processing still covers the **whole source asset**; adoption preserves the clip range. Shortening a timeline clip does not reduce model computation automatically. Transcript correction still opens **Details and editing** in the asset editor rather than an inline multitrack editor.
 
 Beats, tempo, key, time/pitch, EQ, compression, reverb and volume curves use DSP. Blueprint and section-prompt compilation use rules. No hidden AI model performs those functions. CREPE stable/rest are decoder variants of one neural network.
 
@@ -71,4 +71,4 @@ Quality evidence: [melody evaluation](melody-next.en.md), [separation](separatio
 
 Run `scripts/benchmark_local_models.py` with an isolated interpreter, model directory, device and output directory; the development environment needs psutil. Use `--input-dir` to reuse identical WAV bytes in paired CPU/GPU runs. Machine-readable results: `benchmarks/results/local-hardware-2026-10-17.json`. Record driver/runtime versions, input hashes and actual devices. Developer GPU environments must not stand in for installer CPU results.
 
-Next priorities: managed RoFormer/Qwen installation and alignment; processing selected clips only; releasable resident workers to reduce waits; and a complete humming → corrected MIDI → editable accompaniment → arrangement/export workflow. AI mixing, polyphonic transcription, controllable singing and deep Agent integration remain future work.
+See the [dev17 guide](qwen-and-separation.en.md) for managed RoFormer/Qwen setup and word alignment. The dev16 measurements above retain their original conditions and are not speed guarantees for the new packs. Next priorities: processing selected clips only; releasable resident workers to reduce waits; and a complete humming → corrected MIDI → editable accompaniment → arrangement/export workflow. AI mixing, polyphonic transcription, controllable singing and deep Agent integration remain future work.

@@ -4,16 +4,16 @@
 
 Models are optional. Sampled instruments, MIDI, recording, arrangement, effects and exports work without neural weights.
 
-The tool packs below are part of **dev16 development builds**. The published dev14 installer automatically prepares ACE-Step only.
+The tool packs below are part of **dev17 development builds**. The published dev14 installer automatically prepares ACE-Step only.
 
 | Capability | Backend | Setup | Guide |
 | --- | --- | --- | --- |
 | Text generation, reference variation, region repaint | ACE-Step 1.5 Turbo | **AI setup** on Windows Home, or a source setup script | [Generation](music-generation.en.md) · [Repaint](volume-and-repaint.md) |
-| Vocal/backing separation | Mel-Band RoFormer KJ | Manual isolated environment | [Separation](separation.en.md) |
+| Vocal/backing separation | Mel-Band RoFormer KJ | AI tools → Vocals & backing | [Setup and use](qwen-and-separation.en.md) · [Separation](separation.en.md) |
 | Two/four-part separation | Demucs htdemucs | AI tools → Stems, melody & transcription | [Workflow](ai-production-workflow.md) |
 | Monophonic MIDI | CREPE | Shared automatic tool pack with Demucs | [Workflow](ai-production-workflow.md) · [Evaluation](melody-next.en.md) |
 | Transcription and text correction | Whisper small | Stems, melody & transcription pack; detailed text editing in the asset editor | [Editor models](next-models.en.md) |
-| Transcription | Qwen3-ASR | Manual isolated environment | [Editor models](next-models.en.md) |
+| Transcription and word timing | Qwen3-ASR-1.7B + ForcedAligner-0.6B | AI tools → Speech, lyrics & word timing | [Setup and use](qwen-and-separation.en.md) |
 | Speech denoising | DPDFNet2, experimental GTCRN | AI tools → Clean speech recordings | [Speech cleanup](speech-cleanup.en.md) |
 
 ## Stems, melody, transcription and speech cleanup
@@ -23,6 +23,8 @@ Open **AI tools** from Home or the workstation model panel. Choose a pack and cl
 - **Stems, melody & transcription**: CPU Torch 2.5.1, Demucs, CREPE and Whisper small; download estimate 1–2 GB, keep 6 GB free. Includes librosa tempo/key analysis and time/pitch processing, which are DSP.
 - **Clean speech recordings**: sherpa-onnx, DPDFNet2 and GTCRN; download estimate 150–300 MB, keep 1 GB free. Intended for speech; processing complete music may damage instruments.
 - **NVIDIA acceleration pack**: private Torch 2.10 / CUDA 12.8 runtime; estimated download 3–5 GB, keep 10 GB free. Requires Turing or newer, at least 4 GB VRAM and driver 570 or newer. Setup tests real CUDA inference.
+- **Vocals & backing · RoFormer**: private CUDA runtime; download estimate 4–6 GB, keep 12 GB disk space free. Requires Turing or newer NVIDIA GPU with at least 4 GB total VRAM.
+- **Speech, lyrics & word timing · Qwen**: ASR and alignment load sequentially in BF16; download estimate 10–13 GB, keep 24 GB disk space free. Requires Ampere or newer NVIDIA GPU with at least 8 GB total VRAM; tasks also check for about 6 GB free VRAM. Alignment does not fix recognition errors. See the [guide](qwen-and-separation.en.md).
 - Windows x64 CPU and CUDA packs can coexist; choose the device in the workstation. Explicit interpreter settings retain priority. Cleanup and DSP use CPU. ACE-Step has separate requirements.
 - Pause/retry retains completed downloads. Closing the app stops its installation subprocesses. Files live under `%LOCALAPPDATA%\MusicWorkbench\AI\tools`, outside the application and projects.
 
@@ -41,9 +43,9 @@ Open **AI setup** on Home. Follow the hardware checks, environment preparation, 
 - Verified hardware: RTX 4070 Laptop 8 GB with 32 GB RAM. Other configurations can differ in compatibility and speed.
 - Pause/retry reuses verified caches. Managed files default to `%LOCALAPPDATA%\MusicWorkbench\AI`.
 
-## Manual setup and compatibility editor
+## Advanced setup and compatibility editor
 
-RoFormer and Qwen3-ASR still need manual setup with a source checkout and Python. Follow the relevant guide and restart the workstation afterwards. Keep incompatible Torch dependencies in separate environments.
+Existing manual RoFormer/Qwen3-ASR environments remain supported, and explicit interpreter or separation configuration takes priority. Source setup scripts are available for customization. Keep incompatible Torch dependencies in separate environments.
 
 `next.html` is the retained single-asset editor for speech processing, transcription and detailed results. Its Next runtime instructions are not prerequisites for the installed app's basic features.
 

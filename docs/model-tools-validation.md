@@ -1,4 +1,50 @@
-# CPU tool pack validation / CPU 工具包验证
+# Local tool pack validation / 本地工具包验证
+
+## dev17: managed RoFormer and Qwen / 自动分轨与转写工具包
+
+Windows x64, Core Ultra 9 185H, RTX 4070 Laptop 8 GB, 32 GB RAM, Python 3.12.10,
+Torch 2.10 CUDA 12.8. Both packs were installed into new embedded environments.
+Existing model downloads were reused and checked against pinned upstream hashes;
+the full remote weight transfer was not repeated. Offline verification disabled
+Python socket connections and required valid outputs before publishing runtime manifests.
+
+两个工具包使用新建的独立环境，复用已有模型文件并逐项核对固定上游哈希。
+安装后禁用 Python socket 连接进行真实 CUDA 推理；Qwen 的五秒安装示例通过了完整声学对齐检查。
+这是已有 Windows 电脑上的环境安装验证，没有覆盖全新系统或更多显卡。
+
+| Workflow / 流程 | Measured outcome / 实测结果 |
+| --- | --- |
+| RoFormer, 30 s factory-sample mix / 内置乐器混合 | 20.6 s; aligned replacement, reopening, WAV export and undo passed / 对齐替换、重开、导出与撤销通过 |
+| Qwen, 23.112 s noisy speech / 含噪语音 | Coarse 36.2 s; acoustic timing 43.2 s. Same 67 recognized tokens; 64 valid word spans, three lines flagged / 识别文字保留，三行需复核 |
+| Text correction / 改字 | Edited-line word times cleared; original transcript preserved; TXT/LRC/SRT contain corrections / 清除改动行旧字词时间，保留原识别并导出更正 |
+| Licensed 45 s song / 自带授权歌曲 | RoFormer 19.8 s → adopt vocals → Qwen 34.9 s; 66 recognized tokens, 37 valid word spans; all six lines need review / 六行均有部分时间需复核 |
+
+Times are worker-stage measurements including imports, loading, inference and writing;
+they exclude queueing, environment probes and initial Python startup. These are single
+trials with warm OS caches and background checks/setup activity, not controlled speed
+comparisons. First Qwen installation verification took 101.9 s on five seconds of audio.
+Torch peak allocations were about 2.0 GiB for song separation and 4.4 GiB for Qwen;
+CUDA context and other applications are excluded.
+
+有效时间段数量只表示通过结构检查，**不是对齐准确率**。歌曲示例的六行均需复核，不能据此
+宣称歌词或歌唱对齐已经准确。模型加载开销明显，后续优先改善片段处理和重复加载。
+工作台任务卡会显示部分时间需复核；逐字定位不改正识别错词。
+
+The song demo is an execution example, not annotated ground truth. Valid word spans
+do not measure accuracy. Every song line needed timing review. The workstation now
+shows this in task cards, rather than presenting a completed task as reliable timing.
+
+Raw records, input hashes, versions and limits:
+[JSON](../benchmarks/results/managed-advanced-2026-10-17.json).
+Reproduce timed Qwen stages with `scripts/benchmark_local_models.py --models qwen3-asr`
+and `--alignment native` or `--alignment qwen`, using its managed Python and model
+directory. `--input-dir` reuses identical input WAVs. For RoFormer, use
+`--models mel-band-roformer-kj --separation-config <pack>/separation-runtime.json`.
+
+[Setup and use / 安装与使用](qwen-and-separation.md) ·
+[English guide](qwen-and-separation.en.md).
+
+## dev15: CPU pack / CPU 工具包
 
 Scope: dev15 automatic installation and workstation integration. These checks
 establish executable workflows, not separation, transcription or composition quality.
@@ -8,7 +54,7 @@ dev16 的 CPU/GPU 速度与流程复查见 [硬件报告](model-hardware.md)；�
 
 范围：dev15 的自动安装与工程衔接。以下结果验证运行流程，不代表音乐或转写质量评测。
 
-## Environment / 环境
+### Environment / 环境
 
 - Windows x64, Intel Core Ultra 9 185H, four inference threads.
 - Each pack was installed into a new embedded Python 3.12.10 directory. No system
@@ -20,7 +66,7 @@ dev16 的 CPU/GPU 速度与流程复查见 [硬件报告](model-hardware.md)；�
 - This is a clean inference environment on an existing Windows host, not a fresh
   Windows virtual-machine or broad hardware compatibility test.
 
-## Offline inference / 离线推理
+### Offline inference / 离线推理
 
 Setup checked checkpoint hashes and ran every declared capability with Python
 socket connections disabled. Demucs processed a non-silent mix of licensed factory
@@ -48,7 +94,7 @@ test does not measure recognition errors or perceptual quality.
 以上十条处理路径涉及五种 AI 模型及 DSP 操作，解码器变体和 DSP 不作为新增模型计数。
 全部运行通过；本次未测识别误差或听感质量。
 
-## Workstation workflow / 工程流程
+### Workstation workflow / 工程流程
 
 Using the real HTTP task queue with default settings and automatic managed-runtime
 discovery:
@@ -63,7 +109,7 @@ discovery:
 通过真实任务队列和默认配置，验证了导入、四分轨替换及撤销、旋律音符采用、
 重开与 WAV 导出、转写改字、降噪音频加入工程。未改动用户已有作品。
 
-## Failure behavior / 失败行为
+### Failure behavior / 失败行为
 
 Automated regression checks cover cross-window cancellation, interrupted setup,
 preservation of the last published manifest after inference failure, corrupt or
@@ -72,9 +118,10 @@ upgrades. UI tests cover polling without replacing cards, retained error message
 and hiding use controls after failed checks. Existing ACE-Step preview playback is
 checked against repeated reloads.
 
-## Remaining coverage / 尚未覆盖
+### Remaining coverage / 尚未覆盖
 
-RoFormer and Qwen3-ASR still require manual setup. CPU throughput on full-length
+In dev15, RoFormer and Qwen3-ASR required manual setup; dev17 adds managed packs
+described in the [current guide](qwen-and-separation.en.md). CPU throughput on full-length
 songs, automatic GPU profiles, new Windows installations and more hardware/network
 conditions need separate validation. Existing model quality benchmarks remain the
 source for quality claims; installation success does not replace them.
