@@ -65,6 +65,7 @@
     complete: ["准备完成", "Ready"],
   };
   const reasons = {
+    "cuda-compatibility": ["自动配置需要 Ampere 或更新的 NVIDIA 显卡和 570 或更新驱动。", "Automatic setup requires NVIDIA Ampere or newer and driver 570 or newer."],
     "windows-x64": [
       "自动配置目前支持 Windows 10/11 64 位。",
       "Automatic setup currently supports Windows 10/11 x64.",
@@ -112,7 +113,7 @@
     $("create").hidden = !ready;
     $("reason").textContent =
       actionError ||
-      (check?.reasons || []).map((r) => tr(...reasons[r])).join(" ");
+      (check?.reasons || []).map((r) => tr(...(reasons[r] || [r, r]))).join(" ");
     if (check) {
       $("hardware").textContent = check.gpus.length
         ? check.gpus
@@ -123,6 +124,8 @@
         tr("可用空间：", "Free space: ") +
         (check.free_bytes / 1024 ** 3).toFixed(1) +
         " GB";
+      const profile = check.recommended_profile;
+      if (profile) $("hardware").textContent += ` · ${profile.id} · ${profile.quantization ? "DiT INT8" : "BF16"}`;
       $("directory").textContent = check.directory;
     }
     const progress = status?.progress;

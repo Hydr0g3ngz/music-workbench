@@ -24,6 +24,7 @@
 ## 使用本地 AI
 
 - [支持的模型与安装方式](models.md)：区分软件内自动配置、手动安装和研究候选。
+- [硬件与实测速度](model-hardware.md)
 - [ACE-Step 音乐生成](music-generation.md)：文字、参考变奏、参数与故障排查。
 - [人声与伴奏分离](separation.md)：试听后对齐采用，保留原素材。
 - [AI 制作流程](ai-production-workflow.md)：从构思到可恢复交付。

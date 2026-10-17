@@ -67,6 +67,7 @@ def transcribe_whisper(source: Path, config: dict) -> Lyrics:
         )
     device = config["device"]
     precision = "int8_float16" if device == "cuda" else "int8"
+    config["_compute_type"] = precision
     key = (
         "whisper",
         config["asr_model"],

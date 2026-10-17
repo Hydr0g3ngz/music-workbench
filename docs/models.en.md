@@ -4,7 +4,7 @@
 
 Models are optional. Sampled instruments, MIDI, recording, arrangement, effects and exports work without neural weights.
 
-The tool packs below are part of **dev15 development builds**. The published dev14 installer automatically prepares ACE-Step only.
+The tool packs below are part of **dev16 development builds**. The published dev14 installer automatically prepares ACE-Step only.
 
 | Capability | Backend | Setup | Guide |
 | --- | --- | --- | --- |
@@ -22,20 +22,21 @@ Open **AI tools** from Home or the workstation model panel. Choose a pack and cl
 
 - **Stems, melody & transcription**: CPU Torch 2.5.1, Demucs, CREPE and Whisper small; download estimate 1–2 GB, keep 6 GB free. Includes librosa tempo/key analysis and time/pitch processing, which are DSP.
 - **Clean speech recordings**: sherpa-onnx, DPDFNet2 and GTCRN; download estimate 150–300 MB, keep 1 GB free. Intended for speech; processing complete music may damage instruments.
-- Both packs run on Windows x64 CPU without a dedicated GPU. ACE-Step has separate GPU requirements. Automatic GPU acceleration setup is not included in these two packs yet.
+- **NVIDIA acceleration pack**: private Torch 2.10 / CUDA 12.8 runtime; estimated download 3–5 GB, keep 10 GB free. Requires Turing or newer, at least 4 GB VRAM and driver 570 or newer. Setup tests real CUDA inference.
+- Windows x64 CPU and CUDA packs can coexist; choose the device in the workstation. Explicit interpreter settings retain priority. Cleanup and DSP use CPU. ACE-Step has separate requirements.
 - Pause/retry retains completed downloads. Closing the app stops its installation subprocesses. Files live under `%LOCALAPPDATA%\MusicWorkbench\AI\tools`, outside the application and projects.
 
 After installation, click **Use in workstation**, import a recording, select an audio clip and run a tool from the model list. Audition results before adding tracks. CREPE notes can be added to an instrument track; **Details and editing** opens transcript corrections.
 
 Use **Check environment** to find missing dependencies or corrupt weights, or **Repair setup** to prepare the pack again. Explicitly configured inference environments retain priority; existing models do not need moving.
 
-[Installation and workstation validation](model-tools-validation.md).
+[Installation and workstation validation](model-tools-validation.md) · [Actual speed, quantization and integration audit](model-hardware.en.md).
 
 ## Automatic ACE-Step setup
 
 Open **AI setup** on Home. Follow the hardware checks, environment preparation, model download and generation test. Return to the workstation, generate material, audition and adopt it.
 
-- Windows x64, compatible NVIDIA driver and at least 8 GB VRAM.
+- Windows x64, NVIDIA Ampere or newer, at least 8 GB total VRAM and driver 570 or newer. Free VRAM selects INT8 offload, resident INT8 or BF16 before generation.
 - At least 35 GB free space; roughly 8–12 GB of initial downloads with internet access.
 - Verified hardware: RTX 4070 Laptop 8 GB with 32 GB RAM. Other configurations can differ in compatibility and speed.
 - Pause/retry reuses verified caches. Managed files default to `%LOCALAPPDATA%\MusicWorkbench\AI`.

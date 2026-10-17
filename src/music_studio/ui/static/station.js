@@ -119,11 +119,16 @@
     instrumental: "Instrumental",
     generationDuration: "Duration",
     generationAdvanced: "More parameters",
+    generationGPUProfile: "GPU profile",
+    generationGPUAuto: "Automatic",
+    generationGPULow: "Save VRAM · DiT INT8 + CPU offload",
+    generationGPUBalanced: "Balanced · DiT INT8 · 10 GB free VRAM",
+    generationGPUQuality: "Original precision · BF16 · 18 GB free VRAM",
     generationSeed: "Random seed",
     generationSteps: "Inference steps",
     generationSubmit: "Generate music draft",
     generationProfile:
-      "Experimental · CUDA + INT8 weights + CPU offload · no language model. Try 12–20s first. Generated tempo may differ from the target BPM.",
+      "Experimental · NVIDIA GPU with 8 GB+ VRAM · precision and offload depend on the profile · no language model. Try 12–20s first. Generated tempo may differ from the target BPM.",
     audioProcessing: "AUDIO PROCESSING",
     taskDetails: "Parameters and diagnostics",
     local: "Local production · Your sound stays here",
@@ -1094,6 +1099,12 @@
             "打开模型面板以检查本地环境",
             "Open Models to check the local runtime",
           );
+    if (health?.available) {
+      const profile = health.hardware?.recommended;
+      $("generation-health").textContent += profile
+        ? ` · ${tr("自动建议：", "Auto recommendation: ")}${profile.gpu.name} · ${profile.id} · ${profile.quantization ? "DiT INT8" : "BF16"}`
+        : " · " + tr("生成前会检查显存和兼容性", "VRAM and compatibility checked before generation");
+    }
     $("generation-health").title = health?.message || "";
     $("generation-bpm").textContent = s.session ? `${content().bpm} BPM` : "";
   }
@@ -1179,11 +1190,15 @@
     if (task?.source_clip)
       previewTimer = setTimeout(stopPreview, task.source_clip.duration * 1000);
   }
+  const modelOptions = {};
   function renderModels() {
+    for (const card of $("model-list").querySelectorAll("[data-model-card]")) {
+      try { modelOptions[card.dataset.modelCard] = StationModelControls.read(card); } catch { /* Keep last valid values. */ }
+    }
     $("model-list").innerHTML = s.models
       .map(
         (m) =>
-          `<div class="model-card"><strong>${esc(m.title[s.lang === "zh" ? 0 : 1])}</strong><small>${esc(m.description[s.lang === "zh" ? 0 : 1])}</small>${m.id === "mel-band-roformer-kj" && !m.runnable ? `<details class="model-setup"><summary>${tr("安装与诊断", "Setup and diagnostics")}</summary><p>${tr("首次使用需安装独立环境与约 913 MB 权重；启动和推理不自动下载。", "First use requires a separate runtime and ~913 MB weights. Startup and inference never download.")}</p><code>python scripts/setup_separation.py</code>${m.health.error ? `<p>${esc(m.health.error)}</p>` : ""}</details>` : ""}${m.setup_url && !m.runnable ? `<a class="model-setup-link" href="${esc(m.setup_url)}">${tr("安装此工具 →", "Set up this tool →")}</a>` : ""}<div class="model-actions"><span>${esc(m.health.state)} · ${m.health.weights ? tr("权重已缓存", "weights cached") : tr("权重待检查", "check weights")}</span><button data-check-model="${m.id}">${tr("检查", "Check")}</button><button data-run-model="${m.id}" ${m.runnable ? "" : "disabled"}>${tr("运行", "Run")}</button></div></div>`,
+          `<div class="model-card" data-model-card="${esc(m.id)}"><strong>${esc(m.title[s.lang === "zh" ? 0 : 1])}</strong><small>${esc(m.description[s.lang === "zh" ? 0 : 1])}</small>${m.id === "mel-band-roformer-kj" && !m.runnable ? `<details class="model-setup"><summary>${tr("安装与诊断", "Setup and diagnostics")}</summary><p>${tr("首次使用需安装独立环境与约 913 MB 权重；启动和推理不自动下载。", "First use requires a separate runtime and ~913 MB weights. Startup and inference never download.")}</p><code>python scripts/setup_separation.py</code>${m.health.error ? `<p>${esc(m.health.error)}</p>` : ""}</details>` : ""}${StationModelControls.controls(m, modelOptions[m.id], s.lang)}<small>${m.execution_device === "cuda" ? tr("自动模式默认：NVIDIA GPU", "Automatic defaults to NVIDIA GPU") : m.execution_device === "cpu" ? (m.device === "cpu" ? tr("使用 CPU", "Runs on CPU") : tr("自动模式默认：CPU", "Automatic defaults to CPU")) : tr("检查后显示实际运行设备", "Check to see the runtime device")}${m.stage === "melody" ? tr(" · 请使用独唱、哼唱或单音乐器，CPU 提取可能较慢。", " · Use solo singing, humming or a monophonic instrument. CPU extraction can be slow.") : ""}</small>${m.setup_url && !m.runnable ? `<a class="model-setup-link" href="${esc(m.setup_url)}">${tr("安装此工具 →", "Set up this tool →")}</a>` : ""}<div class="model-actions"><span>${esc(({verified: tr("已验证", "Verified"), unchecked: tr("待检查", "Not checked"), missing: tr("缺少组件", "Missing components"), failed: tr("检查失败", "Check failed")})[m.health.state] || m.health.state)} · ${m.health.weights ? tr("权重已缓存", "weights cached") : tr("权重待检查", "check weights")}</span><button data-check-model="${m.id}">${tr("检查", "Check")}</button><button data-run-model="${m.id}" ${m.runnable ? "" : "disabled"}>${tr("运行", "Run")}</button></div></div>`,
       )
       .join("");
   }
@@ -1259,7 +1274,7 @@
         s.tasks
           .map(
             (t) =>
-              `<div class="task-row"><span><strong>${esc(t.model)}</strong><small>${esc(t.error || taskLabel(t.status))}</small>${t.source_clip ? `<small>${esc(t.source_clip.name)} · ${t.source_clip.start.toFixed(2)}s · ${tr("完整素材处理，采用时保留片段范围", "Full source processed; clip bounds retained on adoption")}</small>` : ""}</span>${t.status === "complete" && ["separate", "transform"].includes(t.stage) && t.source_clip ? `<button data-adopt-stems="${t.id}" ${canReplaceStems(t) ? "" : "disabled"} title="${tr("源片段更改或移除后，需要先撤销再替换", "Undo source clip changes or removal before replacing")}">${t.stage === "transform" ? tr("采用适配结果", "Adopt fitted result") : tr("用分轨替换片段", "Replace clip with stems")}</button>` : ""}${t.status === "complete" && t.stage === "melody" && t.source_clip ? `<button data-adopt-melody="${t.id}">${tr("旋律加入乐器轨", "Add melody as notes")}</button>` : ""}${
+              `<div class="task-row"><span><strong>${esc(t.model)}</strong><small>${esc(t.error || taskLabel(t.status))}</small>${t.metrics ? `<small>${esc(t.metrics.device.toUpperCase())} · ${t.metrics.seconds.toFixed(1)}s${t.metrics.realtime_factor == null ? "" : " · " + t.metrics.realtime_factor.toFixed(2) + "× " + tr("音频时长", "audio duration")}</small>` : ""}${t.source_clip ? `<small>${esc(t.source_clip.name)} · ${t.source_clip.start.toFixed(2)}s · ${tr("完整素材处理，采用时保留片段范围", "Full source processed; clip bounds retained on adoption")}</small>` : ""}</span>${t.status === "complete" && ["separate", "transform"].includes(t.stage) && t.source_clip ? `<button data-adopt-stems="${t.id}" ${canReplaceStems(t) ? "" : "disabled"} title="${tr("源片段更改或移除后，需要先撤销再替换", "Undo source clip changes or removal before replacing")}">${t.stage === "transform" ? tr("采用适配结果", "Adopt fitted result") : tr("用分轨替换片段", "Replace clip with stems")}</button>` : ""}${t.status === "complete" && t.stage === "melody" && t.source_clip ? `<button data-adopt-melody="${t.id}">${tr("旋律加入乐器轨", "Add melody as notes")}</button>` : ""}${
                 t.artifacts
                   .map((a) =>
                     a.kind === "audio"
@@ -1967,6 +1982,7 @@
       revision: s.session.revision,
       clip: c.id,
       model: run.dataset.runModel,
+      ...StationModelControls.read(run.closest("[data-model-card]")),
     });
     dock("tasks");
     await pollTasks();

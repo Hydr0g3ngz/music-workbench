@@ -96,6 +96,8 @@ def execute(request):
         if config["device"] == "cuda" and not torch.cuda.is_available():
             raise RuntimeError("CUDA is unavailable; choose CPU or Auto")
         if config["device"] == "cuda":
+            # Catch unsupported architectures/driver kernels before loading weights.
+            torch.ones(1, device="cuda").sum().item()
             torch.cuda.reset_peak_memory_stats()
 
         def reject_download(*args, **kwargs):
@@ -212,12 +214,16 @@ def execute(request):
     if config["device"] == "cuda":
         import torch
 
-        peak = round(torch.cuda.max_memory_allocated() / 1024**2, 2)
+        if model != "whisper-small":
+            peak = round(torch.cuda.max_memory_allocated() / 1024**2, 2)
     result = {
         "artifacts": artifacts,
         "metrics": {
             "seconds": round(time.perf_counter() - started, 3),
+            "audio_seconds": round(duration, 3),
+            "realtime_factor": round((time.perf_counter() - started) / max(duration, 0.001), 3),
             "device": config["device"],
+            "compute_type": config.get("_compute_type"),
             "torch_peak_mb": peak,
             "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
         },

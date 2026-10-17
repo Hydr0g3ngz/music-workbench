@@ -49,6 +49,18 @@ PACKS = {
         "entry": "/station.html?tools=speech-cleanup",
     },
 }
+PACKS["music-tools-cuda"] = {
+    **PACKS["music-tools"],
+    "title": ["分轨、旋律与转写 · NVIDIA 加速", "Stems, melody & transcription · NVIDIA"],
+    "description": [
+        "为支持的 NVIDIA 显卡准备独立 CUDA 环境。保留 CPU 工具包，可自行选择设备。",
+        "Private CUDA runtime for supported NVIDIA GPUs. Keep the CPU pack and choose the device.",
+    ],
+    "device": "cuda",
+    "required_free_bytes": 10 * 1024**3,
+    "download_estimate": "3–5 GB",
+    "entry": "/station.html?tools=music-tools-cuda",
+}
 
 
 def packs_root():
@@ -59,10 +71,18 @@ def pack_for(model):
     return next((key for key, spec in PACKS.items() if model in spec["models"]), None)
 
 
-def managed_runtime(model):
+def managed_runtime(model, device="auto"):
     """Cheap discovery only. A verified manifest is published after offline inference."""
     key = pack_for(model)
     if not key:
+        return None
+    if key == "music-tools":
+        cpu = published_runtime(packs_root() / key, key)
+        accelerated = published_runtime(packs_root() / "music-tools-cuda", "music-tools-cuda")
+        if device == "cpu":
+            return cpu or accelerated
+        return accelerated or (cpu if device == "auto" else None)
+    if device == "cuda":
         return None
     return published_runtime(packs_root() / key, key)
 
@@ -124,13 +144,21 @@ def preflight(root, pack):
         reasons.append("windows-x64")
     if free < spec["required_free_bytes"]:
         reasons.append("disk-space")
+    gpus = []
+    if spec.get("device") == "cuda":
+        from .hardware import cuda128_supported, nvidia_gpus
+
+        gpus = nvidia_gpus()["gpus"]
+        if not any(cuda128_supported(g) and g["memory_mib"] >= 4000 for g in gpus):
+            reasons.append("cuda-compatibility")
     return {
         "supported": not reasons,
         "reasons": reasons,
         "free_bytes": free,
         "required_free_bytes": spec["required_free_bytes"],
         "directory": str(root),
-        "device": "cpu",
+        "device": spec.get("device", "cpu"),
+        "gpus": gpus,
         "download_estimate": spec["download_estimate"],
     }
 
@@ -174,7 +202,10 @@ class ModelSetup:
         job = self.get(key)
         state = job.status()
         installed = published_runtime(job.root, key)
-        checks = [self.registry.describe(model) for model in PACKS[key]["models"]]
+        checks = [
+            self.registry.describe(model, device=PACKS[key].get("device", "cpu"))
+            for model in PACKS[key]["models"]
+        ]
         checked_failure = any(
             m["health"]["state"] not in ("unchecked",) and not m["runnable"] for m in checks
         )
@@ -199,7 +230,7 @@ class ModelSetup:
         if self.get(key).status()["state"] in ACTIVE:
             raise StudioError("Wait for setup to finish before checking", 409)
         for model in PACKS[key]["models"]:
-            self.registry.check(model)
+            self.registry.check(model, device=PACKS[key].get("device", "cpu"))
         return self.describe(key)
 
     def close(self):

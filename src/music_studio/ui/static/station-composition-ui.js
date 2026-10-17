@@ -441,6 +441,7 @@ window.StationCompositionUI = {
         reference_strength: Number($("generation-strength").value),
         seed: Number($("generation-seed").value),
         steps: Number($("generation-steps").value),
+        gpu_profile: $("generation-gpu-profile")?.value || "auto",
         language: $("generation-instrumental").checked
           ? "unknown"
           : $("generation-language").value,

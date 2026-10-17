@@ -4,7 +4,7 @@
 
 模型是可选组件。采样乐器、MIDI、录音、编排、效果器与导出不需要神经网络权重。
 
-以下自动工具包属于 **dev15 开发版**；GitHub 已发布的 dev14 仅提供 ACE-Step 自动环境配置。
+以下自动工具包属于 **dev16 开发版**；GitHub 已发布的 dev14 仅提供 ACE-Step 自动环境配置。
 
 | 能力 | 当前后端 | 安装方式 | 使用入口 |
 | --- | --- | --- | --- |
@@ -22,20 +22,21 @@
 
 - **分轨、旋律与转写**：CPU 版 Torch 2.5.1、Demucs、CREPE 与 Whisper small，预计下载 1–2 GB，预留 6 GB。还包含 librosa 速度/调性分析与变速变调；这些属于 DSP。
 - **清理讲话录音**：sherpa-onnx、DPDFNet2 与 GTCRN，预计下载 150–300 MB，预留 1 GB。用于讲话录音，处理完整音乐可能损伤乐器。
-- 均支持 Windows x64，使用 CPU，无需独立显卡。ACE-Step 的 GPU 要求独立计算；这两个工具包尚未提供自动 GPU 加速安装。
+- **NVIDIA 加速工具包**：独立的 Torch 2.10 / CUDA 12.8 环境，预计下载 3–5 GB，预留 10 GB。需要 Turing 或更新的 NVIDIA GPU、至少 4 GB 显存和 570 或更新驱动；安装逐项执行真实 CUDA 推理。
+- CPU 与 CUDA 工具包支持 Windows x64，可以共存；工作台可选择设备，显式配置的解释器仍优先。降噪与 DSP 使用 CPU。ACE-Step 的 GPU 条件独立计算。
 - 安装可暂停、重试，保留已完成下载；关闭软件会停止它启动的安装子进程。存放于 `%LOCALAPPDATA%\MusicWorkbench\AI\tools`，与应用及工程分开。
 
 安装后点击 **在工作台使用**，导入录音并选中音频片段，在模型列表运行处理。结果先试听，再加入轨道；CREPE 结果可作为音符加入乐器轨。转写结果的 **详细结果与编辑** 支持修改识别文字。
 
 **检查当前环境** 用于检测缺失依赖或损坏权重，**修复安装** 会重新检查和准备工具。显式配置的旧推理环境继续优先使用，无需搬动已有模型。
 
-[安装与工程衔接验证记录](model-tools-validation.md)。
+[安装与工程衔接验证记录](model-tools-validation.md) · [实际速度、量化范围与流程审查](model-hardware.md)。
 
 ## ACE-Step 自动配置
 
 打开首页 **AI 自动配置**，按提示检查电脑、准备环境、下载模型并完成生成测试。准备成功后，回工作台生成素材；完成后先试听，再采用。
 
-- Windows x64；兼容 NVIDIA 驱动，至少 8 GB 显存。
+- Windows x64；Ampere 或更新的 NVIDIA GPU、至少 8 GB 总显存和 570 或更新驱动。生成前按空闲显存选择 INT8 卸载、INT8 常驻或 BF16。
 - 至少 35 GB 可用磁盘，首次下载约 8–12 GB，需要网络。
 - 已验证的硬件为 RTX 4070 Laptop 8 GB、32 GB RAM；其他硬件的可用性与速度可能不同。
 - 暂停或失败后可重试，复用已校验缓存。模型和环境默认放在 `%LOCALAPPDATA%\MusicWorkbench\AI`。

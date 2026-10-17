@@ -180,8 +180,8 @@ Path(folder,'music-studio-manifest.json').write_text(json.dumps({'revision':revi
         "model_revision": MODEL,
         "source_archive_sha256": ARCHIVE_SHA256,
         "weights_manifest_sha256": digest(view / "music-studio-manifest.json"),
-        "profile": "cuda-int8-offload-v3-pread",
-        "quantization": "int8_weight_only",
+        "profile": "cuda-auto-v4-pread",
+        "quantization_policy": "gpu-free-memory",
         "managed": True,
     }
     progress("verify", 0.88)

@@ -3,6 +3,9 @@
 Scope: dev15 automatic installation and workstation integration. These checks
 establish executable workflows, not separation, transcription or composition quality.
 
+dev16 hardware and GPU follow-up: [measured speed and integration audit](model-hardware.en.md).
+dev16 的 CPU/GPU 速度与流程复查见 [硬件报告](model-hardware.md)；下文保留 dev15 的验证范围。
+
 范围：dev15 的自动安装与工程衔接。以下结果验证运行流程，不代表音乐或转写质量评测。
 
 ## Environment / 环境

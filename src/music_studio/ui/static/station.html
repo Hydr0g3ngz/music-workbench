@@ -32,6 +32,7 @@
     <script src="/station-fit-ui.js" defer></script>
     <script src="/station-audition-ui.js" defer></script>
     <script src="/station-tutorial.js" defer></script>
+    <script src="/station-model-controls.js" defer></script>
     <script src="/station.js" defer></script>
   </head>
   <body>
@@ -629,6 +630,14 @@
           </div>
           <details class="generation-advanced">
             <summary data-t="generationAdvanced">更多参数</summary>
+            <label><span data-t="generationGPUProfile">显卡运行方案</span>
+              <select id="generation-gpu-profile">
+                <option value="auto" data-t="generationGPUAuto">自动选择</option>
+                <option value="low-vram" data-t="generationGPULow">节省显存 · DiT INT8 + 内存卸载</option>
+                <option value="balanced" data-t="generationGPUBalanced">均衡 · DiT INT8 · 需 10 GB 空闲显存</option>
+                <option value="quality" data-t="generationGPUQuality">原始精度 · BF16 · 需 18 GB 空闲显存</option>
+              </select>
+            </label>
             <label
               ><span data-t="generationStrength">参考保留强度</span
               ><input
@@ -673,7 +682,7 @@
           </button>
           <p id="generation-health" class="library-caption" role="status"></p>
           <p class="generation-footnote" data-t="generationProfile">
-            实验功能 · CUDA + INT8 权重 + CPU 卸载 · 不加载语言模型。先试 12–20
+            实验功能 · 需 NVIDIA 8 GB 及以上显存 · 精度与卸载随方案变化 · 不加载语言模型。先试 12–20
             秒；生成节奏可能偏离目标 BPM。
           </p>
           <a

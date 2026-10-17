@@ -1,5 +1,19 @@
 # Changelog / 更新记录
 
+## 0.2.0.dev16 — GPU tools and model controls / GPU 工具与模型参数（开发版）
+
+Adds a separate, verified NVIDIA CUDA 12.8 tool pack for Demucs, CREPE and
+Whisper. CPU packs remain available. Device selection routes both the interpreter
+and checkpoint directory, with independent health checks. Fixed official Demucs
+checkpoint loading on Torch 2.6+. Main-workstation tasks now expose and preserve
+device, transcription language and speech-cleanup strength.
+
+新增独立 NVIDIA 加速工具包，保留 CPU 版；修复主工作台设备、语言、降噪强度未传入任务的问题。
+ACE-Step 按空闲显存选择运行方案，记录实际量化范围、卸载设置和资源数据。
+新增可复现的本地速度测量与逐模型流程说明，区分实际推理、质量评测和硬件验证范围。
+
+See [hardware and workflow evidence](docs/model-hardware.md).
+
 ## 0.2.0.dev15 — Local AI tool packs / 本地 AI 工具包（开发版）
 
 Bilingual AI tool management adds private CPU environments for Demucs, CREPE,

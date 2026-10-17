@@ -31,6 +31,7 @@ PENDING = ("queued", "checking", "running", "cancelling")
 
 
 class Generate(RevisionRequest, ContextRequest):
+    gpu_profile: Literal["auto", "low-vram", "balanced", "quality"] = "auto"
     prompt: str = Field(min_length=3, max_length=1200)
     lyrics: str = Field(default="", max_length=4000)
     instrumental: bool = True
@@ -122,11 +123,23 @@ class CreationManager:
     def health():
         try:
             config = runtime()
+            from .hardware import ace_advice
+
             return {
                 "available": True,
                 "state": "configured",
                 "model_revision": config["model_revision"],
-                "profile": "CUDA · INT8 weights · CPU offload · no LM · 10–60s drafts",
+                "profile": "CUDA · automatic VRAM profile · no LM · 10–60s drafts",
+                "hardware": ace_advice(),
+                "components": {
+                    "dit_parameters": 2393872518,
+                    "vae_parameters": 168695426,
+                    "text_encoder_parameters": 595776512,
+                    "checkpoint_dtype": "BF16",
+                    "checkpoint_bytes": 6316843408,
+                    "quantization_scope": "DiT decoder linear weights only",
+                    "language_model": False,
+                },
             }
         except (StudioError, OSError, ValueError, KeyError) as error:
             return {"available": False, "state": "unavailable", "message": str(error)}
@@ -262,8 +275,13 @@ class CreationManager:
         duration = request.duration
         if request.mode != "text2music":
             clip = next(
-                (c for t in state["content"]["tracks"] for c in t["clips"]
-                 if c["id"] == request.source_clip and c["asset"]), None
+                (
+                    c
+                    for t in state["content"]["tracks"]
+                    for c in t["clips"]
+                    if c["id"] == request.source_clip and c["asset"]
+                ),
+                None,
             )
             if not clip or not 10 <= clip["duration"] <= 60:
                 raise StudioError("Select a 10–60 second audio clip for variation")
@@ -330,17 +348,28 @@ class CreationManager:
                 worker["reference_audio"] = str(reference)
             write_json(directory / "worker.json", worker)
             self._status(key, "running")
-            arguments = [config["python"], "-X", "utf8", "-m",
-                         "music_studio.studio.ace_worker", str(directory / "worker.json")]
+            arguments = [
+                config["python"],
+                "-X",
+                "utf8",
+                "-m",
+                "music_studio.studio.ace_worker",
+                str(directory / "worker.json"),
+            ]
             if config.get("managed"):
                 # Use the current app's worker after an app upgrade, while keeping
                 # sys.path in the isolated AI environment for all dependencies.
-                arguments = [config["python"], "-X", "utf8", "-c",
-                             "import music_studio,runpy,sys;"
-                             "music_studio.__path__=[sys.argv.pop(1)];"
-                             "runpy.run_module('music_studio.studio.ace_worker',run_name='__main__')",
-                             str(Path(__file__).resolve().parents[1]),
-                             str(directory / "worker.json")]
+                arguments = [
+                    config["python"],
+                    "-X",
+                    "utf8",
+                    "-c",
+                    "import music_studio,runpy,sys;"
+                    "music_studio.__path__=[sys.argv.pop(1)];"
+                    "runpy.run_module('music_studio.studio.ace_worker',run_name='__main__')",
+                    str(Path(__file__).resolve().parents[1]),
+                    str(directory / "worker.json"),
+                ]
             code = run_owned(
                 arguments,
                 directory / "worker.log",
@@ -360,8 +389,12 @@ class CreationManager:
                 options = task["parameters"]
                 spliced = directory / "output/repaint-spliced.wav"
                 result["metrics"]["repaint"] = splice(
-                    directory / "reference.wav", generated, spliced,
-                    options["repaint_start"], options["repaint_end"], options["repaint_blend"],
+                    directory / "reference.wav",
+                    generated,
+                    spliced,
+                    options["repaint_start"],
+                    options["repaint_end"],
+                    options["repaint_blend"],
                 )
                 generated = spliced
             info = dsp.inspect_audio(generated)
@@ -445,8 +478,12 @@ class CreationManager:
             pinned = (task.get("composition_context") or {}).get("section")
             state = self.arrangement.get(project)
             current = next(
-                (s for s in state["content"].get("sections", [])
-                 if pinned and s["id"] == pinned["id"]), None
+                (
+                    s
+                    for s in state["content"].get("sections", [])
+                    if pinned and s["id"] == pinned["id"]
+                ),
+                None,
             )
             if (
                 not current
@@ -479,10 +516,14 @@ class CreationManager:
         origin = Origin(
             title=f"ACE-Step 1.5 Turbo · Seed {task['parameters']['seed']}",
             author=("Generated locally with ACE-Step; " + original.get("author", ""))[:1000],
-            license=("Model: MIT; reference: " + original.get("license", "unspecified")
-                     if reference else "Model: MIT")[:150],
+            license=(
+                "Model: MIT; reference: " + original.get("license", "unspecified")
+                if reference
+                else "Model: MIT"
+            )[:150],
             source_url="https://github.com/ACE-Step/ACE-Step-1.5",
-            sha256=task["sha256"], details=details[:3000],
+            sha256=task["sha256"],
+            details=details[:3000],
         )
         if request.replace_source:
             if task["parameters"].get("mode") != "repaint" or not reference:
@@ -492,8 +533,10 @@ class CreationManager:
 
             state = self.arrangement.get(project)
             content = Arrangement.model_validate(state["content"])
-            clip = next((c for t in content.tracks for c in t.clips
-                         if c.id == reference["clip"]["id"]), None)
+            clip = next(
+                (c for t in content.tracks for c in t.clips if c.id == reference["clip"]["id"]),
+                None,
+            )
             # Default-filled fields allow older project snapshots to compare correctly.
             from .arrangement import Clip
 
@@ -502,8 +545,10 @@ class CreationManager:
             audio = task["audio"]
             asset = {
                 "id": fingerprint({"project": task["source_project"], "asset": "source"})[:16],
-                "source_project": task["source_project"], "source_asset": "source",
-                "name": "AI region repaint", "duration": audio["duration"],
+                "source_project": task["source_project"],
+                "source_asset": "source",
+                "name": "AI region repaint",
+                "duration": audio["duration"],
                 "waveform": dsp.peaks(self.audio(project, identity), 480),
             }
             clip.asset, clip.offset, clip.origin = asset["id"], 0, origin

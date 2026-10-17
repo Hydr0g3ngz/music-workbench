@@ -4,7 +4,6 @@ import contextlib
 import os
 import platform
 import shutil
-import subprocess
 import sys
 import threading
 import time
@@ -39,30 +38,18 @@ def config_path():
 def preflight(root):
     root.mkdir(parents=True, exist_ok=True)
     free = shutil.disk_usage(root).free
-    gpu, error = [], None
-    try:
-        probe = subprocess.run(
-            [
-                "nvidia-smi",
-                "--query-gpu=name,memory.total,driver_version",
-                "--format=csv,noheader,nounits",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=5,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-        )
-        for line in probe.stdout.strip().splitlines():
-            name, memory, driver = [x.strip() for x in line.split(",")]
-            gpu.append({"name": name, "memory_mib": int(float(memory)), "driver": driver})
-    except (OSError, ValueError, subprocess.SubprocessError) as exc:
-        error = type(exc).__name__
+    from .hardware import ace_advice, cuda128_supported
+
+    advice = ace_advice()
+    gpu, error = advice["gpus"], advice["probe_error"]
     supported = os.name == "nt" and platform.machine().lower() in ("amd64", "x86_64")
     reasons = []
     if not supported:
         reasons.append("windows-x64")
     if not any(g["memory_mib"] >= 8000 for g in gpu):
         reasons.append("nvidia-8gb")
+    elif not any(cuda128_supported(g, ace=True) and g["memory_mib"] >= 8000 for g in gpu):
+        reasons.append("cuda-compatibility")
     if free < 35 * 1024**3:
         reasons.append("disk-35gb")
     return {
@@ -73,6 +60,7 @@ def preflight(root):
         "required_free_bytes": 35 * 1024**3,
         "directory": str(root),
         "probe_error": error,
+        "recommended_profile": advice.get("recommended"),
         "download_estimate": "8–12 GB",
         "license": "MIT",
         "source": "https://github.com/ace-step/ACE-Step-1.5",

@@ -250,19 +250,27 @@ class TaskManager:
         try:
             self.service.project_dir(project)
             self._status(key, "checking", started_at=time.time())
-            spec = self.registry.require(task["model"], cancelled=lambda: self._cancelled(key))
+            spec = self.registry.require(
+                task["model"], cancelled=lambda: self._cancelled(key), device=task["device"]
+            )
             if self._cancelled(key):
                 raise TaskStopped("Task cancelled")
             directory = self.service.studio_dir(project, f"tasks/{key}")
             request_file = directory / "request.json"
             request = read_json(request_file)
-            request["settings"].update(self.registry.environment_settings(task["model"]))
+            request["settings"].update(
+                self.registry.environment_settings(task["model"], task["device"])
+            )
             request["owner_pid"] = os.getpid()
             write_json(request_file, request)
-            self._status(key, "running", runtime=self.registry.describe(task["model"])["health"])
+            self._status(
+                key,
+                "running",
+                runtime=self.registry.describe(task["model"], device=task["device"])["health"],
+            )
             code = run_owned(
                 [
-                    self.registry.python(spec),
+                    self.registry.python(spec, task["device"]),
                     "-X",
                     "utf8",
                     "-m",

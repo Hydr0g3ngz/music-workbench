@@ -252,8 +252,8 @@ print('Verified',len(files),'checkpoint files',sum(f['bytes'] for f in files),'b
         "source_archive_sha256": ARCHIVE_SHA256,
         "weights_manifest_sha256": digest(model_view / "music-studio-manifest.json"),
         "environment_lock": str(lock),
-        "profile": "cuda-int8-offload-v3-pread",
-        "quantization": "int8_weight_only",
+        "profile": "cuda-auto-v4-pread",
+        "quantization_policy": "gpu-free-memory",
     }
     args.runtime_file.parent.mkdir(parents=True, exist_ok=True)
     temporary = args.runtime_file.with_suffix(".tmp")

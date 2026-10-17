@@ -56,7 +56,9 @@ def verify(pack, root):
         length = min(len(sample), len(music) - first)
         music[first : first + length] += sample[:length] * 0.25
     sf.write(folder / "music.wav", music, 44100, subtype="FLOAT")
-    config = Settings(model_dir=str(root / "models"), device="cpu", offline=True).resolved()
+    config = Settings(
+        model_dir=str(root / "models"), device=PACKS[pack].get("device", "cpu"), offline=True
+    ).resolved()
     os.environ["TORCH_HOME"] = str(root / "models/torch")
     report = {}
     for model in PACKS[pack]["models"]:
@@ -77,6 +79,12 @@ def verify(pack, root):
             }
         )
         result = read_json(folder / model / "result.json")
+        if (
+            PACKS[pack].get("device") == "cuda"
+            and not CATALOG[model].get("device")
+            and result["metrics"]["device"] != "cuda"
+        ):
+            raise ValueError("GPU verification did not execute on CUDA")
         if not result["artifacts"]:
             raise ValueError("Verification returned no artifacts")
         for artifact in result["artifacts"]:

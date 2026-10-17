@@ -24,7 +24,7 @@ from .composition import Blueprint, Role
 from .envelope import VolumePoint
 from .envelope import envelope as clip_envelope
 from .fitting import FitOptions
-from .models import RevisionRequest, StrictModel
+from .models import LocalTaskRequest, RevisionRequest, StrictModel
 from .service import StudioError
 
 RATE = 44100
@@ -178,6 +178,9 @@ class ProcessClip(RevisionRequest):
     model: str = Field(min_length=1, max_length=80)
     time_ratio: float = Field(default=1, ge=0.5, le=2)
     pitch_shift: int = Field(default=0, ge=-12, le=12)
+    device: Literal["auto", "cpu", "cuda"] = "auto"
+    language: str | None = Field(default=None, min_length=2, max_length=12, pattern=r"^[a-zA-Z-]+$")
+    strength: float = Field(default=1, ge=0, le=1)
     fit: FitOptions | None = None
 
 
@@ -394,8 +397,6 @@ class ArrangementService:
         return self.update(key, request.revision, content, asset)
 
     def process_clip(self, key, request):
-        from .models import LocalTaskRequest
-
         state = self.get(key)
         if state["revision"] != request.revision:
             raise StudioError("Session changed; reload before processing", 409)
@@ -423,6 +424,9 @@ class ArrangementService:
                 asset=asset["source_asset"],
                 time_ratio=request.time_ratio,
                 pitch_shift=request.pitch_shift,
+                device=request.device,
+                language=request.language,
+                strength=request.strength,
             ),
         )
         with self.studio.transaction() as db:

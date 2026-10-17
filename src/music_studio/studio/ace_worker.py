@@ -134,6 +134,30 @@ def execute(request):
 
     if not torch.cuda.is_available():
         raise RuntimeError("This creation profile requires an NVIDIA CUDA GPU")
+    from .hardware import ace_profile
+
+    devices = []
+    for index in range(torch.cuda.device_count()):
+        with torch.cuda.device(index):
+            free, total = torch.cuda.mem_get_info()
+        capability = torch.cuda.get_device_capability(index)
+        devices.append(
+            {
+                "index": index,
+                "name": torch.cuda.get_device_name(index),
+                "memory_mib": total // 1024**2,
+                "free_mib": free // 1024**2,
+                "capability": capability[0] + capability[1] / 10,
+            }
+        )
+    eligible = [g for g in devices if g["memory_mib"] >= 8000 and g["capability"] >= 8]
+    if not eligible:
+        raise RuntimeError("This ACE-Step build needs an Ampere or newer NVIDIA GPU with 8 GB VRAM")
+    gpu = max(eligible, key=lambda g: g["free_mib"])
+    torch.cuda.set_device(gpu["index"])
+    profile = ace_profile(gpu, request["parameters"].get("gpu_profile", "auto"))
+    # Exercise a kernel, not just driver detection, before loading large models.
+    torch.ones(1, device="cuda").sum().item()
     torch.cuda.reset_peak_memory_stats()
 
     def record(stage):
@@ -167,7 +191,7 @@ def execute(request):
             # Keep the pinned model snapshot immutable. It already contains model code.
             return None
 
-    progress(0, "Loading ACE-Step · CPU offload")
+    progress(0, "Loading ACE-Step · " + profile["id"])
     handler = OfflineHandler()
     message, ready = handler.initialize_service(
         project_root=str(source),
@@ -175,16 +199,16 @@ def execute(request):
         device="cuda",
         use_flash_attention=False,
         compile_model=False,
-        offload_to_cpu=True,
-        offload_dit_to_cpu=True,
-        quantization=runtime.get("quantization", "int8_weight_only"),
+        offload_to_cpu=profile["offload_to_cpu"],
+        offload_dit_to_cpu=profile["offload_dit_to_cpu"],
+        quantization=profile["quantization"],
         use_mlx_dit=False,
     )
     if not ready:
         raise RuntimeError(message)
     loaded = time.monotonic()
     record("initialized")
-    if handler.quantization != runtime.get("quantization", "int8_weight_only"):
+    if handler.quantization != profile["quantization"]:
         raise RuntimeError("Required quantization was disabled; repair the ACE-Step environment")
     options = request["parameters"]
     params = GenerationParams(
@@ -236,8 +260,11 @@ def execute(request):
         "device": torch.cuda.get_device_name(),
         "torch": torch.__version__,
         "language_model": False,
-        "offload": True,
-        "quantization": runtime.get("quantization", "int8_weight_only"),
+        "profile": profile,
+        "offload": profile["offload_to_cpu"],
+        "quantization": profile["quantization"],
+        "quantization_scope": "DiT decoder linear weights only; "
+        "VAE/text encoder remain floating point",
         "grad_enabled": torch.is_grad_enabled(),
         "cpu_threads": torch.get_num_threads(),
         "checkpoint_backend": storage_backend,

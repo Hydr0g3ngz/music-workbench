@@ -4,6 +4,8 @@
 .release-check/
 .cache/
 .artifacts/
+.playwright-cli/
+output/playwright/
 outputs/
 models/
 __pycache__/

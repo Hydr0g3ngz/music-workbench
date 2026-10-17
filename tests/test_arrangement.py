@@ -33,6 +33,46 @@ def save(client, state):
     return response.json()
 
 
+def test_main_workstation_passes_model_controls_to_task_queue(client, monkeypatch):
+    state = create(client, True)
+    clip = next(c for t in state["content"]["tracks"] for c in t["clips"] if c["asset"])
+    calls = []
+
+    def submit(project, request):
+        calls.append((project, request))
+        return {"id": "0123456789abcdef", "status": "queued"}
+
+    monkeypatch.setattr(client.app.state.studio.tasks, "submit", submit)
+    response = client.post(
+        f"/api/workstation/projects/{state['id']}/process",
+        json={
+            "revision": state["revision"],
+            "clip": clip["id"],
+            "model": "dpdfnet2-48k",
+            "device": "cpu",
+            "language": "zh",
+            "strength": 0.35,
+        },
+    )
+    assert response.status_code == 202, response.text
+    assert len(calls) == 1
+    task = calls[0][1]
+    assert task.device == "cpu" and task.language == "zh" and task.strength == 0.35
+    assert task.asset != "current"  # Always use the selected clip's original asset.
+    response = client.post(
+        f"/api/workstation/projects/{state['id']}/process",
+        json={
+            "revision": state["revision"],
+            "clip": clip["id"],
+            "model": "crepe-rest",
+            "device": "cuda",
+            "strength": 2,
+        },
+    )
+    assert response.status_code == 422
+    assert len(calls) == 1
+
+
 def test_demo_real_audio_midi_export_and_reopen(client, tmp_path):
     state = create(client, True)
     prefix = f"/api/workstation/projects/{state['id']}"

@@ -12,7 +12,20 @@ def separate(source: Path, output: Path, config: dict) -> dict:
     from demucs.pretrained import get_model
 
     torch.manual_seed(config.get("seed", 0))
-    model = get_model(config["separation_model"])
+    # Demucs 4 serializes its constructor alongside weights. Torch 2.6+ defaults
+    # to weights_only=True. Load only our fixed, hash-verified official checkpoint.
+    checkpoint = Path(config["model_dir"]) / "torch/hub/checkpoints/955717e8-8726e21a.th"
+    if config["separation_model"] == "htdemucs" and checkpoint.is_file():
+        from demucs.states import load_model
+
+        from ..io import sha256
+        from ..studio.model_install_worker import DEMUCS_SHA
+
+        if sha256(checkpoint) != DEMUCS_SHA:
+            raise ValueError("Pinned Demucs checkpoint checksum mismatch")
+        model = load_model(torch.load(checkpoint, map_location="cpu", weights_only=False))
+    else:
+        model = get_model(config["separation_model"])
     model.eval()
     data, rate = sf.read(source, dtype="float32", always_2d=True)
     if model.samplerate != rate or model.audio_channels != data.shape[1]:

@@ -33,7 +33,8 @@ def wait_for(check, timeout=20):
 
 
 @pytest.fixture
-def local_project(tmp_path):
+def local_project(tmp_path, monkeypatch):
+    monkeypatch.setenv("MUSIC_WORKBENCH_DATA", str(tmp_path / "user-data"))
     project = "abcdef1234567890"
     folder = tmp_path / project
     studio = folder / ".studio"

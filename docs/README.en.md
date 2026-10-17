@@ -24,6 +24,7 @@
 ## Use local AI
 
 - [Supported models and setup](models.en.md): automatic setup, manual installation and research candidates.
+- [Hardware and measured speed](model-hardware.en.md)
 - [ACE-Step generation](music-generation.en.md): text, reference variations, settings and troubleshooting.
 - [Vocal/backing separation](separation.en.md): audition and aligned adoption with originals retained.
 - [AI production workflow](ai-production-workflow.md): from brief to portable delivery.

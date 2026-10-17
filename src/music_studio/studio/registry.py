@@ -22,8 +22,7 @@ CATALOG = {
     "musical-analysis": {
         "title": ["素材速度、调性与电平分析", "Material tempo, key & levels"],
         "description": [
-            "Librosa 全局估计；报告节拍与调性分差。可能存在半速/倍速与转调误判。"
-            "DSP，无神经权重。",
+            "Librosa 全局估计；报告节拍与调性分差。可能存在半速/倍速与转调误判。DSP，无神经权重。",
             "Global librosa estimates with beats and key margin. Tempo/key may be ambiguous. "
             "DSP, no neural weights.",
         ],
@@ -86,6 +85,7 @@ CATALOG = {
         "runtime": "base",
         "imports": ["numpy", "soundfile"],
         "stage": "inspect",
+        "device": "cpu",
         "license": "MIT (Music Studio)",
         "source": "https://github.com/Hydr0g3ngz/music-studio",
     },
@@ -218,6 +218,7 @@ CATALOG = {
         "runtime": "inference",
         "imports": ["librosa", "scipy"],
         "stage": "rhythm",
+        "device": "cpu",
         "license": "ISC (librosa)",
         "source": "https://github.com/librosa/librosa",
     },
@@ -229,6 +230,7 @@ def child_environment(model_dir: str) -> dict:
     environment.update(
         PYTHONUTF8="1",
         PYTHONUNBUFFERED="1",
+        PYTHONDONTWRITEBYTECODE="1",
         PYTHONPATH=str(Path(__file__).resolve().parents[2]),
         HF_HUB_OFFLINE="1",
         HF_HUB_DISABLE_TELEMETRY="1",
@@ -252,7 +254,7 @@ class ModelRegistry:
         self.health = {}
         self.lock = threading.Lock()
 
-    def python(self, spec):
+    def python(self, spec, device="auto"):
         slot = spec["runtime"]
         if slot == "separation":
             from .separation import runtime
@@ -267,7 +269,7 @@ class ModelRegistry:
         )
         if configured:
             return str(Path(configured).expanduser().resolve())
-        managed = self.managed(spec)
+        managed = self.managed(spec, device)
         if managed:
             from .model_setup import bind_app
 
@@ -275,17 +277,21 @@ class ModelRegistry:
             return managed["python"]
         return sys.executable
 
-    def managed(self, spec):
+    def managed(self, spec, device="auto"):
         # Explicit launch settings remain authoritative; installer users need no settings.
         if spec["runtime"] == "inference" and self.settings.inference_python:
             return None
         from .model_setup import managed_runtime
 
+        if device == "auto":
+            device = self.settings.device
         key = next((k for k, value in CATALOG.items() if value is spec), None)
-        return managed_runtime(key) if key else None
+        if spec.get("device") == "cpu":
+            device = "cpu"
+        return managed_runtime(key, device) if key else None
 
-    def environment_settings(self, model):
-        managed = self.managed(self.spec(model))
+    def environment_settings(self, model, device="auto"):
+        managed = self.managed(self.spec(model), device)
         return {"model_dir": managed["model_dir"]} if managed else {}
 
     def spec(self, model):
@@ -293,15 +299,15 @@ class ModelRegistry:
             raise StudioError("Unknown local model", 404)
         return CATALOG[model]
 
-    def _probe(self, model, deep=False, cancelled=lambda: False):
+    def _probe(self, model, deep=False, cancelled=lambda: False, device="auto"):
         spec = self.spec(model)
         try:
-            python = self.python(spec)
-            managed = self.managed(spec)
+            python = self.python(spec, device)
+            managed = self.managed(spec, device)
             if deep and managed:
                 from .model_setup import pack_for, packs_root, verify_files
 
-                verify_files(managed, packs_root() / pack_for(model))
+                verify_files(managed, packs_root() / managed.get("pack", pack_for(model)))
             if spec["runtime"] == "separation":
                 from .separation import runtime
 
@@ -382,12 +388,16 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
                     "-c",
                     script,
                     json.dumps(spec),
-                    self.environment_settings(model).get("model_dir", self.settings.model_dir),
+                    self.environment_settings(model, device).get(
+                        "model_dir", self.settings.model_dir
+                    ),
                     "1" if deep else "0",
                 ],
                 log,
                 child_environment(
-                    self.environment_settings(model).get("model_dir", self.settings.model_dir)
+                    self.environment_settings(model, device).get(
+                        "model_dir", self.settings.model_dir
+                    )
                 ),
                 timeout=90,
                 cancelled=cancelled,
@@ -403,6 +413,12 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
                     "weights": False,
                 }
             result = json.loads(lines[-1].split(":", 1)[1])
+            if device == "cuda" and not spec.get("device") and deep and not result.get("cuda"):
+                result.update(
+                    state="failed",
+                    error="CUDA is unavailable in this runtime; "
+                    "install the NVIDIA tool pack or choose CPU",
+                )
             if spec["runtime"] == "separation":
                 checkpoint = Path(runtime()["root"]) / "MelBandRoformer.ckpt"
                 result.update(weight_files=1, weight_bytes=checkpoint.stat().st_size)
@@ -412,37 +428,76 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
         except (OSError, TimeoutError, ValueError) as error:
             return {"state": "failed", "error": str(error), "weights": False}
 
-    def check(self, model, *, deep=True, cancelled=lambda: False):
+    def cache_key(self, model, device):
+        device = self.spec(model).get("device", device)
+        return model if device == "auto" else model + ":" + device
+
+    def runtime_identity(self, model, device):
+        try:
+            return self.python(self.spec(model), device)
+        except (OSError, ValueError, KeyError):
+            return None
+
+    def check(self, model, *, deep=True, cancelled=lambda: False, device="auto"):
         # Serialize optional native imports so several clients cannot flood GPU initialization.
         with self.lock:
-            found = self._probe(model, deep, cancelled)
+            found = self._probe(model, deep, cancelled, device)
             found.setdefault("checked_at", time.time())
-            self.health[model] = found
-        return self.describe(model, found)
+            found["runtime_python"] = self.runtime_identity(model, device)
+            self.health[self.cache_key(model, device)] = found
+        return self.describe(model, found, device)
 
-    def describe(self, model, health=None):
+    def describe(self, model, health=None, device="auto"):
         from .model_setup import pack_for
 
         spec = self.spec(model)
-        found = health or self.health.get(model)
-        managed = self.managed(spec)
-        if managed and (not found or found.get("checked_at", 0) < managed["installed_at"]):
+        found = health or self.health.get(self.cache_key(model, device))
+        managed = self.managed(spec, device)
+        if managed and (
+            not found
+            or found.get("checked_at", 0) < managed["installed_at"]
+            or found.get("runtime_python", managed["python"]) != managed["python"]
+        ):
             # Setup already ran every capability offline. Enable the UI immediately;
             # require() still performs a fresh deep check before the first task.
-            found = {"state": "verified", "weights": True, "checked_at": 0,
-                     "cuda": False, "source": "offline-install-verification"}
+            found = {
+                "state": "verified",
+                "weights": True,
+                "checked_at": 0,
+                "cuda": managed.get("device") == "cuda",
+                "source": "offline-install-verification",
+            }
         if found is None:
             # No model runtime is imported merely by opening the page.
             found = {"state": "unchecked", "weights": None}
+        setup_pack = pack_for(model)
+        if setup_pack == "music-tools" and device == "cuda":
+            setup_pack = "music-tools-cuda"
         return {
             "id": model,
             **{k: v for k, v in spec.items() if k != "imports"},
             "health": found,
             "offline": True,
-            "setup_pack": pack_for(model),
-            "setup_url": (
-                "/ai-setup.html#" + pack_for(model) if pack_for(model) else None
+            "execution_device": spec.get("device")
+            or (
+                "cpu"
+                if device == "cpu" or (device == "auto" and self.settings.device == "cpu")
+                else "cuda"
+                if found.get("cuda")
+                else "cpu"
+                if found.get("cuda") is False
+                else "unchecked"
             ),
+            "runtime_source": "managed" if managed else "configured",
+            "devices": (
+                ["cpu"]
+                if spec.get("device") == "cpu"
+                else ["cpu", "cuda"]
+                if found.get("cuda")
+                else ["cpu"]
+            ),
+            "setup_pack": setup_pack,
+            "setup_url": ("/ai-setup.html#" + setup_pack if setup_pack else None),
             "max_duration_seconds": 7200 if spec["stage"] in ("inspect", "loudness") else 600,
             "runnable": found["state"] == "verified" and found.get("weights") is True,
             "resource_note": "One local task at a time; memory depends on audio, "
@@ -471,15 +526,18 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
             self.health.pop(model, None)
         return self.check(model)
 
-    def require(self, model, cancelled=lambda: False):
-        found = self.health.get(model)
+    def require(self, model, cancelled=lambda: False, device="auto"):
+        found = self.health.get(self.cache_key(model, device))
+        managed = self.managed(self.spec(model), device)
         if (
             not found
             or found["state"] != "verified"
             or time.time() - found.get("checked_at", 0) > 300
+            or found.get("runtime_python") != self.runtime_identity(model, device)
+            or (managed and found.get("checked_at", 0) < managed["installed_at"])
         ):
-            self.check(model, cancelled=cancelled)
-        result = self.describe(model)
+            self.check(model, cancelled=cancelled, device=device)
+        result = self.describe(model, device=device)
         if not result["runnable"]:
             health = result["health"]
             reason = health.get("error") or (

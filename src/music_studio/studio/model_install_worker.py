@@ -84,9 +84,16 @@ def install(pack, root):
     progress("runtime", 0.02)
     python, env = prepare_python(root, cache)
     progress("dependencies", 0.1)
-    if pack == "music-tools":
+    if pack.startswith("music-tools"):
+        accelerated = pack == "music-tools-cuda"
         wheels = [
-            windows_wheel(name, "cp312", cache, version="2.5.1", flavor="cpu")
+            windows_wheel(
+                name,
+                "cp312",
+                cache,
+                version="2.10.0" if accelerated else "2.5.1",
+                flavor="cu128" if accelerated else "cpu",
+            )
             for name in ("torch", "torchaudio")
         ]
         boot.run(python, "-m", "pip", "install", "--no-warn-script-location", *wheels, env=env)
@@ -107,7 +114,7 @@ def install(pack, root):
     progress("models", 0.5)
     models = root / "models"
     models.mkdir(exist_ok=True)
-    if pack == "music-tools":
+    if pack.startswith("music-tools"):
         checkpoint = models / "torch/hub/checkpoints/955717e8-8726e21a.th"
         checkpoint.parent.mkdir(parents=True, exist_ok=True)
         boot.download(
@@ -188,7 +195,7 @@ for name in names:
             "pack": pack,
             "python": str(python),
             "model_dir": str(models),
-            "device": "cpu",
+            "device": PACKS[pack].get("device", "cpu"),
             "files": manifest,
             "verification": verification,
         },

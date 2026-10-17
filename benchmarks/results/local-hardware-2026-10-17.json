@@ -1,0 +1,271 @@
+{
+  "date": "2026-10-17",
+  "hardware": {
+    "os": "Windows x64",
+    "cpu": "Intel Core Ultra 9 185H",
+    "gpu": "NVIDIA RTX 4070 Laptop 8 GB",
+    "driver": "591.74",
+    "ram_gb": 32
+  },
+  "measurement": "One isolated process per task; startup, import, load, inference and output included. No OS cache flush. Single trial; speed evidence, not quality. RoFormer/Qwen/ACE execution checks overlapped installation and are not controlled comparisons.",
+  "reports": {
+    "cpu": {
+      "schema": 1,
+      "device_requested": "cpu",
+      "threads": 4,
+      "cases": [
+        {
+          "model": "demucs-four-stems",
+          "audio_seconds": 30.0,
+          "process_seconds": 49.614,
+          "realtime_factor": 1.654,
+          "sampled_peak_rss_mib": 1336.4,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 48.354,
+            "device": "cpu",
+            "torch_peak_mb": null,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "36e7f4cd61f0e20876a10912d5d51aa0d2ef400e4926dabe150685ec7f37e4d5"
+        },
+        {
+          "model": "crepe-rest",
+          "audio_seconds": 30.0,
+          "process_seconds": 109.029,
+          "realtime_factor": 3.634,
+          "sampled_peak_rss_mib": 1191.2,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 107.609,
+            "device": "cpu",
+            "torch_peak_mb": null,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "36e7f4cd61f0e20876a10912d5d51aa0d2ef400e4926dabe150685ec7f37e4d5"
+        },
+        {
+          "model": "whisper-small",
+          "audio_seconds": 23.112,
+          "process_seconds": 16.573,
+          "realtime_factor": 0.717,
+          "sampled_peak_rss_mib": 855.4,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 15.72,
+            "device": "cpu",
+            "torch_peak_mb": null,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "0242b00b9ae817ffb5f6a5ade0308747501960f9007454182aa8158bf3774a01"
+        }
+      ],
+      "notes": "Measure actual isolated workstation tasks. Bundled samples; no network or downloads.\n\nThis is a speed/resource benchmark, not an audio-quality evaluation. Each case starts a\nnew worker, matching the workstation queue. OS file caches are not flushed. Model load,\ninference and artifact writing remain included in worker time."
+    },
+    "gpu": {
+      "schema": 1,
+      "device_requested": "cuda",
+      "threads": 4,
+      "cases": [
+        {
+          "model": "demucs-four-stems",
+          "audio_seconds": 30.0,
+          "process_seconds": 9.061,
+          "realtime_factor": 0.302,
+          "sampled_peak_rss_mib": 1390.9,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 8.034,
+            "audio_seconds": 30.0,
+            "realtime_factor": 0.268,
+            "device": "cuda",
+            "compute_type": null,
+            "torch_peak_mb": 553.06,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "36e7f4cd61f0e20876a10912d5d51aa0d2ef400e4926dabe150685ec7f37e4d5"
+        },
+        {
+          "model": "crepe-rest",
+          "audio_seconds": 30.0,
+          "process_seconds": 11.026,
+          "realtime_factor": 0.368,
+          "sampled_peak_rss_mib": 1305.5,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 9.873,
+            "audio_seconds": 30.0,
+            "realtime_factor": 0.329,
+            "device": "cuda",
+            "compute_type": null,
+            "torch_peak_mb": 735.33,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "36e7f4cd61f0e20876a10912d5d51aa0d2ef400e4926dabe150685ec7f37e4d5"
+        },
+        {
+          "model": "whisper-small",
+          "audio_seconds": 23.112,
+          "process_seconds": 11.7,
+          "realtime_factor": 0.506,
+          "sampled_peak_rss_mib": 1258.6,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 10.515,
+            "audio_seconds": 23.112,
+            "realtime_factor": 0.455,
+            "device": "cuda",
+            "compute_type": "int8_float16",
+            "torch_peak_mb": 0.0,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "0242b00b9ae817ffb5f6a5ade0308747501960f9007454182aa8158bf3774a01"
+        }
+      ],
+      "notes": "Measure actual isolated workstation tasks. Bundled samples; no network or downloads.\n\nThis is a speed/resource benchmark, not an audio-quality evaluation. Each case starts a\nnew worker, matching the workstation queue. OS file caches are not flushed. Model load,\ninference and artifact writing remain included in worker time."
+    },
+    "cleanup": {
+      "schema": 1,
+      "device_requested": "cpu",
+      "threads": 4,
+      "cases": [
+        {
+          "model": "dpdfnet2-48k",
+          "audio_seconds": 23.112,
+          "process_seconds": 11.269,
+          "realtime_factor": 0.488,
+          "sampled_peak_rss_mib": 160.4,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 10.82,
+            "device": "cpu",
+            "torch_peak_mb": null,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "8b9a98ff26a68388de38d84bb5d5be13744a3bf369337f15b1343d73f50dc292"
+        },
+        {
+          "model": "gtcrn",
+          "audio_seconds": 23.112,
+          "process_seconds": 3.236,
+          "realtime_factor": 0.14,
+          "sampled_peak_rss_mib": 111.8,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 2.999,
+            "device": "cpu",
+            "torch_peak_mb": null,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "8b9a98ff26a68388de38d84bb5d5be13744a3bf369337f15b1343d73f50dc292"
+        }
+      ],
+      "notes": "Measure actual isolated workstation tasks. Bundled samples; no network or downloads.\n\nThis is a speed/resource benchmark, not an audio-quality evaluation. Each case starts a\nnew worker, matching the workstation queue. OS file caches are not flushed. Model load,\ninference and artifact writing remain included in worker time."
+    },
+    "roformer": {
+      "schema": 1,
+      "device_requested": "cuda",
+      "threads": 4,
+      "cases": [
+        {
+          "model": "mel-band-roformer-kj",
+          "audio_seconds": 30.0,
+          "process_seconds": 29.897,
+          "realtime_factor": 0.997,
+          "sampled_peak_rss_mib": 2858.6,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 28.214,
+            "audio_seconds": 30.0,
+            "realtime_factor": 0.94,
+            "device": "cuda",
+            "compute_type": null,
+            "torch_peak_mb": 2027.15,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "b367745a9c4df711dc4f60c178f8162338b1b5f0b461b681086a64bae3f1bb59"
+        }
+      ],
+      "notes": "Measure actual isolated workstation tasks. Bundled samples; no network or downloads.\n\nThis is a speed/resource benchmark, not an audio-quality evaluation. Each case starts a\nnew worker, matching the workstation queue. OS file caches are not flushed. Model load,\ninference and artifact writing remain included in worker time."
+    },
+    "qwen": {
+      "schema": 1,
+      "device_requested": "cuda",
+      "threads": 4,
+      "cases": [
+        {
+          "model": "qwen3-asr",
+          "audio_seconds": 23.112,
+          "process_seconds": 53.941,
+          "realtime_factor": 2.334,
+          "sampled_peak_rss_mib": 5012.1,
+          "exit_code": 0,
+          "worker_metrics": {
+            "seconds": 52.003,
+            "audio_seconds": 23.112,
+            "realtime_factor": 2.25,
+            "device": "cuda",
+            "compute_type": null,
+            "torch_peak_mb": 4480.88,
+            "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2."
+          },
+          "input_sha256": "8375e3f86c776d19121566738216c2b28af145ce1fd1ac0f106c9f74981345f8"
+        }
+      ],
+      "notes": "Measure actual isolated workstation tasks. Bundled samples; no network or downloads.\n\nThis is a speed/resource benchmark, not an audio-quality evaluation. Each case starts a\nnew worker, matching the workstation queue. OS file caches are not flushed. Model load,\ninference and artifact writing remain included in worker time."
+    }
+  },
+  "ace": {
+    "load_seconds": 78.704,
+    "generation_seconds": 16.031,
+    "total_seconds": 94.735,
+    "device": "NVIDIA GeForce RTX 4070 Laptop GPU",
+    "torch": "2.10.0+cu128",
+    "language_model": false,
+    "profile": {
+      "id": "low-vram",
+      "quantization": "int8_weight_only",
+      "offload_to_cpu": true,
+      "offload_dit_to_cpu": true,
+      "dtype": "bfloat16",
+      "gpu": {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+        "memory_mib": 8187,
+        "free_mib": 7054,
+        "capability": 8.9
+      },
+      "note": "Policies for 10–60 s, batch 1. Setup tests actual inference on your GPU; RTX 4070 Laptop 8 GB is the locally measured reference."
+    },
+    "offload": true,
+    "quantization": "int8_weight_only",
+    "quantization_scope": "DiT decoder linear weights only; VAE/text encoder remain floating point",
+    "grad_enabled": false,
+    "cpu_threads": 8,
+    "checkpoint_backend": "pread",
+    "resident_ram_mib": 9087.7,
+    "peak_allocated_mib": 3149.6,
+    "peak_reserved_mib": 3222.0,
+    "available_ram_mib": 2202.9,
+    "cuda_free_mib": 6746.0,
+    "private_commit_mib": 13002.5,
+    "peak_private_commit_mib": 17946.8,
+    "available_system_commit_mib": 5568.9,
+    "peak_resident_ram_mib": 11291.9
+  },
+  "paired_output_checks": {
+    "cpu": {
+      "four_stems_aligned": true,
+      "four_stems_sum_max_abs_error": 2.9802322387695312e-08
+    },
+    "gpu": {
+      "four_stems_aligned": true,
+      "four_stems_sum_max_abs_error": 1.4901161193847656e-08
+    },
+    "melody": {
+      "cpu_notes": 60,
+      "gpu_notes": 60,
+      "pitch_and_boundary_sequences_equal": true
+    }
+  }
+}
