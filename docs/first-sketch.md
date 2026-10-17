@@ -30,8 +30,4 @@ Use **Learn** in the workstation header to resume. The full offline guide opens 
 
 Explore local AI after the lesson. A configured ACE-Step runtime opens generation; otherwise open setup. Try a 12-second instrumental, audition before adopting, then fit timing, trim and fade. The first automatic profile covers ACE-Step and requires a compatible NVIDIA GPU with 8 GB VRAM, 35 GB free space and roughly 8–12 GB initial downloads. Speed and quality vary.
 
-## 本版验收 / Validation
-
-在独立 QA 目录通过真实界面完成五步：开始播放、鼓独奏并还原、键盘片段内将一个音升半音、贝斯推子降低 2 dB、导出 WAV 与 MWB。WAV 17.78 秒，采样峰值 −10.5 dBFS、约 −24.6 LUFS。实际生成文件作为教程验证，未做听感或易用性研究。
-
-All five actions were performed through the real UI in an isolated QA project: playback, drum solo and restore, a keys note raised by one semitone, bass lowered 2 dB, WAV and MWB exports. The WAV is 17.78 seconds, −10.5 dBFS sample peak and about −24.6 LUFS. This verifies operations and files, not listening quality or novice usability.
+[技术验证 / Technical verification](feature-validation.md)。

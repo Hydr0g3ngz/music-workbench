@@ -1,5 +1,7 @@
 # Music Studio
 
+> 历史参考：原 Music Studio 歌曲分析流程或拆分前版本。当前工作台请从 [安装与入门](README.md) 开始；原分析产品见 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。本页的功能、命令与测量按所述旧版本解释。
+
 > **Create · 0.2.0.dev5：从想法到作品的制作工作台预览**。采样乐器、鼓点、MIDI 导入、多轨编排、混音台与 WAV/MIDI 导出。
 > 双击 `Start-Music-Studio-Create.cmd`，或阅读[启动与功能范围](create-preview.md)。旧版与旧数据保留；录音、总线与自动化仍在开发。
 > 新增：[实时 EQ、压缩、混响、预设与主输出限制](mixing.md)，播放中调参、A/B，带尾音导出。
@@ -21,7 +23,7 @@
 
 *Next 实机界面；CC BY 4.0 带噪语音示例、真实 CPU 降噪与响度测量。模型并不保证每个片段都改善，逐例退步见实测报告。*
 
-[English](README.en.md) · [下载预览版](https://github.com/Hydr0g3ngz/music-studio/releases) · [快速开始](QUICKSTART.md) · [实测](lyrics-v4.md) · [路线图](roadmap.md)
+[English](pre-split-readme.en.md) · [下载预览版](https://github.com/Hydr0g3ngz/music-studio/releases) · [快速开始](legacy-quickstart.md) · [实测](lyrics-v4.md) · [路线图](roadmap.md)
 
 **把一首歌，展开成可以同步试听的人声、伴奏、歌词、主旋律 MIDI、和弦与节拍。**
 
@@ -39,7 +41,7 @@
 3. 点击 **加载示例歌曲**，立即探索 45 秒预计算授权示例，切换原曲、人声与伴奏，改字并导出。无需下载神经模型。
 
 **这是早期预览版。ZIP 包含源码、wheel 和授权示例，不是独立 EXE，不包含 Python、CUDA 或模型权重。**
-详细安装、CPU 选项、故障处理和升级保留数据见 [快速开始](QUICKSTART.md)。
+详细安装、CPU 选项、故障处理和升级保留数据见 [快速开始](legacy-quickstart.md)。
 
 从源码体验：
 
@@ -92,14 +94,14 @@ Linux 手动安装、Qwen 与双模型锚点、CLI 和输出格式见 [详细使
 灰字只表示缺少可靠词时间，不等于错词。主旋律是单主唱估计，和弦目前为大小三和弦 / N；
 自动结果仍需试听核对，核对标记与模型分数不是正确率。长歌曲占用更多浏览器内存。
 
-[完整报告与逐例结果](lyrics-v4.md) · [数据来源与复现命令](benchmarks/README.md) · [算法与时间基准](architecture.md)
+[完整报告与逐例结果](lyrics-v4.md) · [数据来源与复现命令](../benchmarks/README.md) · [算法与时间基准](architecture.md)
 
 ## 一起改进
 
 欢迎用中文或英文提交可复现的安装、播放、识别问题。优先反馈：哪一步阻碍首次试听、
 哪句歌词难以修正、哪种导出不好用。请先用内置授权示例复现，避免公开私人音频。
 
-[贡献指南](CONTRIBUTING.zh-CN.md) · [English contributing guide](CONTRIBUTING.md) · [路线图](roadmap.md) · [版本记录](CHANGELOG.md)
+[贡献指南](../CONTRIBUTING.zh-CN.md) · [English contributing guide](../CONTRIBUTING.md) · [路线图](roadmap.md) · [版本记录](../CHANGELOG.md)
 
 ```sh
 python -m pip install -e ".[ui,benchmark,dev]"
@@ -110,5 +112,5 @@ python scripts/package_release.py
 ```
 
 核心 / API / 播放测试不下载神经模型；真实模型评测需另行执行。前端没有构建步骤或外部 CDN。
-代码采用 [MIT](LICENSE)。模型、数据与示例录音各自保留原许可，见 [第三方说明](THIRD_PARTY_NOTICES.md)
-与 [示例署名](src/music_studio/ui/demo/ATTRIBUTION.md)。
+代码采用 [MIT](../LICENSE)。模型、数据与示例录音各自保留原许可，见 [第三方说明](../THIRD_PARTY_NOTICES.md)
+与 [示例署名](../src/music_studio/ui/demo/ATTRIBUTION.md)。

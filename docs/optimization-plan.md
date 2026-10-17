@@ -1,5 +1,7 @@
 # 模型、测试集与界面优化计划 · 2026-10-15
 
+> 历史参考：原 Music Studio 歌曲分析流程或拆分前版本。当前工作台请从 [安装与入门](README.md) 开始；原分析产品见 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。本页的功能、命令与测量按所述旧版本解释。
+
 > 这是早期调研计划。当前已扩展到43例，最新结论见 [歌词 v4](lyrics-v4.md)、[工作台验证](ui-v4-validation.md)，接下来的发布与体验优先级见 [路线图](roadmap.md)。未实测的候选仍保留为未来方向。
 
 这份计划按当前产品范围制定：本地输入歌曲，得到可试听的人声/伴奏、歌词、主唱旋律及和弦节拍，并在同一时间轴上查看。编辑功能只做歌词文字纠错。下一版的主要投入放在自动结果的质量、运行可靠性和查看体验。
@@ -19,7 +21,7 @@
 
 这套小集合用于固定回归和筛选方案。已知训练集重叠需要单独标记：例如 [VocalParse](https://github.com/pymaster17/VocalParse) 使用了 GTSinger 训练，[STARS](https://github.com/gwx314/STARS) 也公开了相应训练准备路径。后续比较这些模型时，要增加未见歌曲的确认测试，不能用训练内分数选默认模型。
 
-现成标注也有不同性质：DALI 大量标注来自自动构建；MIR-ST500 发布标注和音频链接，音频版本需要核对；Opencpop 官方下载要求申请。这些都可以扩展，但不作为本轮已经下载并验证的样本来计数。[DALI 原库](https://github.com/gabolsgabs/DALI)、[MIR-ST500 官方说明](https://github.com/york135/singing_transcription_ICASSP2021)、[Opencpop 下载说明](https://wenet-e2e.github.io/opencpop/download/)。
+现成标注也有不同性质：DALI 大量标注来自自动构建；MIR-ST500 发布标注和音频链接，音频版本需要核对；Opencpop 官方下载要求申请。这些都可以扩展，但不作为该实验已经下载并验证的样本来计数。[DALI 原库](https://github.com/gabolsgabs/DALI)、[MIR-ST500 官方说明](https://github.com/york135/singing_transcription_ICASSP2021)、[Opencpop 下载说明](https://wenet-e2e.github.io/opencpop/download/)。
 
 ## 模型与算法：推荐比较顺序
 

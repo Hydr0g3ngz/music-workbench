@@ -1,14 +1,16 @@
 # 开始使用 / Getting started
 
+> 历史参考：原 Music Studio 歌曲分析流程或拆分前版本。当前工作台请从 [安装与入门](README.md) 开始；原分析产品见 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。本页的功能、命令与测量按所述旧版本解释。
+
 **Next · 0.2.0.dev2 音频工作台 / Audio workbench**
 
 双击 **Start-Music-Studio-Next.cmd**，导入录音或打开带噪语音示例，点击“让讲话更清楚”。
 首次 Next 依赖安装需联网；CPU 清理模型的权重需在界面明确安装。支持音量统一、A/B、
-预览、采用、撤销和导出。[完整 Next 说明](docs/next-preview.md)。
+预览、采用、撤销和导出。[完整 Next 说明](next-preview.md)。
 
 Double-click **Start-Music-Studio-Next.cmd**, import audio or try the noisy speech demo,
 then choose **Clearer speech**. Initial dependency setup needs network access; install
-CPU model weights explicitly in the UI. [Next guide](docs/next-preview.en.md).
+CPU model weights explicitly in the UI. [Next guide](next-preview.en.md).
 The classic launcher and its existing workspace remain separate; its guide follows.
 
 **经典歌曲分析 · Classic song analysis · v0.1.2 workflow**
@@ -71,4 +73,4 @@ for a custom environment. After installation, stop the old console with Ctrl+C a
 
 示例音频 / Demo audio: **Let's Go Fishin' — Karissa Hobbs, CC BY 3.0**.
 Changes: first 45 seconds, separated stems, compressed previews and machine estimates.
-[Full attribution / 完整署名](src/music_studio/ui/demo/ATTRIBUTION.md).
+[Full attribution / 完整署名](../src/music_studio/ui/demo/ATTRIBUTION.md).

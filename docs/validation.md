@@ -1,5 +1,7 @@
 # v0.1 validation · 2026-10-15
 
+> Historical reference for the Studio analysis workflow or a pre-split build. Start with [current Workbench documentation](README.en.md). The analysis product is maintained in [Music Studio](https://github.com/Hydr0g3ngz/music-studio). Commands and measurements below apply to the stated historical version.
+
 These are actual local runs. They demonstrate interoperability, offline execution and output integrity, **not accuracy across arbitrary songs**.
 
 The subsequent workbench run analyzed the full 132.989-second song in 107.31 seconds. Its browser and API checks are recorded in [UI validation](ui-validation.md).

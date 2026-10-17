@@ -1,40 +1,64 @@
-# Contributing
+# Contributing to Music Workbench
 
-[中文](CONTRIBUTING.zh-CN.md) · [Roadmap](docs/roadmap.en.md)
+[中文](CONTRIBUTING.zh-CN.md) · [Roadmap](docs/workbench-roadmap.md)
 
-Use Python 3.11 or 3.12. Core/API/UI development needs no neural runtime:
+Issues and pull requests are welcome in English or Chinese. Describe the musical task, what currently blocks it and the behavior you want. Discuss large engine/model changes in an issue before implementation; small fixes can go straight to a PR. Use shareable synthetic or licensed audio for reproduction.
+
+## Development setup
+
+Use Python 3.11/3.12 and Node 22. Static HTML/CSS/JavaScript needs no frontend build or external CDN. Basic development does not require Torch or downloaded models.
 
 ```sh
-python -m pip install -e ".[ui,benchmark,dev]"
-python -m ruff check .
-python -m pytest -q
-node --test tests/ui_playback.test.cjs tests/ui_i18n.test.cjs
-python scripts/package_release.py
+python -m venv .venv
+# Windows: .venv/Scripts/activate
+# Linux/macOS: source .venv/bin/activate
+python -m pip install -e ".[workstation,benchmark,agent,dev]"
+music-workbench
 ```
 
-Core and UI tests do not download neural models and can run with `.[ui,dev]` alone. They cover sample-rate conversion, note timing, one-word/multiple-note mapping, major/minor chord baselines, beat detection, variable-tempo MIDI, cache invalidation, resume after a stage failure, upload/result/download flows, cancellation and project path boundaries. Pipeline orchestration tests use deterministic adapters; they are not model-accuracy tests.
+The source launcher uses `outputs/workbench` and an available port starting at 8920. Use a separate workspace for destructive fixtures, never personal project data. Windows can also use `Start-Music-Workbench.cmd`.
 
-Install `.[benchmark]` as well to exercise the optional music-metric adapter test. CI includes this extra. The [public regression suite](benchmarks/README.md) is an opt-in real-audio check with frozen upstream references; downloading it and running neural inference are separate commands. Never commit benchmark audio, reference lyric text or recognition transcripts. The explicitly credited bundled preview is a separate CC BY 3.0 presentation asset, not benchmark data. Report training overlap and timing coverage beside accuracy.
+## Locate the implementation
 
-The UI is served by `music-studio ui`. HTML, CSS and JavaScript live in `src/music_studio/ui/static/` and need no frontend build or external CDN. After changing static assets, reload the browser and check the upload, playback, lyric seek and export flows. Keep the audio tracks on one Web Audio clock. The UI should consume the engine's project records rather than add a second implementation of inference.
+| Area | Location |
+| --- | --- |
+| Entrypoint | `src/music_studio/workbench_cli.py` |
+| Projects, revisions and assets | `src/music_studio/studio/service.py`, `arrangement.py`, `models.py`, `project_pack.py` |
+| Creation and model adapters | `creation.py`, `tasks.py`, `registry.py`, `ace_worker.py`, `separation.py`, `ai_setup.py` in `studio/` |
+| Audio render, instruments and effects | `studio/dsp.py`, `effects.py`, `library.py`; `ui/static/station-engine.js`, `effects-dsp.js` and worklets |
+| Workstation UI | `src/music_studio/ui/static/station*`, `welcome*`, `learn*`, `ai-setup*` |
+| Desktop and packaging | `desktop/`, `scripts/package_*.py`, `scripts/build-desktop.ps1` |
 
-Playback regression tests use Node's built-in runner (Node 22 recommended), without npm dependencies. They exercise the actual status poll handler and audio-session code, including legacy version identity, concurrent loading, lazy stems, cancelled requests and rapid seek. Always verify continuous real-browser playback as well; a passing fake AudioContext test cannot establish audible quality.
+The internal `music_studio` namespace retains import/project compatibility. This repository's product and entrypoint are Music Workbench. Classic analysis and the Next single-asset editor are compatibility components; [Music Studio](https://github.com/Hydr0g3ngz/music-studio) maintains the separate song-analysis product.
 
-Scoped contribution ideas and acceptance criteria are listed in the [roadmap](docs/roadmap.md). Do not add a full notation editor to solve lyric-text correction. For benchmark changes, keep frozen manifests and confirmation assignments intact, account for failures, separate languages/domains, and publish timing coverage beside conditional timing error.
+## Validate changes
 
-Before changing inference adapters, also run `scripts/smoke_test.py` on local audio with real models and run `music-studio validate OUTPUT`. Report the hardware, package versions, model settings and resulting warnings. Do not commit personal audio, model weights, local outputs or credentials.
+```sh
+python -m ruff check .
+python -m pytest -q
+node --test tests/ui_playback.test.cjs tests/ui_i18n.test.cjs tests/ui_transport.test.cjs tests/ui_comparison.test.cjs tests/ui_station.test.cjs tests/ui_creation.test.cjs tests/ui_recording.test.cjs tests/ui_timing.test.cjs tests/ui_workflow.test.cjs tests/ui_composition.test.cjs tests/ui_material.test.cjs tests/ui_envelope.test.cjs tests/ui_desktop.test.cjs tests/ui_setup.test.cjs tests/ui_tutorial.test.cjs
+```
 
-Keep the canonical audio timebase unchanged. Do not fabricate character-level lyrics, downbeats, confidence probabilities or missing notes to fill an output. Backend failures must be visible and resumable. Update the schema version when making an incompatible project format change.
+These are the regression commands in [CI](.github/workflows/tests.yml). Core tests use deterministic adapters; passing them does not measure model quality. For packaging changes, also run `python scripts/package_release.py`, install the resulting wheel in a separate environment with `[ui,audio,agent]` and `httpx`, then run `python scripts/verify_release.py --no-models`.
 
-## Translation and releases
+UI/audio changes need actual browser checks: import, continuous playback, rapid seek, mute/solo, editing, undo, reopen and export. Polling, language changes and panel redraws must retain active audio sources and one transport clock. Compare exported audio when changing DSP. For UI changes, include screenshots in both languages and inspect narrow layouts and keyboard access.
 
-UI messages live in `src/music_studio/ui/static/i18n.js`. Add English translations
-for the Chinese source messages and use named placeholders in dynamic `t()` calls.
-Never translate song titles, lyrics or editor inputs. UI language must not change
-song-language settings, request audio, reset playback or trigger inference.
-Check both languages, dialogs, 720p and narrow layouts with real screenshots.
+## Translation
 
-For a release, update the package version, changelog and `docs/releases/vX.Y.Z.md`,
-validate a clean installation, then push `vX.Y.Z`. The release workflow checks the
-tag/version, runs regression tests, builds ZIP/wheel/sdist/checksums and publishes
-a preview. Do not claim remote CI succeeded based on local checks alone.
+Workstation modules use paired Chinese/English messages and local translation helpers; `station.js` stores `station-language`. Home, lessons and AI setup have their own message definitions. The classic UI uses `i18n.js`; updating that file alone does not translate the workstation.
+
+Follow the surrounding module's convention and check both languages. Never translate project names, lyrics, prompts or model output. Language switching must preserve playback, project state and pending work.
+
+## Models and project integrity
+
+Keep model runtimes isolated, pin code/weight revisions and hashes, and record their licenses separately. Results become typed candidates with source metadata; completion must not silently replace the arrangement. Adoption must support undo, save/reopen and export. Expose failures and cancellation with actionable diagnostics.
+
+For model changes, use licensed frozen inputs and report hardware, versions, parameters, failures, quality and resource use. Reproduction and dataset rules are in [technical reference](docs/technical-reference.md) and [benchmarks](benchmarks/README.md). Keep confirmation assignments fixed and report regressions and training overlap. Do not commit private audio, reference lyric text, transcripts, credentials or weights.
+
+Preserve timing units, immutable sources and optimistic revisions. Incompatible project-format changes require explicit schema/migration work; include history and portable-project checks. Never manufacture missing note/word times or present model scores as correctness probabilities.
+
+## Releases and documentation
+
+Write documentation for users or contributors who have not seen development discussions. Put current instructions in guides, future work in the roadmap, versioned measurements in technical reports and user-visible changes in release notes. Keep Chinese and English guides consistent.
+
+Update the package version, changelog and `docs/releases/vX.Y.Z.md`. Validate the wheel and intended desktop/installer package, including a clean installation and project retention, before tagging. The [release workflow](.github/workflows/release.yml) validates tags and builds ZIP/wheel/sdist/checksums. It creates a prerelease **draft** when no release exists and preserves existing reviewed assets. Desktop installers and media require their separate packaging steps; review the final draft and checksums before publishing.

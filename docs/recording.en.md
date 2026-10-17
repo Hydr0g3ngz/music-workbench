@@ -28,8 +28,4 @@ On device failure, delivered PCM remains recoverable; an undelivered audio-threa
 
 Synchronized overdubbing, input monitoring, count-in, latency calibration and multichannel recording are not implemented. The timeline position does not compensate for input hardware/browser latency.
 
-## Validation
-
-Node tests cover tail blocks, frame limits, PCM WAV, cancelled permission, resource release, permission denial and device loss. API tests cover nonzero placement, retry, reopen, history and WAV export.
-
-Browser checks use synthetic 440 Hz WAV input for the full workflow, save failure/retry and narrow layouts. This does not measure real hardware latency or microphone quality.
+[技术验证 / Technical verification](feature-validation.md)。

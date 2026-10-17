@@ -1,50 +1,64 @@
-# 贡献指南
+# 参与 Music Workbench 开发
 
-[English](CONTRIBUTING.md) · [路线图](docs/roadmap.md)
+[English](CONTRIBUTING.md) · [路线图](docs/workbench-roadmap.md)
 
-欢迎使用中文或英文反馈和贡献。先说明具体使用场景及修改后行为；较大的模型或交互改动建议先开 issue，
-小修复可以直接提交 PR。请使用授权示例或可分享的合成音频复现，避免公开个人歌曲与隐私信息。
+欢迎使用中文或英文提交 issue 和 PR。说明要完成的音乐任务、当前障碍与期望行为。较大的引擎或模型改动建议先讨论；小修复可以直接提交 PR。复现材料请使用可分享的合成或授权音频。
 
-## 本地开发
+## 开发环境
 
-Python 3.11 / 3.12；前端为 HTML/CSS/JS，无构建步骤和外部 CDN。
-不做神经推理时不需要安装 PyTorch 或模型：
+使用 Python 3.11/3.12 与 Node 22。前端为静态 HTML/CSS/JavaScript，无构建步骤或外部 CDN；基础开发不需要 Torch 或模型权重。
 
 ```sh
-python -m pip install -e ".[ui,benchmark,dev]"
-python -m ruff check .
-python -m pytest -q
-node --test tests/ui_playback.test.cjs tests/ui_i18n.test.cjs
-python scripts/package_release.py
+python -m venv .venv
+# Windows: .venv/Scripts/activate
+# Linux/macOS: source .venv/bin/activate
+python -m pip install -e ".[workstation,benchmark,agent,dev]"
+music-workbench
 ```
 
-Node 测试使用内置 runner，推荐 Node 22，无 npm 依赖。
-Windows 默认测试临时目录权限有问题时可指定新的 `--basetemp=.artifacts/pytest-your-run`。
-安装、预计算示例、API、版本、回收站与播放回归不下载模型；它们验证工程行为，不能证明识别准确率。
+源码默认作品目录为 `outputs/workbench`，从端口 8920 起选择空闲端口。Windows 也可运行 `Start-Music-Workbench.cmd`。破坏性测试使用独立工作区，不要使用个人作品。
 
-## 界面与翻译
+## 代码位置
 
-界面位于 `src/music_studio/ui/static/`，双语消息在 `i18n.js`。
-保留中文源消息并添加英文映射，动态文案使用 `t()` 与命名参数。歌词、歌曲名、用户输入与模型预测不能进入翻译器。
-界面语言与“歌词语言”是独立选项，切换界面语言不能重建播放器、重置项目或触发推理。
+| 范围 | 位置 |
+| --- | --- |
+| 启动入口 | `src/music_studio/workbench_cli.py` |
+| 工程、版本与素材 | `src/music_studio/studio/service.py`、`arrangement.py`、`models.py`、`project_pack.py` |
+| 创作与模型适配 | `studio/` 下的 `creation.py`、`tasks.py`、`registry.py`、`ace_worker.py`、`separation.py`、`ai_setup.py` |
+| 音频、乐器与效果 | `studio/dsp.py`、`effects.py`、`library.py`；`ui/static/station-engine.js`、`effects-dsp.js` 与 worklet |
+| 工作台界面 | `src/music_studio/ui/static/` 下的 `station*`、`welcome*`、`learn*`、`ai-setup*` |
+| 桌面与打包 | `desktop/`、`scripts/package_*.py`、`scripts/build-desktop.ps1` |
 
-修改界面后检查中英文、窄屏、720p、键盘访问、弹窗、无结果、错误、导出与回收站；
-PR 提供真实截图。保持三轨同一个 Web Audio 时钟，实际浏览器验证连续试听和快速拖动。
+内部 `music_studio` 包名用于兼容已有导入与工程；当前产品入口为 Music Workbench。经典分析与 Next 单素材编辑器是兼容组件；独立歌曲分析产品由 [Music Studio](https://github.com/Hydr0g3ngz/music-studio) 维护。
 
-## 模型与 benchmark
+## 验证修改
 
-修改推理适配器需另行执行真实模型 smoke test、`music-studio validate OUTPUT`，并报告硬件、依赖、
-模型修订版、资源范围和警告。评测命令、数据来源与冻结规则见 [benchmark 说明](benchmarks/README.md)。
+```sh
+python -m ruff check .
+python -m pytest -q
+node --test tests/ui_playback.test.cjs tests/ui_i18n.test.cjs tests/ui_transport.test.cjs tests/ui_comparison.test.cjs tests/ui_station.test.cjs tests/ui_creation.test.cjs tests/ui_recording.test.cjs tests/ui_timing.test.cjs tests/ui_workflow.test.cjs tests/ui_composition.test.cjs tests/ui_material.test.cjs tests/ui_envelope.test.cjs tests/ui_desktop.test.cjs tests/ui_setup.test.cjs tests/ui_tutorial.test.cjs
+```
 
-禁止改动已冻结的 manifest 原始字节和确认集划分；不在确认集上调参。分开报告语言、录音域、
-文字错误、匹配覆盖、条件时间误差及失败；同时说明未改善之处与训练重叠未知的限制。
-源音频、标注正文、模型输出和权重保留本地，只有已明确授权的内置体验示例可进入仓库。
+以上命令与 [CI](.github/workflows/tests.yml) 一致。确定性适配器测试不代表模型质量。修改打包时，另运行 `python scripts/package_release.py`，在独立环境安装生成的 wheel 及 `[ui,audio,agent]`、`httpx`，执行 `python scripts/verify_release.py --no-models`。
 
-不能用均匀切字捏造词时间，不能把模型分数或核对标记当成正确率。保持统一原始音频时间基准，
-失败需可见、可恢复。项目格式有不兼容变更时升级 schema。
+界面或音频改动需在真实浏览器验证导入、连续播放、快速定位、静音/独奏、编辑、撤销、重开和导出。任务轮询、切换语言、面板重绘必须保持现有音源与统一时钟；DSP 修改要比较实际导出。界面 PR 提供中英文截图，检查窄窗口与键盘访问。
 
-## 发布
+## 翻译
 
-修改包版本、更新 `CHANGELOG.md` 和 `docs/releases/vX.Y.Z.md`，完成检查与干净环境验证，
-再推送对应 `vX.Y.Z` 标签。发布工作流校验版本、运行测试、构建 ZIP / wheel / 源码与 SHA-256，
-并发布为 preview。不要把仅本地通过的测试描述成远程 CI 已通过。
+工作台各模块使用中英成对消息及局部翻译函数，`station.js` 保存 `station-language`。首页、教程和 AI 配置有各自文案；经典界面的 `i18n.js` 不覆盖整个工作台。
+
+沿用对应模块的方式并检查两种语言。工程名、歌词、提示词与模型输出不进入翻译器。切换语言应保留播放、工程和待处理操作。
+
+## 模型与工程完整性
+
+模型使用隔离环境，固定源码、权重修订和哈希，分别记录许可。结果保存为有类型、带来源的候选；任务完成不能自动替换编排。采用须支持撤销、保存重开与导出，失败和取消需有明确诊断。
+
+模型改动使用授权固定输入，报告硬件、版本、参数、失败、质量和资源；复现与数据规则见 [技术参考](docs/technical-reference.md)、[benchmark](benchmarks/README.md)。保持确认集划分，报告退步和训练重叠。不提交私人音频、参考歌词正文、转写、凭据或权重。
+
+保持时间单位、原素材与乐观版本检查。工程格式不兼容变更需明确升级 schema 与迁移，检查历史和便携工程。缺失音符/词时间应保持缺失，模型分数不能标成正确率。
+
+## 文档与发布
+
+文档直接面向未读过开发讨论的用户或贡献者。当前操作写入指南，未来工作写入路线图，版本测量写入技术报告，发布说明描述用户可见变化；中英内容保持一致。
+
+更新包版本、更新记录和 `docs/releases/vX.Y.Z.md`，验证 wheel 及目标桌面/安装包，检查全新安装和工程保留后打标签。[发布工作流](.github/workflows/release.yml) 校验标签并构建 ZIP、wheel、源码和校验文件；不存在同名版本时创建**预发布草稿**，已存在时保留人工审核过的附件。桌面安装器与媒体另有打包步骤，公开前需审核草稿和校验值。

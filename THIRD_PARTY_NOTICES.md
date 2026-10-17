@@ -2,7 +2,7 @@
 
 The optional [Beat This!](https://github.com/CPJKU/beat_this) implementation and authors' checkpoints use MIT terms. small0 is pinned by SHA-256; relevant fold checkpoints use the authors' official-cloud `OC-Checksum` SHA-1 metadata (2026-10-15). Models stay outside Git. small0/final0 training includes GuitarSet, so their diagnostic results do not establish held-out accuracy.
 
-Music Studio's original code is MIT licensed. Dependencies and model weights retain their own licenses. Models are downloaded from upstream sources; they are not committed or relicensed by this repository. This list identifies the principal components, not a replacement for their license files or the transitive dependency notices shipped with their packages.
+Music Workbench's application code is MIT licensed; shared engine code retains its original attribution. Dependencies and model weights retain their own licenses. Models are downloaded from upstream sources; they are not committed or relicensed by this repository. This list identifies the principal components, not a replacement for their license files or the transitive dependency notices shipped with their packages.
 
 | Component | Use | Upstream license/source |
 | --- | --- | --- |

@@ -23,5 +23,5 @@ Describe a concrete example and how you would verify it works.
 
 ## Scope / 范围
 
-Does this require a new model, or can it improve an existing workflow? See the [roadmap](../../docs/roadmap.md) for planned work.
-是否必须引入新模型，还是可以改善现有流程？已有计划见[路线图](https://github.com/Hydr0g3ngz/music-studio/blob/main/docs/roadmap.md)。
+Does this require a new model, or can it improve an existing workflow? See the [roadmap](https://github.com/Hydr0g3ngz/music-workbench/blob/main/docs/workbench-roadmap.md) for planned work.
+是否必须引入新模型，还是可以改善现有流程？已有计划见[路线图](https://github.com/Hydr0g3ngz/music-workbench/blob/main/docs/workbench-roadmap.md)。

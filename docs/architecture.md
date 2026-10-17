@@ -1,5 +1,7 @@
 # v0.1 architecture
 
+> Historical Studio analysis architecture. Current workstation design is documented in [Platform design](workbench-plan.en.md); users should start with [Workbench documentation](README.en.md). The analysis product is maintained in [Music Studio](https://github.com/Hydr0g3ngz/music-studio).
+
 Music Studio is a local batch analysis engine with an optional local web workbench. It has no account system or hosted inference dependency. Initial package/model downloads require a network connection. Once installed and cached, `--offline` prevents model downloads.
 
 ## Pipeline

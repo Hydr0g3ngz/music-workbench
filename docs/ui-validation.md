@@ -1,5 +1,7 @@
 # Local UI validation · 2026-10-15
 
+> Historical reference for the Studio analysis workflow or a pre-split build. Start with [current Workbench documentation](README.en.md). The analysis product is maintained in [Music Studio](https://github.com/Hydr0g3ngz/music-studio). Commands and measurements below apply to the stated historical version.
+
 The local workbench was tested against actual saved model outputs and through a browser. It is a playback and inspection UI, with no lyric/note editing yet. These checks establish working integration, not transcription accuracy.
 
 ## Full song through the workbench

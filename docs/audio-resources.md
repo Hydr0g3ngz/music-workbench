@@ -3,7 +3,7 @@
 [English](audio-resources.en.md) · [完整模型候选](local-model-candidates.md) · [工作台路线](workbench-plan.md)
 
 调研日期：2026-10-16。依据官方仓库、模型卡和数据发布页筛选。
-这是接入建议，不是安装清单或本机性能报告；本轮没有下载模型权重、批量音频或运行新模型。
+本文是模型、素材与存储的研究快照，表中判断按调研日期解释；当前可安装后端见 [模型支持](models.md)。
 代码、权重、声库与素材分别记录许可，不能仅凭仓库标注“开源”决定全部用途。
 
 ## 优先验证的模型
@@ -25,9 +25,9 @@
 | 交互式音乐生成 | [Magenta RealTime 2](https://github.com/magenta/magenta-realtime)、[模型卡](https://github.com/magenta/magenta-realtime/blob/main/MODEL.md) | 文字、音频参考与 MIDI 条件控制的连续音乐生成 | 后续扩展；代码 Apache-2.0，权重 CC BY 4.0。small 230M/base 2.4B，当前实时路径主打 Apple Silicon；NVIDIA 离线推理与 Windows 接入另验 |
 | 吉他音箱建模 | [Neural Amp Modeler](https://github.com/sdatkinson/neural-amp-modeler)、[推理核心](https://github.com/sdatkinson/NeuralAmpModelerCore) | 吉他 DI 经过音箱/效果音色模型形成成品轨 | 后续录音/效果器方向；代码/核心 MIT，第三方 .nam 音色与箱体 IR 各有许可。不是 MIDI 吉他乐器；低延迟设备链路仍需实现 |
 
-已有 Qwen3-ASR、Whisper、Demucs、CREPE 和语音清理继续作为对照和可用工具，见[实际支持](next-models.md)。
+已有 Qwen3-ASR、Whisper、Demucs、CREPE 和语音清理继续作为对照和可用工具，见[实际支持](models.md)。
 模型生成出的 WAV 应成为可试听、插入、移动、撤销和导出的工程素材；转录出的 MIDI 应能换音色继续创作。
-后者还需要完成 MIDI 导入与采样乐器等平台功能，不能用可下载一个 MIDI 文件代替整个制作流程。
+MIDI 导入与采样乐器已可用于继续制作，见 [素材库指南](creation-library.md)。
 
 ## 高资源或受限的补充候选
 
@@ -55,7 +55,7 @@ HeartMuLa、多乐器转谱、音色转换与音乐理解等其他候选保留�
 | [LRCLIB](https://github.com/tranxuanthang/lrclib) | 查询普通/同步歌词，辅助纠错 | 自托管服务代码 MIT，支持歌词 API；歌词内容权利不能从 MIT 代码许可推导 | 可选歌词候选来源，匹配艺人/版本/时长并让用户确认；不直接当标准答案，不默认打包整库 |
 
 Freesound 2026 年 FAQ 另列上传者的生成式 AI 训练偏好；素材使用、评测与训练用途需要分别记录。
-大规模训练数据应走其 Data Packs 流程，本轮不批量抓取。歌词检索也不替代 ASR 与强制对齐的独立评测。
+大规模训练数据应走其 Data Packs 流程。歌词检索也不替代 ASR 与强制对齐的独立评测。
 
 ## 可复用的评测数据
 
@@ -75,7 +75,7 @@ Slakh 的合成域表现也不能代替真实混音评测。各模型训练重�
 ## 如果指软件存储，保留 SQLite，再按需加索引
 
 当前代码 `StudioService` 已用 `.studio.sqlite3` 保存工程相关状态，采用 WAL；制作工程表也在其中。
-这是本地代码事实，下面是下一阶段建议，并非本轮完成的数据库迁移。
+以下索引方案是待评估设计；当前未进行相应数据库迁移。
 
 | 组件 | 角色 | 选择依据 |
 | --- | --- | --- |

@@ -1,4 +1,6 @@
-# Next: local models and tasks
+# Compatibility asset editor: models and tasks
+
+> Advanced source/runtime setup for the retained Next single-asset editor and shared inference environment. See [current model support](models.en.md) for workstation installation paths.
 
 [中文](next-models.md) · [Preview guide](next-preview.en.md) · [Future candidates (not integrated)](local-model-candidates.en.md)
 
@@ -112,5 +114,4 @@ MCP reads the workspace's `.studio-runtime.json` by default, or accepts
 
 Melody remains a monophonic estimate. Both rest-preserving and legacy decoding are
 available; see the [evaluation](melody-next.en.md). Speech denoising is available;
-text-conditioned separation, audio generation and automatic model routing remain on the
-[roadmap](workbench-plan.en.md), not available capabilities.
+text-conditioned separation and automatic model routing remain planned. Music generation is available in the multitrack workstation; see [supported models](models.en.md).

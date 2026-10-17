@@ -3,8 +3,7 @@
 [中文](creation-library.md) · [Start the workstation](create-preview.en.md)
 
 Audition a sound or groove, then add it to the multitrack project. The starter instruments
-ship with the application and need no model download, GPU or connection. Older projects
-and the three original synth sounds remain available.
+ship with the application alongside three synth sounds and need no model download, GPU or connection.
 
 ## Start arranging
 
@@ -70,11 +69,4 @@ See `src/music_studio/data/creation/NOTICE.md` and `manifest.json` for licenses,
 source/derived hashes and exact filenames. `python scripts/build_creation_library.py` explicitly
 rebuilds the pack over the network; normal application startup never invokes it.
 
-## Validation
-
-Backend checks cover real FLAC decoding/hashes, piano pitch spectra, WAV/MIDI, drum channels,
-credits, tempo changes, sustain, original-file retention, dense 1025-note imports, history
-and malformed inputs. An installed wheel decoded and verified all 23 samples; both wheel
-and source distribution were checked for asset completeness. Actual browser verification
-covered looping, MIDI import, velocity editing, instrument audition, both languages, WAV
-export and narrow-window controls.
+[技术验证 / Technical verification](feature-validation.md)。

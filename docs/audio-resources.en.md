@@ -3,8 +3,7 @@
 [中文](audio-resources.md) · [Full model index](local-model-candidates.en.md) · [Platform plan](workbench-plan.en.md)
 
 Researched 2026-10-16 using official repositories, model cards and dataset releases.
-These are integration recommendations, not installed providers or local performance measurements.
-No model weights or bulk audio were downloaded, and no new inference was run for this research.
+This is a research snapshot scoped to its date, rather than an installation list or local performance report. See [model support](models.en.md) for current integrations.
 Track code, weight, voicebank and content licenses separately.
 
 ## Models worth validating first
@@ -29,7 +28,7 @@ Priority reflects creative value, project integration cost and license clarity, 
 Existing Qwen3-ASR, Whisper, Demucs, CREPE and speech cleanup remain useful tools and baselines;
 see [actual support](next-models.en.md). Generated WAV files should become project assets that users
 can audition, insert, move, undo and export. MIDI should support instrument replacement and composition.
-This still requires platform MIDI import and sampling instruments; a downloadable MIDI alone is insufficient.
+MIDI import and sampled instruments are available for continued editing; see the [instrument guide](creation-library.en.md).
 
 ## Additional candidates with resource or usage constraints
 

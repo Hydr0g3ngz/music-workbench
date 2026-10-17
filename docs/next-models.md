@@ -1,4 +1,6 @@
-# Next：本地模型与任务
+# 兼容素材编辑器：模型与任务
+
+> 本文供需要手动配置模型的源码用户使用，描述保留的 Next 单素材编辑器与共用推理环境。当前工作台的安装方式与支持状态见 [模型目录](models.md)。
 
 [English](next-models.en.md) · [预览说明](next-preview.md) · [未来模型候选（尚未接入）](local-model-candidates.md)
 
@@ -96,5 +98,4 @@ MCP 默认读取同一工作区的 `.studio-runtime.json`，也支持启动参�
 `--inference-python`、`--lyrics-python` 和 `--model-dir`。只在自己的机器上使用这个本地配置。
 
 旋律仍是单旋律估计。保留休止与旧版解码都提供作比较，详见
-[分段评测](melody-next.md)。语音去噪已接入；按描述分离、生成式音频和自动选择最佳模型仍待开发；
-这些在[计划](workbench-plan.md)中按实际验证逐项推进。
+[分段评测](melody-next.md)。语音去噪可用；按描述分离与自动模型选择仍待开发。音乐生成已在多轨工作台提供，见 [支持模型](models.md)。

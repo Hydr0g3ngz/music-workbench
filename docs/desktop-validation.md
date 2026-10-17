@@ -1,5 +1,7 @@
 # dev11 验证 / Validation
 
+> dev11 历史验证 / Historical dev11 verification。当前安装器与 AI 自动配置见 [安装指南](windows-install.md)，后续测试见 [Windows 验证](windows-validation.md)。
+
 验证日期：2026-10-16，Windows x64。这里记录开发验收，不代表已完成青少年可用性研究或正式稳定发布。
 
 173 Python tests、66 Node UI tests、Ruff 和 diff 检查通过。安装 wheel 后，原有发布烟测通过；与当前源码的 148 个包文件逐一一致。
@@ -27,6 +29,6 @@ This tests application-local Python, an occupied port, relaunch reuse, no-model 
 - [真实重绘记录](../benchmarks/results/repaint-dev11.json)：16 秒既有 AI 素材重绘 6–10 秒，选区外采样完全一致。浏览器原位采用，撤销和重做通过。
 - [音量与过渡播放记录](../benchmarks/results/volume-playback-dev11.json)：两段 16 秒素材，2 拍/1.111111 秒等功率交叉淡化，带音量曲线；WAV 全长 30.888889 秒。浏览器主输出 Opus 捕获与离线 WAV 的 10 ms RMS 相关系数 0.993665，没有额外静音窗。覆盖过渡边界，不是听感评价。
 - 曲线 WAV 逐采样与预期误差 `<3e-7`；便携工程恢复、撤销、边界校验通过。
-- 原有五条工程数据库记录（包括回收站）内容、素材与历史逐字节核对未改变。验证素材使用独立工作目录。
+- 独立工作目录中核对工程、回收站、素材与历史的保留。
 
-Real model inference and browser audio capture validate the implemented path, not musical quality. Existing five project rows, asset references and histories were unchanged. Model tests used a separate workspace. Model installation still needs a technical setup guide; a no-terminal installer, signed distribution, runtime security upgrade and actual beginner testing are next-release work.
+Real model inference and browser audio capture validate the implemented path, not musical quality. Project records, asset references and histories were checked for retention. Model tests used a separate workspace. Model installation still needs a technical setup guide; a no-terminal installer, signed distribution, runtime security upgrade and actual beginner testing are next-release work.

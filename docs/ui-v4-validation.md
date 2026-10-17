@@ -1,6 +1,8 @@
 # 工作台 v4 验证 · 2026-10-15
 
-本机验收入口：`http://127.0.0.1:8770/`。默认发布命令仍使用 8765，可通过 `--port` 修改。使用 RTX 4070 Laptop 8GB / 32GB RAM。
+> 历史参考：原 Music Studio 歌曲分析流程或拆分前版本。当前工作台请从 [安装与入门](README.md) 开始；原分析产品见 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。本页的功能、命令与测量按所述旧版本解释。
+
+验证环境：Windows，RTX 4070 Laptop 8 GB / 32 GB RAM。
 
 ## 真实模型流程
 

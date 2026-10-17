@@ -1,10 +1,10 @@
 # Speech cleanup and matched listening
 
+> For the compatibility asset editor `next.html`. This page covers speech cleanup and a fixed-data evaluation. See the [workstation guide](create-preview.en.md) for music creation.
+
 [中文](speech-cleanup.md) · [Next setup](next-preview.en.md) · [Local models](next-models.en.md)
 
-`0.2.0.dev2` adds speech cleanup, loudness normalization and synchronized A/B to the shared
-project, asset, preview and undo system. Codex / MCP can use the same operations. The classic
-song analyzer remains available.
+Speech cleanup, loudness normalization and synchronized A/B use shared assets, previews and undo history. Experimental Codex / MCP tools can use the same operations.
 
 ![Real speech cleanup comparison](images/next-cleanup-en.png)
 

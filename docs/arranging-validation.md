@@ -2,10 +2,10 @@
 
 2026-10-16 · 0.2.0.dev9 · Windows · RTX 4070 Laptop GPU
 
-独立测试工程 `bc5c7b3bb2e743ad`，未修改前两首作品或用户原有工程。
+使用独立测试工程验证。
 这是包含留白的功能样本，不作为一首完成作品发布，也没有听感质量评级。
 
-Independent fixture; earlier pieces and existing user projects were preserved.
+A separate fixture isolates workflow verification.
 This partially filled arrangement verifies operations, not finished music or listening quality.
 
 ## 操作记录 / Steps
@@ -74,7 +74,7 @@ invalidated target timing, visible-note coverage, mute/solo, fade bounds and pla
 
 ## 尚未证明 / Not established
 
-动机保留、和声符合、速度符合、自然过渡和音乐质量均未在本轮做盲听或真值评估。
+动机保留、和声符合、速度符合、自然过渡和音乐质量均未在此实验中做盲听或真值评估。
 两段样本的覆盖统计不推断音频能量。没有自动等响度 A/B、crossfade 或新增语言模型。
 小屏布局与零基础用户效率仍需要实际用户验证。
 

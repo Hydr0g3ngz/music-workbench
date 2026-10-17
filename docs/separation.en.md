@@ -2,8 +2,7 @@
 
 [中文](separation.md)
 
-Create follows a connected workflow: import/generate → separate vocals/backing → audition → replace with editable tracks → mix/export.
-Classic, Next, original audio and Demucs remain available. Mel-Band RoFormer KJ is an optional local backend.
+Separate imported/generated audio into vocals and backing, audition and adopt aligned tracks, then continue arranging and mixing. Choose Demucs or optional Mel-Band RoFormer KJ; originals are retained. See [AI workflow](ai-production-workflow.md) for four-part Demucs separation.
 
 ![Separation audition and aligned arrangement](images/create-separation-en.png)
 
@@ -45,7 +44,7 @@ An owned worker loads the model and releases it after completion/cancellation. S
 - Original 8 s window / 50% overlap; inference batch reduced from 4 to 1. CUDA autocast, CPU FP32, no compilation or TTA.
 - Model vocals plus residual backing (`input − vocals`); aligned FLOAT WAV, original gain, no independent normalization.
 - Frame count, rate, channels, finite values and output checksums are validated. Outputs publish together.
-- Two stems only; no drums/bass/guitar separation and no guarantee of perfect isolation.
+- This RoFormer backend outputs vocals/backing only; use Demucs for four parts. Stems can still contain leakage.
 - Up to 10 minutes per task. Memory depends on hardware and input; batch 1 is not a fixed VRAM guarantee.
 
 ## Benchmark

@@ -1,149 +1,49 @@
-# Music Studio Next development preview
+# Compatibility asset editor (Next)
 
-[中文](next-preview.md) · [Plan](workbench-plan.en.md) · [Melody comparison](melody-next.en.md)
+[中文](next-preview.md) · [Documentation](README.en.md) · [Model setup](next-models.en.md)
 
-This is **0.2.0.dev2** on `codex/audio-workbench-next`. It does not replace the older release.
-The original `main`, `v0.1.2` and song workspace are retained separately.
+Next is the retained single-asset editor for transcript correction, speech cleanup, waveform processing and experimental MCP/Codex tools. Use the [Music Workbench workstation](create-preview.en.md) for multitrack music; the two interfaces store different project records.
 
-## Available now
+## Available tools
 
-- Import and edit without running separation, transcription or neural models first.
-- Select ranges, enter times, zoom the waveform and loop playback.
-- Trim, gain, fades, stereo balance, sample-peak normalization and reverse.
-- Mix existing vocals/backing assets with identical sample timelines.
-- Render separate previews; keep, undo and redo, with edit state surviving restarts.
-- Export the audio being auditioned as 16/24-bit PCM or 32-bit float WAV.
-- Rename, search, move projects to Trash, restore and switch English/Chinese.
-- MCP and embedded Codex share projects, selections, previews and activity.
-- Queue local stems, Whisper/Qwen transcripts, two melody decoders, beats and level checks.
-- Check task state, cancel work, audition and download immutable output assets.
-- Correct transcript lines as new versions with TXT/LRC/SRT. See [models and setup](next-models.en.md).
-- CPU speech cleanup, LUFS / true-peak measurement, static-gain loudness normalization and
-  synchronized matched A/B. A licensed 23-second speech demo helps try the explicitly installed
-  denoisers. [Methods and per-case results](speech-cleanup.en.md).
+- Import, waveform selection, trim, gain, fades, balance, reverse and separate previews.
+- Audition originals/candidates, explicitly adopt, undo/redo, reopen and export WAV.
+- On-demand stems, Whisper/Qwen transcription, monophonic MIDI, beats and levels.
+- Correct transcript lines as new versions and download TXT/LRC/SRT, retaining recognition.
+- CPU speech cleanup, LUFS/true peak, static-gain normalization and synchronized matched A/B.
 
-The classic analysis view and licensed 45-second precomputed demo remain available.
-Importing your own audio does not automatically run the complete analysis pipeline.
+Cleanup can damage music or environmental sound. Audition before adoption. [Speech cleanup](speech-cleanup.en.md) · [Models and tasks](next-models.en.md)
 
-## Start
+## Launch from source
 
-On Windows, install Python 3.11/3.12 and double-click `Start-Music-Studio-Next.cmd`.
-It installs a separate Next runtime on first start, without changing the stable `.venv`.
-Manual setup is also available:
+This advanced entry needs Python 3.11/3.12 and optional dependencies. It is not a prerequisite for basic creation in the installed app.
 
-```powershell
-.\scripts\setup-next.ps1
-.\Start-Music-Studio-Next.cmd
+```sh
+python -m pip install -e ".[ui,audio,agent]"
+music-workbench ui --interface next --workspace outputs/asset-editor --port 8926 --open
 ```
 
-Setup downloads UI, decoding, MCP, CPU enhancement runtime and loudness dependencies, without neural weights.
-Next uses `.venv-next`, `outputs/next` and a separate port starting at 8900.
-Development checkouts can also use an existing `.artifacts/workbench-env` runtime.
-The stable app can keep running. Use `setup-next.ps1 -Python <interpreter>` to choose Python.
+Projects stay in the selected workspace. Use one writing service per workspace and close the older service before updating. Neural weights need [separate setup](next-models.en.md).
 
-When upgrading an existing Next workspace, close its older backend before launching. The launcher
-detects a mismatched running version to avoid connecting the new UI to an older API. To retain both,
-extract into a separate folder, or choose an independent workspace and port:
+## Experimental MCP and Codex
 
-```powershell
-.\scripts\launch-next.ps1 -Port 8902 -Workspace outputs/next-cleanup
-```
+The editor can connect an existing Codex CLI/login. Choose **Codex assistant → Connect local Codex**, and try “Lower this audio by 3 dB and create a preview.” Audition the tool result and choose whether to keep it.
 
-Linux/macOS or manual setup:
+Audio processing is local. Codex conversations, read transcripts and tool results use its service; audio is not implicitly attached. These tools cover single-asset editing/tasks, not full workstation track, note and effect control. The experimental app-server interface can vary by CLI version; the tested version is `0.162.0-alpha.17.2`.
 
-```bash
-python3 -m venv .venv-next
-source .venv-next/bin/activate
-python -m pip install -e '.[ui,audio,agent]'
-python -m music_studio ui --interface next --workspace outputs/next --port 8900 --open
-```
-
-## Codex and MCP
-
-Open the **Codex assistant** tab and **Connect local Codex**. The installed Codex CLI needs an
-existing login. The workbench does not read/copy credential files or change global configuration.
-
-Try: “Lower the current audio by 3 dB and create a preview. Do not keep it yet.”
-Actual tool results appear as `CODEX` preview cards. Listen, keep them, or continue manually.
-Previews are the default; originals are retained. The UI and agent share revision conflict checks.
-
-Audio processing stays local. Codex inference uses its service and receives the conversation,
-transcripts it reads and tool results. Audio is not implicitly attached or uploaded. Measurements do not mean
-the assistant has listened. Shell tools, external MCP servers, connectors and subagents are disabled
-for this embedded process, without changing global settings.
-
-Tested CLI: `0.162.0-alpha.17.2`. Dynamic tools in the official app-server remain experimental;
-other versions may need adaptation.
-
-To use existing Codex through MCP, launch:
-
-```text
-<Next Python> -m music_studio.studio.mcp --workspace <absolute Next workspace>
-```
-
-Example configuration to copy and customize; the project does not install it automatically:
+External MCP clients can use this configuration after replacing absolute paths:
 
 ```toml
-[mcp_servers.music_studio]
-command = "/absolute/path/to/.venv-next/bin/python"
-args = ["-m", "music_studio.studio.mcp", "--workspace", "/absolute/path/to/outputs/next"]
+[mcp_servers.music_workbench_assets]
+command = "/absolute/path/to/.venv/bin/python"
+args = ["-m", "music_studio.studio.mcp", "--workspace", "/absolute/path/to/outputs/asset-editor"]
 tool_timeout_sec = 180
 ```
 
-On Windows use `.venv-next/Scripts/python.exe`; forward slashes work in TOML paths.
-16 shared tools cover editing, model checks, queues, results, transcript corrections and A/B.
-Try: “Clean the source with DPDFNet, create a −16 LUFS preview and prepare A/B. Do not adopt.”
-Install weights explicitly through the UI first; agent tools do not download them implicitly.
-See the official [MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
-and [app-server documentation](https://learn.chatgpt.com/docs/app-server).
+On Windows use `.venv/Scripts/python.exe`. Sixteen tools cover selection, previews, adoption/history, model checks, queueing, artifacts, text corrections and A/B. Install weights first. Tools do not accept arbitrary shells, interpreters or download URLs. Conversations last for the service lifetime; editing state and candidates persist in the workspace.
 
-## Current limits
+## Limits and reference
 
-Model registration, isolated runtime checks and task-specific inference are available. Neural
-weights are installed separately. CPU speech enhancement is available; semantic separation,
-streaming long recordings and automatic model routing remain future work. Full song analysis
-remains in the classic view, with its inference dependencies and weights installed separately.
-Edit history and classic analysis history are separate; trimming does not replace an old song's source.
+Melody is monophonic estimation; review text/timing. Speech cleanup is not music restoration, and static LUFS processing does not establish broadcast compliance. Integer exports reject overloads. Long-audio streaming is not available.
 
-Basic meters retain sample peak and full-file RMS; a separate capability adds LUFS/true peak.
-No broadcast conformity is promised. Integer exports reject over-full-scale
-audio. ROSVOT and Basic Pitch are isolated experiments and have not replaced the melody default.
-Conversation sessions currently last for the server lifetime; reconnect after a restart.
-Audio edit state and previews are saved in the workspace.
-
-## Validation
-
-98 Python and 22 Node checks pass locally, covering editing, queues, process-tree cancellation, recovery, text versions, loudness, A/B and
-frozen benchmarks. A real MCP subprocess and SDK client are exercised.
-Installed Codex also called the audio tools to produce a six-second, −3 dB preview while retaining
-the current version. Browser checks and screenshots are recorded separately in this branch.
-Browser checks cover Unicode-path upload, trash/restore, keep/undo/redo, actual WAV download and looping.
-Original audio kept playing past 32 seconds while a real MCP client created a preview and the UI
-language changed. A clean wheel installation without Torch/Whisper also passed import, edit, history
-and export flows. Tests do not call remote models; live model/agent experiments are separate.
-
-[Real capability smoke](../benchmarks/results/next-capabilities-2026-10-16.json): all seven entries
-completed on a licensed 15-second excerpt. Mixture reconstruction error was zero and both MIDI
-roundtrips were within 0.21 ms. This is functional evidence, not recognition accuracy or a long-song
-performance guarantee. Browser checks also ran real 45-second separation and Whisper transcription;
-playback advanced from 7.7 to 31.4 seconds through completion and a locale change without reloading.
-Line corrections produced a separate transcript version.
-Installed Codex also checked a model, queued inference on the real 45-second vocal stem,
-queried completion and read 62 notes. Backend verification retained edit v4 and the current audio.
-One unsuitable artifact read was rejected; the agent recovered by reading note JSON. Its unsuccessful
-tool event is labeled explicitly rather than remaining stuck on Working.
-
-![Next local tasks and real Codex results](images/next-models-en.jpg)
-
-[Full editing-workbench screenshot](images/next-workbench-en.jpg) · [Chinese task view](images/next-models-zh.jpg)
-
-Demo: *Let's Go Fishin'* by Karissa Hobbs, CC BY 3.0. The screenshot includes trimmed, reversed
-and gain-adjusted previews. No artist endorsement is implied.
-[Source and changes](../src/music_studio/ui/demo/ATTRIBUTION.md) · [Chinese screenshot](images/next-workbench-zh.jpg)
-
-```bash
-python -m pip install -e '.[ui,audio,agent,benchmark,dev]'
-python -m ruff check .
-python -m pytest -q
-node --test tests/ui_playback.test.cjs tests/ui_i18n.test.cjs tests/ui_transport.test.cjs tests/ui_comparison.test.cjs
-```
+[Speech methods](speech-cleanup.en.md) · [Melody evaluation](melody-next.en.md) · [Historical task checks](../benchmarks/results/next-capabilities-2026-10-16.json) · [Technical index](technical-reference.md)

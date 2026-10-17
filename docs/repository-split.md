@@ -1,13 +1,18 @@
-# Repository split / 仓库拆分
+# Music Workbench 与 Music Studio / Two projects
 
-- Music Studio: https://github.com/Hydr0g3ngz/music-studio — original song analysis; D:/Music Studio.
-- Music Workbench: https://github.com/Hydr0g3ngz/music-workbench — creation/arrangement/mixing; D:/Music Workbench.
+| 项目 / Project | 用途 / Purpose | 仓库 / Repository |
+| --- | --- | --- |
+| Music Workbench | 创作、编排、录音、混音与本地模型 / Creation, arrangement, recording, mixing and local models | [music-workbench](https://github.com/Hydr0g3ngz/music-workbench) |
+| Music Studio | 整曲分离、歌词、旋律、和弦与节拍分析 / Full-song stems, lyrics, melody, chord and beat analysis | [music-studio](https://github.com/Hydr0g3ngz/music-studio) |
 
-The workstation retains shared engine code under the internal `music_studio` namespace to preserve serialization/import compatibility. It is a separate checkout, remote, distribution (`music-workbench-local`), entry point (`music-workbench`) and default workspace. Historical compatibility pages remain internal; no requirement to install the classic product.
-工作台暂保留内部 music_studio 包名以兼容已有项目及导入；这是独立仓库、独立发行包和独立启动入口，不依赖安装原产品。
+两个产品独立安装、发布和保存项目。使用 Music Workbench 无需安装 Music Studio。内部 `music_studio` 包名用于兼容工程及 Python 导入，并不表示需要同时运行两个产品。
 
-Existing user data, model environments and running servers were not moved. New launches use outputs/workbench on port 8920. To open old projects, explicitly pass --workspace with the original absolute path after closing its previous server. Back up that directory first; do not run two versions against one workspace.
-已有数据、模型环境和服务均未移动。旧项目需在原服务关闭后显式指定绝对路径打开，先备份，不让两个版本同时写入。
+The products have independent installations, releases and project storage. Workbench does not require Studio. The internal `music_studio` Python namespace preserves import and serialization compatibility.
 
-Model setup scripts use the new checkout by default. Existing large model runtimes may be reused through the documented runtime configuration paths without redownloading. No model weights or user audio are copied into this repository.
-模型安装默认使用新目录；可按模型文档配置绝对路径复用已有环境与缓存，不会将模型权重或用户音频提交到仓库。
+Music Workbench 安装版默认作品目录为 `%LOCALAPPDATA%\MusicWorkbench\Projects`；源码默认为 `outputs/workbench`。通过 `.mwb` 转移工作台工程。Music Studio 的歌曲分析结果不自动转换成编排工程；需要时导出音轨或 MIDI，再导入工作台。
+
+Installed Workbench projects default to `%LOCALAPPDATA%\MusicWorkbench\Projects`; source launches use `outputs/workbench`. Transfer arrangements with `.mwb`. Studio analysis results are not automatically converted into arrangements; export stems/MIDI and import them into Workbench.
+
+高级用户可按模型文档连接已有隔离环境与缓存；不要让两个服务同时写同一工作区。拆分前的说明与分析评测保留在 [技术与历史参考](technical-reference.md)，不作为当前安装指南。
+
+Advanced users can connect existing isolated model runtimes/caches using the model guides. Use one service per workspace. Pre-split documentation and analysis evaluations remain in [technical reference](technical-reference.md).

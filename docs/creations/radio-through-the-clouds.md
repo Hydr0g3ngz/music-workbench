@@ -6,11 +6,11 @@
 
 把“云层之间时断时续的无线电信号”变成一段器乐草稿：先有模糊纹理，节拍进入，
 中段留下空间，随后出现更明亮的变奏，最后让最初的信号回响。
-这次让 AI 生成的音频成为主体，再拆解、重组、转成可编辑音符；没有外部脚本写整首乐谱。
+制作方法是以 AI 音频为主体，再拆解、重组，并将部分声部转成可编辑音符。
 
 A radio signal passes through cloud: texture, pulse, open space, brighter variation, then a final reply.
 AI-generated audio forms the main material, separated and rearranged with an editable MIDI echo.
-No externally authored full-score MIDI was injected.
+The arrangement combines generated audio with transcribed MIDI.
 
 ![工程 / Session](../images/cloud-radio-workbench-zh.png)
 
@@ -18,12 +18,12 @@ No externally authored full-score MIDI was injected.
 
 | 步骤 / Step | 操作与目的 / Action and purpose |
 | --- | --- |
-| 1 · 定题 / Brief | 新建独立工程 `6583e6c28f70467a`，120 BPM，先请求 A minor，保留旧工程。Created a separate project and requested A minor; prior projects preserved. |
+| 1 · 定题 / Brief | 新建 120 BPM 工程，生成条件请求 A minor。Create a 120 BPM project and request A minor. |
 | 2 · 主题 / Theme | ACE-Step 文本生成 32 秒，seed `20261017`，8 steps；提示 organic downtempo、四音符 pluck、Rhodes、圆润贝斯和 breakbeat、无歌声。Generated a 32 s instrumental theme. |
 | 3 · 变奏 / Variation | 采用原稿为临时音频片段，再从参考变奏模式固定裁切后的实际音频。32 秒、seed `20261018`、参考强度 0.65，要求保留动机、改变日光质感。Pinned source audio for a reference-based variation. |
 | 4 · 拆解 / Separate | 两份生成各跑一次 Demucs htdemucs 四声部分离，成为鼓/贝斯/vocals/other；在编排中将后两者命名为主题/纹理。These are estimated source roles, not verified isolated instruments. |
 | 5 · 可编辑动机 / Editable echo | 对原稿贝斯跑 CREPE，采用 36 个单旋律估计音符，整体升两个八度、力度 72，换马林巴，裁出留白段。36 stored notes, 15 active note events in the exported bridge MIDI. |
-| 6 · 编排 / Arrange | 用界面的小节定位和跨轨段落复制，组成下表 6 段；采用、重命名、裁切、淡化、复制均使用 UI 操作及 UI 事件自动化。No hidden arrangement injection. |
+| 6 · 编排 / Arrange | 用界面的小节定位和跨轨段落复制，组成下表 6 段；采用、重命名、裁切、淡化与复制通过编排工具完成。Use arrangement tools for adoption, naming, trims, fades and copies. |
 | 7 · 混音 / Mix | 纹理轨降低电平、变奏轨微调；马林巴 −14 dB、右偏 0.15、氛围空间。尾段 3 秒淡出，主输出 +2 dB，采样峰值限制 −1 dBFS。Static edits, not automated mastering. |
 | 8 · 交付 / Deliver | 实际从界面导出 WAV、MIDI、`.mwb`；保留原始生成、参数与处理记录。新目录恢复同版本工程后 WAV 字节完全相同。 |
 
@@ -63,7 +63,11 @@ ACE-Step 进程驻留 RAM 峰值约 11.1–11.2 GiB，Windows 私有提交约 17
 本次没有直接听感或盲听评价，不把“模型运行成功”写成“作品好听”。
 Capture taps browser audio before OS output, encoded with lossy Opus. These checks are not listening evaluation or a universal glitch guarantee.
 
-## 仍然暴露的问题 / Remaining friction
+## 此案例的限制 / Case-study limits
+
+此案例使用 dev8。后续版本已加入 [对拍与等响度比较](../material-fitting.md)、[音量曲线、交叉淡化与重绘](../volume-and-repaint.md)。以下保留创作当时的限制，便于理解测量范围。
+
+This case used dev8. Later builds added beat fitting, matched A/B, curves, crossfades and repaint. The observations below describe the original workflow.
 
 1. **候选适配优先**：生成条件未必被遵守；全局 BPM/调性并不等于段落对齐。需要拍点/强拍与起拍校准、匹配音量的候选比较。
    Fit material first: estimated tempo/key do not establish downbeat alignment or compliance; add beat views and loudness-matched candidates.
@@ -74,11 +78,11 @@ Capture taps browser audio before OS output, encoded with lossy Opus. These chec
 4. **模型等待**：本机两次生成超过三分之二时间用于加载；需要可释放的常驻 worker，独立测冷/热启动。
    Loading dominates these two tasks; benchmark releasable residency with controlled cold/warm conditions.
 
-UI 自动化中三次选错素材，额外完成了 other 分析、other 再分轨与完整变奏 CREPE。
-这些任务没有用于最终作品，保留在 processing/audit 记录中；不能把所有任务都算成有意的创作决策。
-Three extra tasks caused by UI selection mistakes were retained in the audit and not used in the final piece.
+资源表仅列出用于最终编排的任务；排除三个未采用的额外处理任务。
+The resource table covers tasks used in the final arrangement; three unused extra processing tasks are excluded.
 
 来源：本地模型输出与软件自带 VCSL 马林巴；未使用其他歌曲作参考。
 模型/采样许可与版本分别见[生成](../music-generation.md)、[素材库](../creation-library.md)。
-本地交付目录为 `outputs/creations/radio-through-the-clouds/`，含双语 HTML 报告、试听、工程包、原始候选、日志与校验值；
-大文件不随 Git 源码提交。此记录描述制作过程，不承诺 AI 输出权利或音乐质量。
+生成音频和该案例工程未随源码分发；复现时可按上述参数生成自己的候选并沿段落表编排。需要现成可编辑工程，可使用 [入门示例](../first-sketch.md)。模型/素材许可与生成内容的具体使用条件分别适用。
+
+The generated audio and this case project are not distributed with the source. Generate your own candidates with the recorded settings and arrange using the section table, or start with the [bundled lesson](../first-sketch.md). Model/asset terms apply separately.

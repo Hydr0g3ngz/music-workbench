@@ -138,7 +138,7 @@ entry points remain available; no automatic migration of old songs.
 
 新增独立多轨制作界面、采样乐器/鼓点、MIDI 导入与音符属性编辑，支持可撤销编排、
 混音与 WAV/MIDI 导出。可选 ACE-Step 生成草稿，试听后明确加入工程，附真实资源与失败记录。
-主线为「想法 → 草稿 → 编排 → 混音 → 导出」；下一批优先完善效果器与混音预设。
+支持「想法 → 草稿 → 编排 → 混音 → 导出」流程；该版本尚无后续加入的效果器与混音预设。
 旧版本与工作区保留。此包不是独立 EXE，不包含 Python 或神经模型权重。
 
 ## 0.2.0.dev2 — Speech cleanup / 语音清理开发预览
@@ -178,6 +178,10 @@ MCP 与实验性 Codex 连接共用项目状态。启动器、环境和输出独
 新增本地模型清单、隔离环境检查、持久化队列、固定素材与转写改字版本，15 个共享工具覆盖
 7 个能力入口，均完成真实模型验证。保留休止的音符解码作为实验选项，因跨数据集退步而未替换默认值。
 
+## Music Studio 历史版本 / Historical Music Studio builds
+
+以下为拆分前的分析产品记录。Current Workbench setup is documented in [Quick start](QUICKSTART.md); the analysis product is maintained in [Music Studio](https://github.com/Hydr0g3ngz/music-studio).
+
 ## 0.1.2 — 2026-10-15 · Preview / 预览版
 
 Fix Qwen recognition failing after separation when starting with the Windows shortcut.
@@ -214,7 +218,7 @@ demo-to-inference regression check.
 - Playback fixes: stable result polling, lazy stem caching and rapid seek/pause handling.
 - 43-case component/lyric benchmark with provenance and separately reported timing coverage/error.
 
-中文：首个公开预览版，提供完整本地分析工作台、中英切换、免模型授权示例、Windows 启动入口、
+中文：初始预览构建，提供本地分析工作台、中英切换、免模型授权示例、Windows 启动入口、
 歌词纠错与版本核对、跟唱与导出、歌曲回收站，以及可复现 benchmark。修复反复载入音轨和快速拖动时暂停的问题。
 
 This is an early release. The Windows ZIP requires Python 3.11/3.12 and an initial

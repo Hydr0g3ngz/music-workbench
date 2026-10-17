@@ -1,45 +1,43 @@
-# 发布与演示素材 / Launch kit
+# 演示与媒体素材 / Media kit
 
-主张 / Message: **从第一段音乐，到本地 AI 音乐工作台。 / Your first musical sketch, then a local AI workstation.**
+Music Workbench 是本地运行的开源音乐创作工作台，提供可编辑音轨、MIDI、录音、混音及可选本地 AI。
 
-先邀请零基础创作者完成一个可编辑作品。展示“用户自己改了什么、带走什么”，再展示模型。公开传播以当前可用功能为依据，不承诺专业 DAW 替代、SOTA 全覆盖或一键产出完整商业歌曲。
+Music Workbench is an open-source local music workstation with editable tracks, MIDI, recording, mixing and optional local AI.
 
-Invite beginners to finish an editable sketch. Show what they change and what they export, then introduce local models. Describe the current preview and hardware requirements accurately.
+## 下载素材 / Assets
 
-## 演示视频 / Demo video
+| 素材 / Asset | 内容 / Contents |
+| --- | --- |
+| [36 秒有声演示 / 36-second MP4](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/Music-Workbench-First-Sketch-Demo.mp4) | 实际界面截图剪辑，配示例导出音乐 / Edited UI screenshots with exported example audio |
+| [GIF](images/first-sketch-demo.gif) | 无声界面预览 / Silent interface preview |
+| [可编辑示例 / Editable MWB](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/First-Sketch-Example.mwb) | 八小节、四轨示例，可恢复后修改 / Eight bars, four tracks, ready to restore and edit |
+| [入门教程 / Beginner lesson](first-sketch.md) | 软件内五步跟练的操作说明 / Companion guide to the five in-app steps |
+| [安装器与校验 / Installer and checksums](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14) | Windows 预览版 / Windows preview |
 
-首版素材是实际 UI 截图剪辑配软件导出的示例音频，标题注明“操作画面节选”；不是连续实时录屏，基础示例不是 AI 生成。可作为 GitHub/短视频的演示预览。发布包提供 MP4；仓库提供无声 GIF 预览。更长版本可按以下分镜补录。
+演示使用内置乐器，基础示例无需 AI。视频是操作画面节选，未呈现连续实时录屏或实际模型生成等待过程。
 
-The first cut combines real UI screenshots with the exported tutorial example and is labelled edited UI highlights. It is not continuous real-time capture; the basic example is not AI-generated. An MP4 is provided with the release and a silent GIF in the repository. Use this storyboard for a longer recording.
+The example uses built-in instruments without AI. The video contains edited UI highlights, not a continuous screen recording or a generation-speed demonstration.
 
-| 时间 / Time | 画面 / Shot | 字幕或口播 / Caption or narration |
-| --- | --- | --- |
-| 0–5 s | 工作台四轨 / Four-track view | “没学过编曲，也可以先改出第一段音乐。” / “Start with a sketch you can change.” |
-| 5–12 s | 鼓独奏并还原 / Solo drums, then restore | “先拆开听：鼓、贝斯、键盘与氛围。” / “Hear the parts before changing the whole.” |
-| 12–22 s | 钢琴卷帘改一个音 / Change one note | “从一个音开始，随时撤销。” / “Make one note yours. Undo any time.” |
-| 22–30 s | 贝斯音量降低 / Lower bass fader | “给主角留出空间。” / “Make room for the main idea.” |
-| 30–38 s | WAV/MWB 导出与跟练完成 / Export and finish | “带走音频，也保留可以继续编辑的工程。” / “Keep the audio and the editable project.” |
-| 38–45 s | AI 配置页 / AI setup | “再把本地开源模型加入流程。首批自动配置 ACE-Step。” / “Add local AI when ready. ACE-Step setup included.” |
+## 项目简介 / Description
 
-AI 演示建议另做第二条，录制实际生成 → 试听 → 入轨 → 对拍/裁切 → 混音。等待若加速，显式写出实际耗时与硬件。先做 12 秒草稿，避免让用户把快速剪辑误认为瞬时生成。
+**中文**：从一段可编辑音乐开始，用采样乐器、MIDI、多轨剪辑与混音完成自己的草稿。Music Workbench 提供 Windows 安装器和软件内双语教程，基础创作无需配置 Python 或下载模型；可选 ACE-Step 本地 AI 帮助生成、变奏和重绘素材。
 
-Make local AI a second video: real generation → audition → adoption → fit/trim → mix. Label sped-up waits with actual time and hardware.
+**English**: Start with an editable sketch and make it yours with sampled instruments, MIDI, multitrack editing and mixing. Music Workbench includes a Windows installer and bilingual in-app lesson. Basic creation needs no Python setup or model download; optional local ACE-Step adds generated material, variations and region repaint.
 
-## 发布文案草稿 / Post drafts
+## 录制一段演示 / Record a walkthrough
 
-**中文标题**：做了个开源音乐工作台：不用配 Python，先跟着改出第一段音乐
+1. 从首页新建教程示例，试听四轨。Create a lesson example and play its four layers.
+2. 独奏鼓，再恢复整体。Solo the drums, then restore the mix.
+3. 在钢琴卷帘中移动一个音符，演示撤销。Move a note in the piano roll and undo it.
+4. 调整贝斯音量，导出 WAV 与 MWB。Balance the bass and export audio plus the editable project.
+5. 若展示 AI，单独记录生成、试听、采用和适配；标明硬件及实际等待时间。For AI, record generation, audition, adoption and fitting; label hardware and elapsed time.
 
-**中文正文**：Music Workbench 是本地运行的开源创作工具。下载 Windows 安装器后，跟着软件里的五步教程试听音轨、改音符、混音并导出 WAV。基础创作无需模型；想继续尝试 AI，可在软件里配置 ACE-Step，再把生成素材放回自己的编排。当前是开发预览，欢迎反馈最影响创作的三个问题。下载与源码：https://github.com/Hydr0g3ngz/music-workbench
+## 版本与署名 / Version and attribution
 
-**English title**: An open local music workbench, with a first sketch you can actually edit
+当前发布是 Windows 10 22H2 / 11 x64 开发预览，安装器未签名。ACE-Step 自动配置需要兼容 NVIDIA ≥8 GB 显卡与 35 GB 空间；其他模型安装方式见 [模型目录](models.md)。功能状态与限制以 [发布说明](releases/v0.2.0.dev14.md) 为准。
 
-**English copy**: Install the Windows preview, follow five in-app steps, change a note, balance the mix and export a WAV. Basic creation needs no model setup. When ready, configure local ACE-Step and bring generated material into your arrangement. This is a development preview; feedback on the three biggest workflow obstacles is welcome. https://github.com/Hydr0g3ngz/music-workbench
+The release is an unsigned Windows development preview. ACE-Step automatic setup requires a compatible NVIDIA GPU with at least 8 GB VRAM and 35 GB free space. Other models have separate setup paths; see [supported models](models.en.md) and [release notes](releases/v0.2.0.dev14.md).
 
-## 发布顺序 / Distribution plan
+介绍项目时请附上 [源码与下载入口](https://github.com/Hydr0g3ngz/music-workbench)。代码、模型权重、截图中的素材及示例工程分别适用其许可，详见 [第三方说明](../THIRD_PARTY_NOTICES.md)；导出工程的素材署名可从软件取得。
 
-1. GitHub 发布页：安装器、校验文件、教程、已知限制、示例工程、短片；README 前屏提供明确下载入口与动态预览。
-2. 找 3–5 位目标用户试用，记录启动失败、跟练卡点、导出成功与主观反馈；不开隐式遥测。
-3. 经用户发布到 B 站/小红书，分别以实操演示和制作过程为内容。社区分享遵循规则，披露作者身份，提供可复现示例。
-4. 先解决试用最常见的阻碍，再发布 AI 深入制作演示。关注首次完成创作与复用意愿，stars 作为结果指标。
-
-Publish artifacts and a clear download path, observe a small set of novice trials without hidden telemetry, then share reproducible demos with author disclosure. Prioritize successful first exports and repeat use; stars are an outcome. These posts are drafts and have not been sent to any external community.
+Link to the [repository](https://github.com/Hydr0g3ngz/music-workbench) when introducing the project. Code, models and example assets have separate licenses; see [third-party notices](../THIRD_PARTY_NOTICES.md) and export project credits from the app.

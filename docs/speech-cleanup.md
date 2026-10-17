@@ -1,9 +1,10 @@
 # 语音清理与等响度试听
 
+> 适用于兼容素材编辑器 `next.html`。这是语音清理指南与固定数据评测，音乐创作入口见 [工作台](create-preview.md)。
+
 [English](speech-cleanup.en.md) · [Next 入门](next-preview.md) · [模型安装](next-models.md)
 
-`0.2.0.dev2` 新增“让讲话更清楚”“统一听感音量”和同位置 A/B。它们操作同一份项目、
-素材、预览与撤销历史；Codex / MCP 也能调用。旧版歌曲分析继续保留。
+“让讲话更清楚”“统一听感音量”和同位置 A/B 操作同一份素材、预览与撤销历史；实验 Codex / MCP 接口也能调用。
 
 ![真实语音清理对比界面](images/next-cleanup-zh.png)
 

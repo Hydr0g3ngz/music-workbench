@@ -2,7 +2,7 @@
 
 [中文](mixing.md) · [Create workstation](create-preview.en.md)
 
-`v0.2.0.dev4` adds live track effects and an optional master sample-peak limiter. No neural weights are needed; source audio stays immutable.
+Shape a mix with live track effects and optional master sample-peak limiting. No neural weights are needed; source audio stays immutable.
 
 ![Effects and multitrack arrangement](images/create-effects-en.png)
 
@@ -31,7 +31,7 @@ Presets are editable starting points, not automatic AI mastering.
 
 The limiter is **not a true-peak limiter**. There is no oversampling or lookahead; heavy reduction distorts.
 Reverb tails extend the export by nominal decay plus 0.1 s; EQ reserves at least 0.15 s.
-This is a fixed-order first set of built-in processors. Reorderable chains, buses/sends, automation, VST and full mastering remain planned.
+Built-in processors use a fixed order. Reorderable chains, buses/sends, effect-parameter automation, VST and full mastering remain planned. For clip volume curves, see [Volume & transitions](volume-and-repaint.md).
 
 ## Playback, export and boundaries
 
@@ -41,20 +41,13 @@ Pause explicitly disposes worklets, so disconnected processors do not keep proce
 
 Numerical parity is verified for playback from the start with fixed parameters; WAV adds 24-bit quantization and the browser graph uses Float32.
 **Seek and resume rebuild filter, compressor and reverb state** without pre-rendering earlier material. The beginning can differ from uninterrupted playback; seeking into a tail alone can be silent.
-Loop boundaries also reset state; gapless looping and cross-loop tails are not promised. Live tweaks are not recorded as automation or exported as a time curve.
+Loops reuse effect graphs and retain tails across cycles. Discontinuous source boundaries can still click; see [Loop and metronome](timing.en.md). Live effect tweaks are not recorded as automation or exported as a time curve.
 Effects need a modern browser and localhost/HTTPS. A worklet failure stops playback with an error instead of silently dropping effects.
 The 32-track project limit is not a guarantee of real-time full-effects performance on every device.
 
 With limiting disabled, the existing export overload guard still rejects WAV clipping and requests a lower master fader.
 The master card displays actual sample peaks and overload warnings. Reduction readings represent recent audio blocks, not long-term maxima.
 
-## Validation (2026-10-16)
-
-- 125 Python and 37 Node checks passed, covering EQ response, compression steady state/release/stereo linking, limiter ceiling, reverb tails, arbitrary block boundaries, extreme settings, bypass, persistence/undo/conflicts and original-file preservation.
-- JavaScript and Python kernels were compared on identical fixed random inputs with absolute/relative tolerances of 2×10⁻¹⁰, both processed and bypassed.
-- Actual Chromium `OfflineAudioContext + AudioWorklet` against a server 24-bit WAV: 44.1 kHz, 61,740 frames, maximum absolute error **1.4901161193847656×10⁻⁷**, RMS error **6.861744876506113×10⁻⁸**. This is numerical consistency for one fixed input/configuration, not a perceptual quality score.
-- Actual browser controls verified presets, playback, A/B and language changes; the playhead advanced while source requests stayed at one. Narrow layout, real WAV and undo/restore were also checked.
-
-Listening judgment is still required; this release does not claim commercial-plugin or automatic-mastering quality.
+[技术验证 / Technical verification](feature-validation.md)。
 
 Algorithm reference: RBJ formulas in the [W3C Audio EQ Cookbook](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html), and the classic Schroeder reverb structure. Implementations: `studio/effects.py` and `ui/static/effects-dsp.js`; cross-language regression: `tests/test_mix_effects.py`.

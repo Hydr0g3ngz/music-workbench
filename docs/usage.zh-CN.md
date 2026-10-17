@@ -1,8 +1,10 @@
 # Music Studio 详细使用说明
 
-快速体验请先阅读 [首页](../README.md) 与 [快速开始](../QUICKSTART.md)。
+> 历史参考：原 Music Studio 歌曲分析流程或拆分前版本。当前工作台请从 [安装与入门](README.md) 开始；原分析产品见 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。本页的功能、命令与测量按所述旧版本解释。
 
-[English](../README.en.md) · [实测与取舍](../docs/lyrics-v4.md) · [产品路线图](../docs/roadmap.md) · [贡献](../CONTRIBUTING.md)
+快速体验请先阅读 [历史首页](pre-split-readme.zh.md) 与 [历史快速开始](legacy-quickstart.md)。
+
+[English](pre-split-readme.en.md) · [实测与取舍](../docs/lyrics-v4.md) · [产品路线图](../docs/roadmap.md) · [贡献](../CONTRIBUTING.md)
 
 **本地运行的开源扒歌引擎：歌曲 → 人声 / 伴奏 + 带时间的歌词 + 主唱旋律 MIDI + 和弦 + 节拍。**
 
@@ -34,7 +36,7 @@ v0.1 提供本地网页工作台、命令行和 Python 引擎，支持同步试�
 - 跟唱视图：当前句与前后句、伴奏与原唱提示音量、逐句定位和循环试听。
 - 固定 43 例公开标注 benchmark（原 26 例 + 新增 17 首中文录音），独立评分、失败记录及显存 / 耗时采样。
 
-## 这一轮实测
+## 歌词 v4 历史实测
 
 新增中文确认集 9 首、1113 个参考字：Whisper small CER **45.28%**，Qwen3-ASR 1.7B CER **14.65%**。同一份 Qwen 文字使用双模型时间锚点后，7 首英语混音的“正确且起音误差 ≤200ms / 全部时间参考词”从 **52.83% 提高到 59.14%**。中文确认集的时间覆盖提高，P90 却从 0.616 秒增至 0.713 秒，因此保留轻量方案，双模型按需选择。
 
@@ -204,7 +206,7 @@ node --test tests/ui_playback.test.cjs
 
 参考 [架构](../docs/architecture.md)、[贡献指南](../CONTRIBUTING.md)、[引擎验证](../docs/validation.md)、[UI 验证](../docs/ui-validation.md) 和 [第三方组件说明](../THIRD_PARTY_NOTICES.md)。仓库包含 Windows / Linux 的核心与 UI 测试 CI 配置；神经模型的下载和 GPU 测试由独立 smoke test 执行。
 
-另外提供 [公开标注测试集与评测工具](../benchmarks/README.md)：固定原 26 个多模块样本及新增 17 首中文录音。数据按原许可下载到本机，Git 仓库保留来源、版本、校验值和指标。下一步优先做无需模型的交互示例、启动与模型管理、慢速练习和导出体验，见 [发布路线图](../docs/roadmap.md)。
+另外提供 [公开标注测试集与评测工具](../benchmarks/README.md)：固定原 26 个多模块样本及新增 17 首中文录音。数据按原许可下载到本机，Git 仓库保留来源、版本、校验值和指标。该版本的后续规划记录在 [历史路线图](roadmap.md)。
 
 ## 许可
 

@@ -1,27 +1,35 @@
-# Music Workbench · 启动 / Quick start
+# 快速开始 / Quick start
 
-安装 Python 3.11/3.12，解压到可写目录，双击 `Start-Music-Workbench.cmd`。首次联网安装基础环境，模型单独安装。默认端口 8920（占用时尝试后续端口），项目目录 outputs/workbench。
+## Windows 安装版 / Windows installer
 
-Install Python 3.11/3.12, extract to a writable folder and run Start-Music-Workbench.cmd. Initial setup installs base dependencies, not models. Default port 8920, project directory outputs/workbench.
+1. 从 [发布页](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14) 下载 `Music-Workbench-0.2.0.dev14-Setup-x64.exe` 并安装。
+2. 从桌面或开始菜单打开 **Music Workbench**。
+3. 首页选择 **跟着做出第一段音乐**，按五步提示完成编辑与导出。
 
-## 源码 / From source
+Download the Setup executable, install, open Music Workbench and choose **Make your first musical sketch**. No separate Python installation, model download or dedicated GPU is needed for the lesson. [Bilingual lesson](docs/first-sketch.md).
+
+Windows 10 22H2 / 11 x64；基础创作可离线使用。需要 AI 时再从首页单独配置。[安装说明 / Installation](docs/windows-install.md)
+
+## 从源码运行 / From source
+
+需要 Python 3.11 / 3.12。Requires Python 3.11 / 3.12.
 
 ```sh
 python -m venv .venv
 # Windows: .venv/Scripts/activate
 # Linux/macOS: source .venv/bin/activate
-python -m pip install -e ".[ui,audio]"
+python -m pip install -e ".[workstation]"
 music-workbench
 ```
 
-无需显卡即可使用采样乐器、鼓点、MIDI、编排、混音与录音。录音时允许浏览器麦克风访问；停止后试听，确认才加入工程。
+源码工程保存在 `outputs/workbench`，从端口 8920 起自动选择空闲端口。Windows 源码用户也可运行 `Start-Music-Workbench.cmd`。
 
-No GPU required for samples, grooves, MIDI, arrangement, mixing or recording. Allow microphone access, then stop and audition before adopting your take.
+Source projects use `outputs/workbench`; the service selects an available port starting at 8920. Windows source users can also run `Start-Music-Workbench.cmd`.
 
-[录音 / Recording](docs/recording.md) · [生成 / Generation](docs/music-generation.md) · [分轨 / Separation](docs/separation.md) · [模型 / Models](docs/next-models.md)
+## 保存作品 / Keep your work
 
-## 数据 / Data
+导出 **WAV** 分享音频，导出 **便携工程 `.mwb`** 保存可编辑编排及音频。安装版作品默认位于 `%LOCALAPPDATA%\MusicWorkbench\Projects`。更新前保存并备份工程，关闭使用同一工作区的旧版本。
 
-更新前备份 outputs；不要让两个版本同时写同一个 workspace。旧 Music Studio 数据不会自动迁移。原歌曲分析产品位于 https://github.com/Hydr0g3ngz/music-studio 。
+Export **WAV** to share audio and **Portable project `.mwb`** to keep editable work and media. Installed projects default to `%LOCALAPPDATA%\MusicWorkbench\Projects`. Save and back up before upgrades; close the older version using that workspace.
 
-Back up outputs before upgrades. Never run two versions against one workspace. Existing Music Studio data is not migrated automatically. The original analysis product is maintained separately.
+[中文文档](docs/README.md) · [English documentation](docs/README.en.md) · [模型 / Models](docs/models.md)

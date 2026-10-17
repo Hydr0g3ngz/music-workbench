@@ -1,5 +1,7 @@
 # v0.1.2 发布验证 / Release validation
 
+> 历史参考：原 Music Studio 歌曲分析流程或拆分前版本。当前工作台请从 [安装与入门](README.md) 开始；原分析产品见 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。本页的功能、命令与测量按所述旧版本解释。
+
 ## 本次启动修复 / Runtime setup fix
 
 2026-10-15, Windows, Python 3.12.4, RTX 4070 Laptop 8GB:
@@ -78,5 +80,5 @@ or bundled Python runtime is claimed. Remote CI/Release status is authoritative
 only after the corresponding GitHub Actions run completes.
 
 这是当前 Windows 机器上的干净虚拟环境验证，不等于全新系统或第二台电脑验收。
-本轮未因翻译或打包重新声称模型准确率提升；真实推理结果见既有 benchmark 与 smoke test。
+此版本的翻译与打包检查不测量模型准确率；真实推理结果见既有 benchmark 与 smoke test。
 远程检查与发布是否成功，以 Actions / Releases 实际结果为准。

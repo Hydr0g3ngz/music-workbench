@@ -26,6 +26,6 @@ AI 自动配置首批覆盖 ACE-Step，其他模型环境继续使用各自的�
 
 The first automatic profile covers ACE-Step. Other model environments still use their own guides. Basic creation needs no models. The installer remains an unsigned preview. A clean machine without WebView2, other hardware/display scales, restricted networks and novice-user usability require additional testing.
 
-Build inputs are pinned by `scripts/prepare_installer_tools.py`; the WebView prerequisite's Microsoft signature is checked during packaging. QA used a separate installer AppId and data directory. The original Music Studio model directories were read-only cache sources; existing Workbench project rows were compared before/after and retained exactly.
+Build inputs are pinned by `scripts/prepare_installer_tools.py`; the WebView prerequisite's Microsoft signature is checked during packaging. Tests used a separate installer AppId and data directory. Project retention was checked by comparing database records and file hashes before and after installation.
 
 Implementation references: [Microsoft WinForms DPI configuration](https://learn.microsoft.com/en-us/dotnet/desktop/winforms/high-dpi-support-in-windows-forms?view=netframeworkdesktop-4.8), [CPython embedding](https://docs.python.org/3.12/using/windows.html#the-embeddable-package), [Inno Setup silent event behavior](https://jrsoftware.org/ishelp/topic_scriptevents.htm), [suppressible validation messages](https://jrsoftware.org/ishelp/topic_isxfunc_suppressiblemsgbox.htm).

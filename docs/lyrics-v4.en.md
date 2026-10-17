@@ -1,5 +1,7 @@
 # Lyrics benchmark v4
 
+> Historical reference for the Studio analysis workflow or a pre-split build. Start with [current Workbench documentation](README.en.md). The analysis product is maintained in [Music Studio](https://github.com/Hydr0g3ngz/music-studio). Commands and measurements below apply to the stated historical version.
+
 [中文完整报告 / Full per-case report](lyrics-v4.md) · [Suite and commands](../benchmarks/README.md)
 
 The suite has **43 cases**: 26 prior component regressions and 17 new Mandarin

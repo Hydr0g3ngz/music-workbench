@@ -1,10 +1,12 @@
 # 产品与开源发布路线图
 
+> 历史参考：原 Music Studio 歌曲分析流程或拆分前版本。当前工作台请从 [安装与入门](README.md) 开始；原分析产品见 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。本页的功能、命令与测量按所述旧版本解释。
+
 [English](roadmap.en.md)
 
-Music Studio 的核心场景是导入一首歌、得到可以同步试听的歌词/主旋律/伴奏，并修正歌词错误。发布重点是第一次能跑通、结果可以核对、导出能继续使用。Stars 是可能的结果，不是可保证的验收指标。
+Music Studio 的核心场景是导入一首歌、得到可以同步试听的歌词/主旋律/伴奏，并修正歌词错误。发布重点是第一次能跑通、结果可以核对、导出能继续使用。
 
-## 本轮已完成
+## 当时已实现
 
 - 43 例有来源、有哈希的评测：新增中文确认录音，分开报告文字错误、时间覆盖与误差。
 - 词时间补充与自然显示分句；不以删除难词或捏造逐字边界提高观感。
@@ -34,9 +36,9 @@ S 表示单个组件的集中修改，M 涉及多个组件，L 涉及新处理�
 
 ## 借鉴的开源做法
 
-[UVR 官方项目](https://github.com/Anjok07/ultimatevocalremovergui) 提供包含运行环境的安装包，并保留手动安装路径。这支持把安装门槛作为工程优先项，但不能证明某个功能必然带来 Stars。Music Studio 应先完成自己的干净环境验收，再考虑相同的分发体验。
+[UVR 官方项目](https://github.com/Anjok07/ultimatevocalremovergui) 提供包含运行环境的安装包，并保留手动安装路径。该分发方式可作为独立运行环境与图形化安装的工程参考。
 
-[ASRU 作者项目](https://github.com/navi0105/LyricAlignment) 提供可追踪的歌词标注和复现实验入口，本项目已用于新增评测。算法候选可以参考 [SOFA](https://github.com/qiuqiao/SOFA) 和 [ROSVOT](https://github.com/RickyL-2000/ROSVOT)，接入前分别核对模型许可、语言和训练重叠；本轮没有声称已运行这两个模型。
+[ASRU 作者项目](https://github.com/navi0105/LyricAlignment) 提供可追踪的歌词标注和复现实验入口，本项目已用于新增评测。算法候选可以参考 [SOFA](https://github.com/qiuqiao/SOFA) 和 [ROSVOT](https://github.com/RickyL-2000/ROSVOT)，接入前分别核对模型许可、语言和训练重叠；该历史版本尚未评测这两个模型。
 
 ## 开源展示与反馈
 

@@ -1,9 +1,9 @@
 # 素材对拍与候选比较 / Beat fitting and candidate comparison
 
-2026-10-16 · Development preview 0.2.0.dev10
+[文档 / Documentation](README.md) · 适用于 / Applies to dev14
 
 让生成或导入的音频能够进入同一首作品：**分析 → 人工确认参考拍 → 制作适配候选 → 等响度试听 → 采用 / 撤销**。
-Tempo analysis and stretching use DSP. No additional neural model or Agent was added.
+Tempo analysis and stretching use DSP; this workflow needs no additional neural model.
 
 ![对拍校准 / Beat fitting](images/material-fit-zh.png)
 
@@ -51,8 +51,8 @@ from an uncertain key estimate. Phase-vocoder transients may smear.
 
 ## 实测 / Verification
 
-独立测试工程 `82a2193550e44173`（`outputs/benchmark/material-dev10`）：浏览器导入授权自制节拍音，
-运行分析、两拍校准、120 BPM 对拍任务、试听、采用、撤销与重做；还比较了上一轮 ACE-Step 的 16 秒主题和参考变奏。
+dev10 独立节拍测试样本：通过浏览器导入自制节拍音，
+运行分析、两拍校准、120 BPM 对拍任务、试听、采用、撤销与重做；还比较了 ACE-Step 的 16 秒主题和参考变奏测试样本。
 这些是工作流验收样本，不是新完成作品或模型音质排名。
 
 The independent fixture used browser import, actual DSP tasks, calibration, A/B, adoption and history.
@@ -74,7 +74,6 @@ python scripts/benchmark_material_fit.py --output outputs/benchmark/material-fit
 ```
 
 阈值：本固定脉冲样本最大峰值误差 <40 ms，首尾漂移 <20 ms；不是全部风格的保证。
-本地原始验证证据：`outputs/benchmark/material-fixtures-dev10/verification.json`。
 自动测试还覆盖无效边界、静音、峰值余量、跨工程访问拒绝、候选损坏、版本冲突、
 参考变奏/处理结果的比较、对拍采用时 BPM 变化、撤销与原素材保持。
 
@@ -82,15 +81,13 @@ The reproducible pulse regression checks <40 ms peak error and <20 ms endpoint d
 Tests also cover bounds, silence, headroom, ownership, corruption, revisions, candidate types and undo.
 
 167 项 Python 测试、64 项前端测试通过；安装后的 wheel 验证覆盖对拍预览与候选比较。
-原有工程行、音频引用和撤销历史逐项对照保持一致。
+检查工程保存、音频引用与撤销历史保留。
 167 Python and 64 frontend tests passed. Installed-wheel checks cover fit preview and candidate A/B;
-all pre-existing project rows, audio references and undo history were unchanged.
+project persistence, audio references and undo history were checked.
 [固定时间基准结果 / Fixed timing result](../benchmarks/results/material-fit-dev10.json)
 
-## 后续 / Next
+## 继续编辑 / Continue editing
 
-将下一轮重点放在可撤销的音量自动化与真正的跨片段过渡；再研究局部时间校准、
-自动强拍模型和候选批量评估。支持模型要以对拍真值、音乐听感与操作修改量验证。
+采用适配素材后，可用 [音量曲线、交叉淡化与局部重绘](volume-and-repaint.md) 组织过渡。变速音乐的局部修正和自动强拍仍在 [路线图](workbench-roadmap.md) 中。
 
-Next: reversible volume automation and actual transitions; then local timing correction,
-learned downbeats and candidate evaluation with timing truth, listening and correction effort.
+After adoption, use [curves, crossfades and repaint](volume-and-repaint.md) for joins. Local timing edits and learned downbeats remain on the [roadmap](workbench-roadmap.md).

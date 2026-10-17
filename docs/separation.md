@@ -2,8 +2,7 @@
 
 [English](separation.en.md)
 
-Create 的主线是：导入/生成素材 → 分离人声与伴奏 → 试听 → 替换成可编排轨道 → 混音与导出。
-经典版、旧 Next 和原始素材保留。Demucs 仍可使用；新增可选 Mel-Band RoFormer KJ。
+将导入或生成的音频拆成人声/伴奏，试听后作为对齐轨道继续编排、混音与导出。可选 Demucs 或 Mel-Band RoFormer KJ；原始素材保留。四声部 Demucs 入口见 [AI 制作流程](ai-production-workflow.md)。
 
 ![分轨试听与对齐编排](images/create-separation-zh.png)
 
@@ -49,7 +48,7 @@ CPU 环境使用 `--torch-index-url https://download.pytorch.org/whl/cpu`。
 - 原配 8 秒窗口、50% 重叠；将推理批次从 4 改为 1，CUDA 使用 autocast，CPU 使用 FP32，不编译、不做 TTA。
 - 人声来自模型，伴奏为输入减去人声；保持原始增益与时间，输出 FLOAT WAV，不对分轨各自归一化。
 - 自动检查帧数、采样率、声道、有限数值和输出哈希；任一分轨失败不发布半份结果。
-- 仅人声/伴奏两分轨；不提供鼓、贝斯、吉他等多乐器拆分，也不保证去掉所有串音。
+- 此 RoFormer 后端仅输出人声/伴奏两分轨；四声部请使用 Demucs。分轨仍可能包含串音。
 - 当前最多 10 分钟/任务。显存仍取决于设备与音频；单批次不是固定显存保证。
 
 ## 可复现对比

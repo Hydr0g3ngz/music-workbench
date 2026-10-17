@@ -1,5 +1,7 @@
 # Music Studio
 
+> Historical reference for the Studio analysis workflow or a pre-split build. Start with [current Workbench documentation](README.en.md). The analysis product is maintained in [Music Studio](https://github.com/Hydr0g3ngz/music-studio). Commands and measurements below apply to the stated historical version.
+
 > **Create · 0.2.0.dev5: an idea-to-export workstation preview.** Sampled instruments,
 > editable grooves, MIDI import, multitrack arrangement, a mixer and WAV/MIDI export. Run
 > `Start-Music-Studio-Create.cmd`; see [setup and scope](create-preview.en.md).
@@ -27,7 +29,7 @@
 *Actual UI: CC BY 4.0 noisy speech, real CPU enhancement and loudness measurements.
 Some clips regress; the evaluation report retains those results.*
 
-[中文](README.md) · [Download preview](https://github.com/Hydr0g3ngz/music-studio/releases) · [Quick start](QUICKSTART.md) · [Benchmark](lyrics-v4.en.md) · [Roadmap](roadmap.en.md)
+[中文](pre-split-readme.zh.md) · [Download preview](https://github.com/Hydr0g3ngz/music-studio/releases) · [Quick start](legacy-quickstart.md) · [Benchmark](lyrics-v4.en.md) · [Roadmap](roadmap.en.md)
 
 **Unfold a song into vocals, backing, timed lyrics, vocal-melody MIDI, chords and beats — on one timeline.**
 
@@ -46,7 +48,7 @@ preference. Model installation requires downloads; cached models support offline
 3. Choose **Try the demo** to explore a credited 45-second precomputed example: original/vocal/backing playback, lyric correction, sing along and exports. No neural-model download required.
 
 **Early preview. The ZIP contains source, a wheel and a credited demo. It is not a standalone EXE and does not bundle Python, CUDA or neural weights.**
-See [Quick start](QUICKSTART.md) for CPU setup, troubleshooting and preserving data during upgrades.
+See [Quick start](legacy-quickstart.md) for CPU setup, troubleshooting and preserving data during upgrades.
 
 From source:
 
@@ -117,7 +119,7 @@ not necessarily incorrect text. Vocal melody is a single-lead estimate; chords
 currently cover major/minor/N. Review markers and model scores are not accuracy
 probabilities. Long songs consume more browser memory.
 
-[Report and interpretation](lyrics-v4.en.md) · [Full per-case results](lyrics-v4.md) · [Data and reproducibility](benchmarks/README.md)
+[Report and interpretation](lyrics-v4.en.md) · [Full per-case results](lyrics-v4.md) · [Data and reproducibility](../benchmarks/README.md)
 
 ## Help improve it
 
@@ -125,7 +127,7 @@ Issues and contributions in English or Chinese are welcome. Start with a reprodu
 problem: installation that blocks first playback, lyrics that are hard to correct,
 or exports that do not work downstream. Try the credited demo first; keep private audio out of public issues.
 
-[Contributing](CONTRIBUTING.md) · [Roadmap](roadmap.en.md) · [Changelog](CHANGELOG.md)
+[Contributing](../CONTRIBUTING.md) · [Roadmap](roadmap.en.md) · [Changelog](../CHANGELOG.md)
 
 ```sh
 python -m pip install -e ".[ui,benchmark,dev]"
@@ -136,6 +138,6 @@ python scripts/package_release.py
 ```
 
 Core, API and playback checks require no neural weights. Real-model evaluation is
-opt-in. No frontend build or external CDN. Original code is [MIT](LICENSE);
-models, data and recordings retain their own licenses. See [third-party notices](THIRD_PARTY_NOTICES.md)
-and [demo attribution](src/music_studio/ui/demo/ATTRIBUTION.md).
+opt-in. No frontend build or external CDN. Original code is [MIT](../LICENSE);
+models, data and recordings retain their own licenses. See [third-party notices](../THIRD_PARTY_NOTICES.md)
+and [demo attribution](../src/music_studio/ui/demo/ATTRIBUTION.md).

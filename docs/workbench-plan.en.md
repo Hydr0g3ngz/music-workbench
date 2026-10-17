@@ -1,148 +1,56 @@
-# Music Studio Next: a local AI music production workstation
+# Music Workbench platform design
 
-[中文](workbench-plan.md) · [Local model candidates](local-model-candidates.en.md) · Updated 2026-10-16
+[中文](workbench-plan.md) · [Roadmap](workbench-roadmap.md) · [Model research](local-model-candidates.en.md)
 
-## Product and priorities
+This document is for platform and backend contributors. Consult the [user guide](create-preview.en.md) for supported behavior and limits. Planned capabilities are not implementation claims.
 
-Build an open-source workstation for composition, arrangement, recording, audio/MIDI editing,
-mixing and delivery, with a broad set of advanced local models.
-**Build the production platform and its capabilities first, then integrate agents deeply.**
-Beginner access comes from templates, presets, explanations and defaults. Experienced users
-must still have tracks, instruments, effects, routing and automation.
+## Product and engineering goals
 
-This revision supersedes the earlier agent-first roadmap and its immediate focus on speech
-cleanup and pause trimming. Existing adapters and cleanup remain useful; multitrack projects,
-creation and mixing now drive development. Model results must enter one editable project.
-A collection of disconnected model pages does not complete the platform.
+Create, arrange, record, edit, mix and export locally. Templates, presets, lessons and reversible edits help beginners; advanced parameters remain available as needed. AI outputs become editable project material. Future Agent control reuses project commands; basic creation does not require conversation.
 
-## Preserve existing releases
-
-Retain classic `main`, the published `v0.1.2`, and the Next `v0.2.0.dev2` prerelease.
-Continue in the separate `codex/audio-workbench-next` worktree with isolated outputs and ports.
-Do not automatically overwrite songs, analyses, corrected lyrics, caches or older projects.
-Song analysis remains one workflow within the wider product.
-
-## Platform scope
-
-| Module | What users should be able to do | Project representation |
+| Area | Existing foundation | Extension |
 | --- | --- | --- |
-| Multitrack arrangement | Place independent sources, move/split/duplicate/loop clips, snap, crossfade and audition ranges | Audio tracks, clips, source ranges, positions and a bar grid |
-| Composition and MIDI | Write/import notes, chords and drums; quantize, transpose, edit velocity and change sounds | MIDI tracks, piano roll, drum grid, tempo/meter maps |
-| Instruments and sampling | Use built-in instruments, samplers and libraries; later add third-party instruments | Instrument tracks, sound references and frozen audio |
-| Recording | Record vocals/instruments with a metronome, count-in, takes and latency compensation | Source-preserving recordings, takes, device and monitoring settings |
-| Mixing and mastering | Levels/pan, mute/solo, EQ, compression, reverb, delay, limiting, sidechain and automation | Inserts, buses, sends/returns, master output and envelopes |
-| AI music creation | Generate from descriptions/lyrics, reinterpret references, add parts and regenerate ranges | New tracks/candidates, preserving original material and generation conditions |
-| Separation and transcription | Extract vocals/instruments; transcribe melody, piano and multiple parts; analyze chords, beats and sections | Aligned stems, MIDI, chord tracks, tempo maps and markers |
-| Singing and sound production | Synthesize singing from notes/lyrics, convert timbre, generate speech/effects | Lyric/note alignment, vocal tracks, effect clips and references |
-| Restoration and transformation | Denoise, normalize, pitch/time shift, stretch and align music | Reversible effects/candidates; separate speech/music presets |
-| Assets and delivery | Manage recordings, loops, one-shots, presets and models; find similar sounds and export | Asset library, model manager, mix/stem/MIDI/project exports |
+| Arrangement | Audio/MIDI tracks, source ranges and positions, split/copy, loops and sections | Group moves, local timing correction, longer projects |
+| Instruments and MIDI | Samples/synths, grooves, import, piano roll and batch edits | More samples, controller events, third-party instruments |
+| Recording | Mono capture, device/meter and audition before adoption | Overdub, monitoring, count-in and latency compensation |
+| Mixing | Levels/pan, fixed EQ/compressor/reverb, volume curves and crossfades | Buses, sends, effect automation and plugin hosting |
+| AI material | ACE-Step, stems, monophonic MIDI, source/task records | Polyphony, singing, timbre, effects, retrieval and restoration |
+| Delivery | WAV/MIDI, credits and portable MWB projects | Portable task recipes, dependency diagnostics and batch delivery |
+| Onboarding | Windows installer/window, ACE-Step setup and bilingual lesson | Broader hardware coverage and observed usability trials |
 
-These are target capabilities, not current support. See [model research](local-model-candidates.en.md).
-Use a dependable audio engine for faders, EQ, routing and transport, and neural models for
-generation, understanding, separation and conversion.
+## Project representation and integrity
 
-## Existing foundation and gaps
+Projects contain tracks and clips. Audio assets are independent; clips reference source ranges and timeline positions, while MIDI stores notes. Convert explicitly between seconds, beats, bars, samples and MIDI ticks. The current grid is fixed 4/4; tempo maps and changing signatures remain future work.
 
-`0.2.0.dev2` provides provenance-aware assets, immutable processing candidates, a task queue,
-audition/export, undo history, lyric correction, separation/transcription/melody tasks,
-loudness inspection and speech cleanup. Reuse them. Ten capability entries include classical
-algorithms and decoder variants, not ten distinct neural networks.
+SQLite stores revisions, asset references, tasks and history; large files remain on disk. Saves/adoption check optimistic revisions, sources stay immutable and failures retain recoverable state. MWB packs the current arrangement, media and credits, excluding weights, environments and the full task database. Incompatible changes need migration, history compatibility and roundtrip checks.
 
-The earlier Next processing contract revolves around one source; the independent Create project now complements it:
+## Playback, rendering and processes
 
-- `MixTrack` in `studio/models.py` has no placement, source offset or duration; `Mix` permits eight inputs.
-- Mixing in `studio/dsp.py` requires identical lengths, sample rates and channel counts.
-- `LocalTaskRequest` expects one audio input. It cannot generate from an empty project or accept multiple audio/MIDI/lyric/reference conditions.
-- Create provides multitrack playback, instrument tracks and basic note editing. Routing graphs, tempo maps and recording remain missing.
+One Web Audio transport schedules audition. Task polling and redraws must preserve active sources. AudioWorklet runs realtime processors; Python DSP renders offline with the same semantics. Compare order, tails, sample rates and clip edges. Record state-rebuild differences after seeking versus uninterrupted playback.
 
-Create uses a new track/clip project and unified transport while retaining the earlier single-audio preview.
+Separate control, audio and model workers so inference cannot block playback. Models use isolated runtimes and cancellable subprocesses. Low-latency recording, device drivers and plugin hosting need separate validation; browser playback does not establish native-device performance.
 
-## Delivery order and acceptance
-
-| Stage | Deliverable | Required evidence | Status |
-| --- | --- | --- | --- |
-| P0A Multitrack projects | Empty projects, audio tracks, clip placement/duration/source offsets, move/split/duplicate/loop, track removal, mute/solo/gain/pan, save/reopen and mix export | Place three sources of different lengths/rates at different positions; playback matches export; reopening preserves positions and provenance | First independent preview implemented; clip looping and other gaps remain; see [scope](create-preview.en.md) |
-| P0B Creation and mixing foundation | MIDI piano roll, drum grid, basic instruments/sampler, BPM/meter, effects chains, buses/sends, automation, recording and device settings | Compose notes/drums, select sounds, record a track, add effects and mix; reopen and export audio/MIDI | Six sounds including three sampled instruments, eight grooves, MIDI import and note properties implemented; fixed-order EQ/compression/reverb and master limiting are now connected; recording/buses remain planned |
-| P1 First music models | Rich task contracts and isolated workers; full-song/local generation, modern separation and music transcription | A real generation → separation → arrangement/instrument editing → mixing → export workflow; outputs enter the project | ACE-Step completed a real 12s instrumental; audition then adopt as a track. Modern separation/transcription and full creation acceptance remain incomplete |
-| P2 Wider ecosystem | Singing, timbre conversion, effects/loop generation, semantic search, more generators/transcribers, time alignment and plugin compatibility | Reproducible examples and quality/resource/failure records per category; community providers share a contract | Planned |
-| P3 Deep agent integration | Agents inspect projects and manipulate tracks, notes, effects and models through multistep workflows | UI and agents share commands/history; users can inspect, audition and undo actions | Deferred; existing adapters retained |
-
-The first P0A production interface is implemented; see [scope and validation](create-preview.en.md). Continue P0B/P1 incrementally; test the first creation model
-before every professional feature exists. Prioritize evaluating ACE-Step 1.5 for creation and
-BSRoFormer/MelBand RoFormer for separation. Select exact weights, defaults and hardware profiles
-from measurements; other providers use the same interface.
-
-Continue the idea → draft → arrangement → mix → export workflow. The first EQ/compression/reverb, limiter and four presets are connected; see [mixing validation](mixing.en.md). Next prioritize modern separation, then clip repeat and a complete-piece acceptance run.
-
-The first complete creation acceptance must produce a 30–60-second piece with retained stems,
-MIDI, effect parameters, final mix and a reopenable project. A generated file, another model
-button or a UI image alone does not satisfy that acceptance.
-
-## Project and runtime architecture
-
-Use `Project → Tracks → Clips`, with separate assets. Projects record sample rate, tempo/meter
-maps, sections and revisions. Clips reference source assets/ranges and timeline positions;
-MIDI retains notes/controllers. Define audio/musical time conversion: seconds are not MIDI ticks.
-Version the project schema; provide migration, atomic saving, missing-asset recovery, backups
-and crash recovery.
-
-Use one transport and scheduler. Task refreshes must not recreate active audio sources;
-fader/solo changes should respond immediately. Use peak caches, block reads and bounded memory.
-Offline rendering and audition share project semantics, including tails, latency compensation,
-resampling and clip boundaries.
-
-Separate control, audio engine and GPU workers. The browser handles editing; low-latency
-recording, device drivers and third-party plugins need a validated native host. Browser
-playback is insufficient evidence. Compare reuse with implementation cost before choosing
-the engine. Retain Python for projects, tasks and models; inference must not block callbacks.
-
-The provider contract needs:
+## Backend contract
 
 | Part | Required information |
 | --- | --- |
-| Description | Provider ID, capabilities, bilingual parameter schemas, version, maintenance status and separate code/weight licenses |
-| Inputs | Zero or multiple inputs: audio, MIDI/score, lyrics, text, references, selections, BPM/key constraints; validate per capability |
-| Execution | Isolated Python/native runtime, device/precision/quantization/offload, estimated and measured RAM/VRAM/disk, queue, progress and cancellation |
-| Outputs | Typed audio/MIDI/score/annotation assets, time base, model/weight revision, seed, parameters and input hashes |
-| Placement | New tracks/candidate clips at explicit positions with alignment/latency metadata; background completion must not overwrite ongoing edits |
-| Extension | Community adapter documentation, a sample provider, contract checks and offline examples; explicit installation from verified sources |
+| Description | Stable provider ID, capabilities, bilingual parameters, version, maintenance and separate code/weight/voice licenses |
+| Inputs | Capability-specific text, audio, MIDI, lyrics, regions and musical conditions; explicit source/project time |
+| Execution | Pinned dependencies, isolation, device/precision/offload, estimated/measured resources, progress and cancellation |
+| Outputs | Typed assets, timebase, input hashes, settings, seed, code/weight revisions and file hashes |
+| Adoption | Explicit target/alignment, source-revision checks, audition, undo, reopen and export |
+| Failure | Actionable diagnostics, no partial publication, retry and explicit interrupted states |
 
-Do not force every model into the current Torch/Transformers environment. Distinguish candidates,
-installable providers, available dependencies, downloaded weights, successful inference and
-measured quality. Show download sizes and removable caches. Measure CPU, 8GB, 12–16GB and 24GB+
-profiles. The local 8GB GPU is the first target, not a ceiling on platform capability.
+Runtime availability, downloaded weights, successful inference and evaluated quality are distinct states. Keep incompatible Torch/Transformers profiles separate. CPU, 8 GB, 12–16 GB and 24 GB+ tiers need actual measurements; parameter count is not a pipeline VRAM budget.
 
-## Interface and beginner access
+## Evaluation and release
 
-Center the interface on production: transport/record/BPM/meter above, assets/instruments/models
-on the left, multitrack arrangement in the center, piano roll/drums/mixer below, and clip/effect/
-generation inspectors on the right. Drag audio, MIDI and candidates into the arrangement.
-Creation also works from an empty project.
+Project checks cover operations, history, playback/export consistency, memory and recovery. Evaluate each model task separately. Do not combine lyric, stem, note and generation scores into one ranking. Disclose training overlap, failures and per-case regressions.
 
-Offer starting points for composing, recording and reworking music, auditionable sound/mixing
-presets and example projects. Explain basic controls and progressively disclose advanced
-parameters. Users can work directly and choose assistance when useful. Agents later operate
-the same project through a sidebar. Localize menus, help, parameters, errors and documentation
-in Chinese and English.
+- Separation: reference SI-SDR, alignment, leakage, transients and resources.
+- Transcription/rhythm: onset, pitch and offset F1, octave errors, beats/downbeats and correction effort.
+- Generation: fixed prompts/seeds, conditions, reference retention, joins, candidate-selection cost and blind listening.
+- Restoration/effects: clean controls, distortion, fidelity, matched levels and realtime/offline consistency.
+- Every backend: controlled cold/warm timings, RAM/VRAM, long input, offline execution, cancellation and recovery.
 
-## Benchmarks and release gates
-
-Retain the [benchmark protocol](benchmark-protocol.md), [melody report](melody-next.en.md)
-and [speech report](speech-cleanup.en.md). Evaluate tasks separately; one leaderboard cannot
-rank every model. Upstream results are not measurements on this machine.
-
-| Category | Required evaluation |
-| --- | --- |
-| Projects/engine | Placement/loops, routing, mute/solo, undo/recovery, export round trips, realtime/offline agreement, memory and dropouts |
-| Separation | Reference-based SDR/SI-SDR where appropriate, alignment, bleed, transient damage and per-case regressions; pin the checkpoint |
-| Transcription/rhythm/chords | Onset/pitch/offset F1, octave errors, polyphony/instrument splits, beat/downbeat F1, weighted chord recall; pitch-class scores are not absolute-pitch accuracy |
-| Music/effects generation | Frozen Chinese/English prompts, style/tempo/duration constraints, lyric CER/PER, blind listening, boundaries and reference melody preservation; retain seeds and full selection costs |
-| Singing/voice/speech | Pronunciation, pitch/timing, identity/intelligibility, vibrato/slides and language coverage; similarity alone does not establish naturalness |
-| Effects/restoration | Levels/true peak, distortion, tails, music preservation, clean controls, matched-loudness listening and failures |
-| Every backend | Cold/warm time, peak RAM/VRAM, input duration, hardware/dependencies, offline operation, cancellation/recovery and distribution eligibility |
-
-Defaults must satisfy quality, resources, licenses and maintenance. Advanced candidates, lighter
-alternatives and older baselines can coexist. Cross-domain melody regressions still block
-replacing the classic default; historical benchmarks do not limit platform scope. Accept
-features against real projects and runtime records. This plan and upstream demos are not
-delivered functionality.
+Validate a complete production path: brief/import, editing, mixing, saving, export and restore in another workspace. Producing one model file does not validate the other project operations. See the [current roadmap](workbench-roadmap.md) and [technical reference](technical-reference.md) for priorities and reproduction.

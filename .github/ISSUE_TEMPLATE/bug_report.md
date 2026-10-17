@@ -1,6 +1,6 @@
 ---
 name: Bug report / 错误报告
-about: Report a reproducible installation, analysis or workbench problem
+about: Report a reproducible installation, creation, playback or model problem
 title: ""
 labels: bug
 assignees: ""
@@ -17,16 +17,17 @@ Describe what you expected and what happened.
 2.
 3.
 
-Can this be reproduced with the built-in example song?
-内置授权示例能否复现？请不要公开私人歌曲、密钥或含隐私的完整日志。
+Can this be reproduced with the built-in editable example?
+内置可编辑示例能否复现？请不要公开私人歌曲、密钥或含隐私的完整日志。
 
 ## Environment / 运行环境
 
-- OS and Python version / 系统与 Python 版本：
+- App version and installer/source launch / 软件版本与安装版或源码启动：
+- OS; Python only for source installs / 系统；源码安装时补充 Python：
 - GPU / VRAM, or CPU / 显卡与显存，或 CPU：
-- Start command and model / timing mode / 启动方式、模型及对齐模式：
-- Analysis scope and approximate song duration / 分析范围及歌曲大致时长：
-- Project/result version, if relevant / 相关项目与结果版本：
+- Model and settings, if relevant / 如涉及模型，请提供模型与参数：
+- Approximate duration and track count / 工程大致时长与轨道数：
+- Audio device/display scaling, if relevant / 如相关，提供音频设备与显示缩放：
 
 ## Evidence / 相关信息
 

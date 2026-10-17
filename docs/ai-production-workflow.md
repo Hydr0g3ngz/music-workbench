@@ -1,66 +1,57 @@
-# AI throughout production / AI 嵌入制作流程
+# 用本地 AI 制作音乐 / Produce with local AI
 
-2026-10-16 · Development preview 0.2.0.dev10
+[文档 / Documentation](README.md) · [模型与安装 / Models and setup](models.md)
 
-主线：一个想法 → 一组可比较的素材 → 可编辑的声部 → 段落编排 → 混音 → 可恢复交付。
-每一步都保留原素材、参数和撤销入口。先把这些操作做好，再向 Agent 开放同一组操作。
+把模型结果当作可继续制作的素材：先试听、选择，再编辑和混音。基础编排无需 Agent；当前模型不会自动接管整首作品。
 
-The workflow is idea → comparable material → editable parts → sections → mix → recoverable delivery.
-Retain originals and parameters; expose the same reversible operations to Agent later.
+Treat model outputs as material to audition, select, edit and mix. Basic arrangement needs no Agent; the current models do not automatically direct the complete production.
 
-| 阶段 / Stage | 目前可用 / Available | 下一步 / Next | 如何验收 / Acceptance |
-| --- | --- | --- | --- |
-| 构思 / Brief | 可编辑作品意图、音色、动机、和声方向；段落角色/相对能量/意图进入实际提示词。Editable blueprint and section intentions enter generation. | 先验收这些规则是否降低修改量，再评估本地语言模型辅助。Measure correction effort, then optional local language assistance. | 预览与入队条件一致；任务固定上下文/工程版本/哈希；手动试听符合度。Preview/queue parity, pinned context and audition. |
-| 素材 / Material | ACE-Step 文本生成与参考变奏；所选音频实际裁切后固定引用。Text generation and cropped-audio reference variation. | 多候选并列试听、相同响度比较、可取消的常驻 worker；局部重生成需先验证上游支持。Candidate comparison, releasable residency, validated region regeneration. | 同 seed/素材版本可追溯；报告加载与生成耗时、RAM/VRAM。Traceable inputs and separate load/generation/memory metrics. |
-| 拆解 / Deconstruct | RoFormer 人声/伴奏、Demucs 四声部；一次采用并保留时间与撤销。Two/four-part separation with aligned adoption. | 比较适合纯音乐的多乐器模型，处理漏音与复杂混音。Compare instrumental separation and leakage. | 固定授权混合音及真值声部，质量/耗时/显存分别报告。Licensed mixture/stem fixtures, separate quality/runtime/memory. |
-| 音符 / Notes | CREPE 单旋律 MIDI 入轨；可拖动、框选、移调、量化、改力度。Editable monophonic transcription. | 首先评估 Basic Pitch 的和弦/多音转录，再评估鼓转录。Evaluate Basic Pitch polyphony, then drums. | 标注音符 F1、时值与音高误差；比较修改次数，不能把检测值当乐谱真值。Note F1/timing/pitch and correction effort. |
-| 适配 / Fit | 波形/估计拍点、参考拍校准、半速/倍速、两拍 BPM、可撤销变速候选。Waveform, manual anchors, half/double-time, two-beat BPM and reversible fitting. | 局部时间校准、自动强拍模型评估。Local timing correction and learned downbeat evaluation. | 固定脉冲样本最大峰值误差 22.03 ms、首尾漂移 9.48 ms；不代表通用精度。Fixture peak error/drift, not general accuracy. |
-| 编排 / Arrange | 段落标记、跨轨复制、小节定位、结构草案、意图/布局对照与边缘淡变。Sections, copying, structure sketches, layout observations and edge fades. | 音量自动化、段落移动与真正的边界交叉淡化。Automation, section moves and actual crossfades. | 不写代码把 8 小节变为 32 小节，能单步撤销；不把轨道层数当作音乐质量。Develop 8→32 bars with coherent undo; no quality score from layer counts. |
-| 录音与修复 / Record & restore | 本地录音；Next 素材编辑器已有可选 GTCRN/DPDFNet 语音降噪。Recording and optional speech cleanup in Next. | 把处理后的录音顺畅送回制作轨道；音乐去噪/去混响需要独立评估。Connect cleanup to creation; separately evaluate music restoration. | 原音/处理音对齐试听，保留下载恢复；语音效果不冒充音乐效果。Aligned audition and recovery; distinguish speech from music. |
-| 混音 / Mix | EQ、压缩、混响、峰值保护、输出测量；素材候选同窗口 LUFS A/B。DSP effects/output measurement and equal-window source candidate LUFS A/B. | 总线/发送、自动化；整工程参考比较。Buses/sends, automation and whole-mix referencing. | 素材 A/B 不含轨道效果；盲听、峰值/动态/频谱与撤销独立验证。Source A/B excludes track effects; separate listening and measurement. |
-| 交付 / Deliver | WAV、MIDI、署名、`.mwb` 音频工程包及恢复。Audio/MIDI/credits and portable projects. | 任务配方随包携带、缺少模型/采样的诊断；之后支持 Agent 批处理导出。Portable task recipes, dependency diagnostics, then Agent export. | 全新目录恢复同版工程，编排与总混音一致。Fresh-workspace restore with the same build and matching mix. |
+## 1. 写下创作意图 / Set a direction
 
-## 使用入口 / Where to use it
+打开「创作蓝图」，填写氛围、音色、动机与段落意图，选择结构草案。生成面板可读取已保存的 BPM、调性与段落上下文；先预览实际提示词。[编曲方法](arranging-methods.md)
 
-新增「创作蓝图」贯穿构思、段落发展与编排打磨；可保存并直接为目标段落生成。
-见 [编曲方法到工作流 / Arrangement methods](arranging-methods.md)。
+Open **Creative blueprint**, set a mood, palette, motif and section intentions, then choose a structure sketch. Generation can use saved tempo/key and section context; preview the compiled prompt first. Blueprint/template assembly uses rules, while ACE-Step generates audio.
 
-新增「对拍校准」与「候选 A/B」：[操作与基准 / Usage and regression](material-fitting.md)。
+## 2. 生成并比较素材 / Generate and compare
 
-1. 「AI 模型」生成；模式可选文字草稿或所选音频的参考变奏。完成后试听，再加入工程。
-   Generate in **AI models**; choose text or reference variation, audition, then adopt.
-2. 选择音频片段 →「素材适配 / AI」→ 分析、四轨拆解、旋律 MIDI 或独立变速变调。
-   Select audio → **Make this material fit** → analysis, four stems, melody or time/pitch.
-3. 「处理任务」中试听与采用。分析仅展示报告，不会自动改 BPM/调性；模型采用可撤销。
-   Audition/adopt in **Tasks**. Reports do not automatically change tempo/key; adoption is reversible.
-4. 「段落与调性」设置标记、按小节复制所有轨道的范围；「适配整首」查看完整结构。
-   Use **Sections & key** for markers and range copying; **Fit song** shows the complete form.
-5. 导出「便携工程」。换目录/电脑后在「工程 → 恢复便携工程」导入 `.mwb`。
-   Export **Portable project**, then restore `.mwb` from **Projects** in another workspace.
+在「AI 模型」生成短器乐草稿。已有 10–60 秒音频可做参考变奏；需要改变局部时使用重绘。完成后试听候选，再加入播放头或指定段落。[生成指南](music-generation.md) · [局部重绘](volume-and-repaint.md)
 
-工程包包含当前素材、编排、来源署名；不包含模型权重、已完成/排队任务数据库或独立模型环境。
-内置乐器由软件自带；要复现完全相同的采样与 DSP，使用同一软件版本。
-MIDI 导出仅含乐器音符，不会把音频声部自动转成全曲乐谱。项目暂限 10 分钟。
+Generate a short instrumental in **AI models**, use a selected 10–60 s source for reference variation, or repaint a region. Audition before adding at the playhead or target section. [Generation](music-generation.en.md) · [Repaint](volume-and-repaint.md)
 
-Packs contain current assets, arrangement and credits, not model weights, task databases or runtimes.
-Factory instruments ship with the app; use the same build for identical sampling/DSP.
-MIDI contains instrument notes, not automatic full-score transcription of audio. Projects currently cap at ten minutes.
+模型请求的调性、节奏或动机不保证被遵守。比较候选时使用 [等响度 A/B](material-fitting.md)，避免只因更响而选择。该比较听素材原音，不含轨道效果。
 
-## 模型与 DSP 边界 / AI and DSP
+Requested key, rhythm or motifs are not verified compliance. Use [matched candidate A/B](material-fitting.md) to compare source audio without arrangement effects.
 
-[ACE-Step](https://github.com/ACE-Step/ACE-Step-1.5)、
-[Demucs](https://github.com/facebookresearch/demucs)、
-[torchcrepe](https://github.com/maxrmorrison/torchcrepe) 已在本次作品实际运行。
-[librosa](https://github.com/librosa/librosa) 分析/变速变调和 libebur128 测量属于 DSP，不标成 AI。
-[Basic Pitch](https://github.com/spotify/basic-pitch) 是下一阶段评估对象，此处不声称已接入。
+## 3. 拆解成可编辑声部 / Separate editable parts
 
-ACE-Step, Demucs and CREPE ran on the actual piece. librosa and libebur128 are DSP/measurement.
-Basic Pitch is a proposed next evaluation, not an implemented capability. Existing pinned source/weight versions
-remain documented in [generation](music-generation.en.md) and [models](next-models.en.md).
+选择音频 →「素材适配 / AI」，可用 Demucs 四声部或 RoFormer 人声/伴奏分离。需要旋律音符时对合适的单旋律声部运行 CREPE，再换音色或编辑音符。采用保留时间关系与来源，支持撤销。[分轨](separation.md)
 
-不把模型数量、生成成功或请求的调性当作质量证明。
-第二首实走的调性候选接近，因此工程没有自动标成提示词要求的 A 小调。
-详见[创作记录与验证边界](creations/radio-through-the-clouds.md)。
+Select audio → **Make this material fit** for Demucs four-part or RoFormer vocal/backing separation. Apply CREPE to a suitable monophonic source, then edit notes or change instruments. Adopted parts retain timing/provenance and support undo. [Separation](separation.en.md)
 
-Model count, successful generation and requested key do not establish quality.
-The second piece has close key candidates, so its project key remains unspecified.
+分轨可能串音，CREPE 不能完整转录复音和声；导出 MIDI 也不会自动为音频轨生成乐谱。
+
+Stems can leak, and CREPE cannot transcribe complete polyphonic harmony. MIDI export does not automatically score audio tracks.
+
+## 4. 对拍与编排 / Fit and arrange
+
+分析速度，人工确认参考拍；必要时选择半速/倍速或两拍校准，制作变速候选。用段落标记与跨轨复制组织材料，再用音量曲线、交叉淡化和局部重绘处理连接。
+
+Analyze tempo, confirm a beat anchor, resolve half/double time or calibrate two beats, then create a fit candidate. Use markers/range copies for form, and curves/crossfades/repaint for joins. Tempo/key analysis and stretching are DSP; they need no new neural model.
+
+[素材适配 / Material fitting](material-fitting.md) · [过渡 / Transitions](volume-and-repaint.md) · [循环 / Loop](timing.md)
+
+## 5. 混音与交付 / Mix and deliver
+
+调整声部音量、声像和效果，检查输出峰值/LUFS。导出 WAV 分享，导出 `.mwb` 保存编排、音频与署名。换电脑后恢复工程继续制作。[混音](mixing.md) · [工程导出](create-preview.md#保存与导出)
+
+Balance levels, pan and effects, check output peaks/LUFS, then export WAV and an editable `.mwb` with audio/credits. Restore the project to continue on another computer. [Mixing](mixing.en.md) · [Project export](create-preview.en.md#save-and-export)
+
+MWB 不包含模型权重、独立环境或完整任务库。生成与处理参数留在原工作区；完全复现采样与 DSP 建议使用相同软件版本。
+
+MWB excludes weights, runtimes and the full task database. Generation/processing recipes remain in the original workspace. Use the same app version for consistent samples/DSP.
+
+## 案例与扩展 / Case study and future work
+
+[《云隙电台》](creations/radio-through-the-clouds.md) 组合 ACE-Step、Demucs 与 CREPE 完成九轨编排。测量记录展示功能连接与资源需求；音乐质量仍需实际试听。多音转谱、更多模型和完整工作台 Agent 控制见 [路线图](workbench-roadmap.md)。
+
+[Radio Through the Clouds](creations/radio-through-the-clouds.md) combines ACE-Step, Demucs and CREPE into nine tracks. Its measurements describe integration/resources; listen to assess musical results. See the [roadmap](workbench-roadmap.md) for polyphonic transcription, more models and full workstation Agent control.

@@ -103,7 +103,7 @@ inspected read-only: maximum timing difference 0.354 ms, pitches matching saved 
 This rules out obvious serialization drift, not transcription errors. Melody quality remains unresolved.
 
 ONNX Runtime 1.31.0 crashed on import on this machine; Basic Pitch ran through an isolated
-1.20.1 compatibility directory. The stable runtime was untouched. Model health checks therefore
+1.20.1 compatibility directory. Model health checks therefore
 need actual imports in a subprocess, rather than package-presence checks alone.
 
 ## Reproduce and attribute

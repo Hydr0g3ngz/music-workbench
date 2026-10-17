@@ -6,9 +6,7 @@ See [audio resources research](audio-resources.en.md) for updated priorities, op
 evaluation datasets and storage choices.
 
 This research index uses upstream repositories and official model cards. It is not an installed
-or working-provider list. See [current support](next-models.en.md). Candidates have not passed a
-shared platform evaluation; earlier standalone experiments do not establish project integration.
-Hardware figures below are upstream guidance. No new weights were downloaded or timed for this research.
+or working-provider list. See [current support](models.en.md); subsequent integrations such as ACE-Step and RoFormer are documented in their user guides. Hardware figures below are upstream guidance, not a shared local benchmark.
 
 ## Candidates by capability
 

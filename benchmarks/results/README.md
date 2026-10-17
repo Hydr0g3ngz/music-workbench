@@ -4,7 +4,7 @@ These are engineering regressions on the pinned 26-case subset. See [the protoco
 
 `baseline.json`, `balanced.json` and `text-priority.json` each account for all 26 cases. The latter two inherit unchanged, measured components; they are not fresh full-run speed tests. The two note decoders use the same hash-verified seed=0 pitch contours. Composition also checks identical source and vocal audio. Per-case metrics and provenance are included; raw audio, reference lyrics and prediction text are excluded.
 
-`rejected-vocal-chunks.json` covers the seven real full songs. `diagnostic-beat-this-small0.json` covers five guitar clips and explicitly records known GuitarSet training overlap; it is blocked from default promotion by the comparison tool. Out-of-fold Beat This weights were not evaluated this iteration. Aggregate hardware-memory samples include other GPU activity and are not instantaneous model-only peaks.
+`rejected-vocal-chunks.json` covers the seven real full songs. `diagnostic-beat-this-small0.json` covers five guitar clips and explicitly records known GuitarSet training overlap; it is blocked from default promotion by the comparison tool. The archived v2 experiment did not evaluate out-of-fold Beat This weights. Aggregate hardware-memory samples include other GPU activity and are not instantaneous model-only peaks.
 
 The original unseeded pilot/baseline remains in the earlier report/history. These reports do not establish unbiased generalization, full-song source separation quality or performance on complex Mandarin mixes. Each data source retains its own license; these original aggregate measurements do not relicense upstream recordings or annotations.
 
