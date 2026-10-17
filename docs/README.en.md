@@ -8,6 +8,7 @@
 - [Five-step lesson](first-sketch.md): listen, edit a note, balance and export.
 - [Workstation guide](create-preview.en.md): layout, tracks, clips, saving and export.
 - [Run from source](../QUICKSTART.md): Python environment and launch commands.
+- [Product and data boundaries](product-boundaries.md): Workbench, Studio, older bookmarks and the asset editor.
 
 ## Make music
 

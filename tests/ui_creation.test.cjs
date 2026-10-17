@@ -132,6 +132,8 @@ test("generation and stem polling preserve audition sources, time and playing st
     },
   };
   const context = vm.createContext({
+    WorkbenchNavigation: require("../src/music_studio/ui/static/workbench-navigation.js"),
+    StationModelControls: require("../src/music_studio/ui/static/station-model-controls.js"),
     s: state,
     generationAudio: audio,
     fitPanel: { stop() {} },

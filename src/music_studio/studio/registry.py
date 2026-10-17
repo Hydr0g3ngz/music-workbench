@@ -87,8 +87,8 @@ CATALOG = {
         "imports": ["numpy", "soundfile"],
         "stage": "inspect",
         "device": "cpu",
-        "license": "MIT (Music Studio)",
-        "source": "https://github.com/Hydr0g3ngz/music-studio",
+        "license": "MIT (Music Workbench)",
+        "source": "https://github.com/Hydr0g3ngz/music-workbench",
     },
     "loudness-ebur128": {
         "title": ["测量听感响度与真峰值", "Measure loudness & true peak"],

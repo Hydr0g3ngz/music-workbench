@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#15161c" />
     <title>Music Workbench</title>
+    <link rel="icon" type="image/svg+xml" href="/workbench-icon.svg" />
     <link rel="stylesheet" href="/station.css" />
     <link rel="stylesheet" href="/station-library.css" />
     <link rel="stylesheet" href="/station-effects.css" />
@@ -33,6 +34,7 @@
     <script src="/station-audition-ui.js" defer></script>
     <script src="/station-tutorial.js" defer></script>
     <script src="/station-model-controls.js" defer></script>
+    <script src="/workbench-navigation.js" defer></script>
     <script src="/station.js" defer></script>
   </head>
   <body>
@@ -108,7 +110,7 @@
         <button id="open-tutorial" class="quiet" aria-expanded="false">入门</button>
         <button id="open-projects" class="quiet" data-t="projects">工程</button
         ><button id="new-project" class="quiet" data-t="new">新建</button
-        ><a href="/next.html" class="previous" data-t="previous">原工作台 ↗</a
+        ><a id="asset-editor" href="/next.html" target="_blank" rel="noopener" class="previous" data-t="previous">素材编辑器 ↗</a
         ><button id="language" class="quiet language">EN</button
         ><button id="export" class="primary">
           <svg><use href="#i-upload" /></svg

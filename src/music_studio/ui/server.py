@@ -16,7 +16,7 @@ from typing import Literal
 import numpy as np
 import soundfile as sf
 from fastapi import FastAPI, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
@@ -527,7 +527,14 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
             codex.shutdown()
             studio.close()
 
-    app = FastAPI(title="Music Studio", lifespan=lifespan, docs_url=None, redoc_url=None)
+    app = FastAPI(title="Music Workbench", lifespan=lifespan, docs_url=None, redoc_url=None)
+
+    @app.get("/", include_in_schema=False)
+    @app.get("/index.html", include_in_schema=False)
+    def home(request: Request):
+        from .navigation import entry_url
+
+        return RedirectResponse(entry_url(request.query_params), status_code=307)
 
     @app.exception_handler(StudioError)
     async def studio_error(request, error):
@@ -597,6 +604,7 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
         except (OSError, subprocess.SubprocessError, IndexError):
             pass
         return {
+            "product": "music-workbench",
             "version": __version__,
             "gpu": gpu,
             "inference_installed": all(
@@ -669,7 +677,7 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
             source = (bundled / relative).resolve()
             if not source.is_relative_to(bundled.resolve()) or sha256(source) != digest:
                 raise HTTPException(
-                    503, "Bundled demo integrity check failed; reinstall Music Studio"
+                    503, "Bundled demo integrity check failed; reinstall Music Workbench"
                 )
         with manager.lock:
             record, _ = manager.create(

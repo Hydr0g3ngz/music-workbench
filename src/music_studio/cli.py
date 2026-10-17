@@ -80,7 +80,7 @@ def doctor() -> dict:
         "model_dir": Settings().model_dir,
         "packages": installed_versions(
             [
-                "music-studio-local",
+                "music-workbench-local",
                 "torch",
                 "torchaudio",
                 "demucs",

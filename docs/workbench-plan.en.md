@@ -4,6 +4,8 @@
 
 This document is for platform and backend contributors. Consult the [user guide](create-preview.en.md) for supported behavior and limits. Planned capabilities are not implementation claims.
 
+Workbench and Studio maintain creation and full-song analysis separately. See [product boundaries](product-boundaries.md) for public entries, data locations and format compatibility. Integrations should supply material that users can continue editing, arranging and mixing.
+
 ## Product and engineering goals
 
 Create, arrange, record, edit, mix and export locally. Templates, presets, lessons and reversible edits help beginners; advanced parameters remain available as needed. AI outputs become editable project material. Future Agent control reuses project commands; basic creation does not require conversation.

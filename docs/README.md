@@ -8,6 +8,7 @@
 - [五步入门](first-sketch.md)：从试听到改音符、混音与导出。
 - [工作台使用指南](create-preview.md)：界面布局、轨道与片段、保存与导出。
 - [源码启动](../QUICKSTART.md)：Python 环境与启动命令。
+- [产品与数据边界](product-boundaries.md)：Workbench 与 Studio、旧书签和素材编辑器。
 
 ## 制作音乐
 

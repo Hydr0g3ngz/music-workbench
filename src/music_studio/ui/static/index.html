@@ -2,91 +2,12 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111416">
-  <title>Music Studio · 本地扒歌工作台</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f4b66b'/%3E%3Cpath d='M8 13v6m5-11v16m6-20v24m5-17v10' stroke='%23141618' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/workbench.css">
-  <script src="/i18n.js?v=5" defer></script>
-  <script src="/playback.js?v=5" defer></script>
-  <script src="/app.js?v=5" defer></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Music Workbench</title>
 </head>
 <body>
-  <aside class="sidebar">
-    <a class="brand" href="/" aria-label="Music Studio 首页"><span class="brand-mark">≋</span><span>Music Studio<small>听见音乐的每一层</small></span></a>
-    <button class="new-project" id="new-project"><span>＋</span> 导入歌曲</button>
-    <input type="file" id="file-input" accept="audio/*,.flac,.m4a,.ogg,.opus" hidden>
-    <div class="section-label"><span>我的项目</span><span id="project-count">0</span></div>
-    <label class="project-search"><span>⌕</span><input id="project-search" type="search" placeholder="搜索歌曲…" aria-label="搜索歌曲"></label>
-    <nav id="project-list" aria-label="歌曲项目"></nav>
-    <button id="trash-button" class="trash-button">♲ <span>回收站</span><small id="trash-count"></small></button>
-    <div class="sidebar-bottom"><span class="local-dot"></span><span>本地运行<small id="hardware">正在检查运行环境</small></span></div>
-  </aside>
-
-  <div class="app">
-    <header class="topbar">
-      <div class="breadcrumb">工作区 <span>/</span> <strong id="breadcrumb-title">歌曲分析</strong></div>
-      <div class="topbar-actions"><select id="project-picker" aria-label="切换歌曲项目"><option value="">我的项目</option></select><button id="mobile-import" class="button subtle" aria-label="导入新的歌曲">＋ 导入</button><button id="mobile-trash" class="button subtle" aria-label="打开回收站">♲</button><span class="version" id="build-version">LOCAL · v0.1.1</span><select id="ui-language" aria-label="Interface language / 界面语言"><option value="zh" lang="zh-CN">中文</option><option value="en" lang="en">English</option></select><button id="demo-button" class="button subtle">♫ 加载示例歌曲</button></div>
-    </header>
-    <main>
-      <div class="title-row"><div class="song-heading"><div class="eyebrow">SONG WORKSPACE</div><h1 id="song-title">把歌曲，展开来看</h1><p id="song-subtitle">导入音频，在同一条时间轴上探索歌词、旋律与伴奏。</p></div><div class="song-actions"><span id="status-badge" class="status-badge">等待导入</span><div id="project-actions" hidden><button id="rename-button" class="button subtle" aria-label="重命名当前歌曲">重命名</button><button id="delete-button" class="button subtle" aria-label="删除当前歌曲" title="移入回收站，可恢复">删除</button></div></div></div>
-
-      <section class="import-panel" id="import-panel" aria-label="导入歌曲">
-        <div class="import-icon">↥</div><div><h2>拖入一首歌，或点击选择文件</h2><p>MP3 · WAV · FLAC · M4A · OGG <span>音频仅保存在本机</span></p></div><button id="choose-file" class="button">选择音频</button>
-      </section>
-
-      <details id="runtime-help" class="runtime-help" hidden><summary>体验模式：分析自己的歌曲需要安装模型</summary><p>内置示例可直接使用。完整分析需安装推理组件并下载模型；GPU 与 CPU 可选。</p><code>.\scripts\setup.ps1 -Mode full -Device cuda -DownloadModels</code><p>没有 NVIDIA 显卡时，将 cuda 改为 cpu。安装后重启软件。</p></details>
-      <details id="analysis-options" class="analysis-options" open><summary><span id="analysis-options-label">分析设置</span><small>选择模式后即可开始</small></summary>
-      <section class="settings-row" aria-label="分析选项">
-        <label>更新范围<select id="analysis-scope"><option value="full">整曲分析</option><option value="lyrics">仅更新歌词</option><option value="align">对齐已修改歌词</option></select></label>
-        <label>分析模式<select id="quality"><option value="balanced">轻量 · Whisper small</option><option value="text" selected>通用 · Whisper turbo</option><option value="qwen">文字优先 · Qwen</option><option value="heart">实验 · HeartTranscriptor</option><option value="configured">使用启动配置</option></select></label>
-        <label>歌词语言<select id="language"><option value="">自动识别</option><option value="zh">中文</option><option value="en">English</option><option value="ja">日本語</option><option value="ko">한국어</option></select></label>
-        <div class="analysis-actions"><button id="analyze-button" class="button primary" disabled>✦ 开始分析</button></div>
-      </section>
-      <details class="advanced-options"><summary>高级设置 <small>设备、音源与实验对齐</small></summary><div class="settings-row">
-        <label>计算设备<select id="device"><option value="auto">自动选择</option><option value="cuda">NVIDIA GPU</option><option value="cpu">CPU</option></select></label>
-        <label>识别音源<select id="lyrics-source"><option value="vocals">分离人声</option><option value="source">原曲</option></select></label>
-        <label>歌词时间<select id="alignment"><option value="native">模型自带时间</option><option value="anchors">声学锚点 · 轻量</option><option value="anchors_dual">声学锚点 · 更完整（需 turbo）</option><option value="qwen">Qwen 独立对齐 · 实验</option><option value="whisper">Whisper 文字对齐 · 实验</option></select></label>
-        <label class="offline-label"><input type="checkbox" id="offline"> 使用已下载模型</label>
-      </div></details>
-
-      <p id="quality-note" class="quality-note">Qwen 适合优先减少错词；声学锚点会标出尚未逐词定位的文字。已有结果和手动修改均保留，可比较、切回。</p>
-      <p id="recognizer-status" class="quality-note" role="status" hidden></p>
-      </details>
-      <section id="version-bar" class="version-bar" hidden aria-label="分析结果版本"><div><span class="version-label">当前结果</span><strong id="result-model"></strong><small id="result-alignment"></small></div><div class="version-tools"><button id="candidate-button" class="button subtle" hidden>查看待确认候选</button><label>结果版本<select id="version-picker" aria-label="切换分析结果版本"></select></label><button id="compare-button" class="button subtle">比较版本</button></div></section>
-
-      <div id="notice" role="status" aria-live="polite" hidden></div><details id="error-details" hidden><summary>查看诊断信息</summary><pre id="error-log"></pre></details>
-      <section id="progress-panel" class="progress-panel" hidden aria-label="分析进度"><div><span id="progress-label">准备分析</span><span id="progress-count">0 / 6</span><button id="cancel-button" class="button danger" hidden>停止分析</button></div><progress id="analysis-progress" max="6" value="0"></progress><p id="progress-detail"></p><div id="stage-list" class="stage-list"></div></section>
-
-      <section class="stats" aria-label="分析概览">
-        <div><span>歌曲时长</span><strong id="stat-duration">—</strong></div><div><span>估计速度</span><strong id="stat-bpm">—<small>BPM</small></strong></div><div><span>歌词段落</span><strong id="stat-lyrics">—<small>句</small></strong></div><div><span>主旋律音符</span><strong id="stat-notes">—<small>个</small></strong></div>
-      </section>
-
-      <div class="workspace-grid">
-        <section class="timeline-panel panel">
-          <div class="panel-heading"><div><h2>同步时间轴</h2><span>和弦 · 歌词 · 旋律 · 音轨</span></div><label class="zoom-label">视图<select id="zoom" aria-label="时间轴显示范围"><option value="15">15 秒</option><option value="30" selected>30 秒</option><option value="0">整首</option></select></label></div>
-          <div class="timeline-wrap"><canvas id="timeline" role="img" aria-label="同步时间轴，分析完成后显示和弦、音符与真实音轨波形"></canvas><div id="playhead" hidden></div><div id="timeline-empty" class="empty-timeline"><span>≋</span><strong>每一层，都在同一个时间里</strong><p>分析完成后，点击波形或音符即可定位试听。</p></div></div>
-          <div class="timeline-nav"><span id="view-start">0:00</span><input type="range" id="view-range" aria-label="时间轴视窗起点" min="0" max="1" step="0.01" value="0" disabled><span id="view-end">0:30</span></div>
-        </section>
-
-        <section class="lyrics-panel panel"><div class="panel-heading"><div><h2>歌词 <small id="edited-count"></small></h2><span id="lyrics-hint">点击定位 · 点击铅笔纠错</span></div><div class="lyrics-tools"><button id="reference-button" class="button subtle" disabled>粘贴歌词</button><label class="follow-label"><input id="follow" type="checkbox" checked> 跟随</label></div></div><div class="review-toolbar"><select id="review-filter" aria-label="筛选歌词"><option value="all">全部歌词</option><option value="text">文字疑点</option><option value="timing">待定位</option><option value="reviewed">已核对</option></select><span id="review-summary">先听，再修正</span><button id="next-review" class="button subtle" disabled title="快捷键 N">下一处核对 ↗</button></div><div id="lyric-list" role="list"><div class="empty-lyrics">♫<p>歌词会出现在这里</p><small>自动识别后可逐句试听核对</small></div></div><div class="lyric-navigation"><button id="previous-line" class="button subtle" aria-label="上一句歌词" disabled>↑ 上一句</button><span id="line-position">0 / 0</span><button id="next-line" class="button subtle" aria-label="下一句歌词" disabled>↓ 下一句</button></div></section>
-      </div>
-
-      <section class="transport panel" aria-label="播放控制">
-        <div class="transport-main"><button id="rewind" class="icon-button" aria-label="回到开头" disabled>↤</button><button id="play-button" class="play-button" aria-label="播放" disabled>▶</button><div class="playback-time"><strong id="current-time">0:00.00</strong><span>/ <span id="total-time">0:00</span></span></div><input type="range" id="seek" aria-label="播放位置" min="0" max="1" step="0.01" value="0" disabled></div>
-        <div class="transport-bottom"><div class="track-selector" role="group" aria-label="试听音轨"><button data-track="source" class="active" aria-pressed="true">原曲</button><button data-track="vocals" aria-pressed="false">人声</button><button data-track="instrumental" aria-pressed="false">伴奏</button><button data-track="melody" aria-pressed="false">旋律 MIDI</button></div><div class="playback-tools"><button id="singalong-button" class="button subtle" disabled title="快捷键 K">⛶ 跟唱</button><button id="loop-button" class="button subtle" aria-pressed="false" disabled>↻ 单句循环</button><label class="volume-label">音量<input id="volume" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="播放音量"></label><select id="export" aria-label="导出分析结果" disabled><option value="">导出结果 ↓</option><option value="midi">主旋律 MIDI</option><option value="vocals">人声音轨</option><option value="instrumental">伴奏音轨</option><option value="lrc">歌词 LRC</option><option value="srt">字幕 SRT</option><option value="chords">和弦 CSV</option><option value="project">完整项目 JSON</option></select></div></div>
-      </section>
-      <footer><span id="audio-status" role="status">选择歌曲后开始分析</span><span id="attribution">自动分析结果可通过试听核对</span></footer>
-    </main>
-  </div>
-  <div id="toast" class="toast" role="status" hidden><span id="toast-text"></span><button id="toast-undo" class="button subtle" hidden>撤销删除</button><button id="toast-close" class="icon-button" aria-label="关闭提示">×</button></div>
-  <dialog id="rename-dialog" aria-labelledby="rename-title"><form id="rename-form"><div class="dialog-heading"><h2 id="rename-title">重命名歌曲</h2><button type="button" class="icon-button" data-close="rename-dialog" aria-label="关闭重命名">×</button></div><label for="rename-input">歌曲名称</label><input id="rename-input" required maxlength="150" autocomplete="off"><p id="rename-error" class="dialog-error" role="alert"></p><div class="dialog-actions"><button type="button" class="button" data-close="rename-dialog">取消</button><button class="button primary" id="rename-save">保存名称</button></div></form></dialog>
-  <dialog id="lyrics-dialog" aria-labelledby="lyrics-editor-title"><form id="lyrics-form"><div class="dialog-heading"><h2 id="lyrics-editor-title">修改歌词</h2><button type="button" class="icon-button" data-close="lyrics-dialog" aria-label="关闭歌词编辑">×</button></div><div class="editor-context"><span id="edit-line-time"></span><button type="button" id="edit-listen" class="button subtle">♫ 循环试听上下文</button></div><label for="lyrics-input">歌词文字</label><textarea id="lyrics-input" rows="3" maxlength="1000"></textarea><p class="editor-note">修改文字会保留整句时间，导出同步更新。Ctrl + Enter 保存。</p><p class="original-lyric">识别原文：<span id="original-lyric"></span></p><details class="retry-options"><summary>尝试另一种识别方式</summary><div class="candidate-options"><label>模型<select id="retry-quality"><option value="text">Whisper turbo</option><option value="qwen">Qwen3-ASR</option><option value="balanced">Whisper small</option></select></label><label>音源<select id="retry-source"><option value="vocals">分离人声</option><option value="source">原曲</option></select></label><button type="button" id="retry-line-button" class="button">生成候选</button></div><p class="editor-note">原歌词保留，试听比较后再决定是否采用。</p></details><p id="lyrics-error" class="dialog-error" role="alert"></p><div class="dialog-actions"><button type="button" id="mark-reviewed" class="button subtle">✓ 已试听核对</button><button type="button" id="lyrics-restore" class="button subtle">恢复原文</button><button type="button" class="button" data-close="lyrics-dialog">取消</button><button class="button primary" id="lyrics-save">保存修改</button></div></form></dialog>
-  <dialog id="candidate-dialog" aria-labelledby="candidate-title"><div class="dialog-heading"><h2 id="candidate-title">识别候选</h2><button class="icon-button" data-close="candidate-dialog" aria-label="关闭识别候选">×</button></div><p class="editor-note">原版本仍在使用。模型输出可能相同，也可能引入新错误，请试听比较。</p><div id="candidate-content"></div><p id="candidate-error" class="dialog-error" role="alert"></p><div class="dialog-actions"><button class="button" data-close="candidate-dialog">保留原版本</button><button id="candidate-accept" class="button primary">采用候选版本</button></div></dialog>
-  <dialog id="singalong" aria-labelledby="singalong-title"><div class="singalong-header"><div><span class="eyebrow">SING ALONG · 本地伴奏</span><h2 id="singalong-title"></h2></div><button class="button" data-close="singalong">退出跟唱 <kbd>Esc</kbd></button></div><div class="singalong-lyrics"><p id="singalong-previous"></p><div id="singalong-current"></div><p id="singalong-next"></p><small id="singalong-hint"></small></div><div class="singalong-controls"><div class="singalong-tracks track-selector" role="group" aria-label="跟唱音轨"><button data-track="source">原曲</button><button data-track="vocals">人声</button><button data-track="instrumental">伴奏</button></div><label class="guide-volume">伴奏中的原唱<input id="guide-volume" type="range" min="0" max="1" step="0.05" value="0" aria-label="伴奏中的原唱音量"><output id="guide-value">0%</output></label><div class="singalong-player"><button id="singalong-prev" class="button">↑ 上一句</button><button id="singalong-play" class="play-button" aria-label="跟唱播放">▶</button><button id="singalong-next-button" class="button">↓ 下一句</button><span id="singalong-time">0:00</span><input id="singalong-seek" type="range" min="0" max="1" step="0.01" value="0" aria-label="跟唱播放位置"></div><p>空格 播放 / 暂停 · ↑ ↓ 切句 · 灰色文字按句定位</p></div></dialog>
-  <dialog id="trash-dialog" aria-labelledby="trash-title"><div class="dialog-heading"><div><h2 id="trash-title">回收站</h2><p>删除的歌曲和分析结果保存在本机，可随时恢复。</p></div><button class="icon-button" data-close="trash-dialog" aria-label="关闭回收站">×</button></div><div id="trash-list"></div></dialog>
-  <dialog id="reference-dialog" aria-labelledby="reference-title"><form id="reference-form"><div class="dialog-heading"><h2 id="reference-title">粘贴歌词并对齐</h2><button type="button" class="icon-button" data-close="reference-dialog" aria-label="关闭粘贴歌词">×</button></div><p class="editor-note">每行一句，保留实际演唱的重复副歌。请选择正确的歌词语言；现场版请核对增删句。</p><label for="reference-input">完整歌词</label><textarea id="reference-input" rows="12" maxlength="50000" required placeholder="在这里粘贴正确歌词，每行一句…"></textarea><p class="editor-note">生成新的结果版本，原识别与手动修改均保留。</p><p id="reference-error" class="dialog-error" role="alert"></p><div class="dialog-actions"><button type="button" class="button" data-close="reference-dialog">取消</button><button id="reference-submit" class="button primary">开始对齐</button></div></form></dialog>
-  <dialog id="compare-dialog" class="wide-dialog" aria-labelledby="compare-title"><div class="dialog-heading"><div><h2 id="compare-title">比较歌词版本</h2><p>文字变化不等于准确率提升，请试听核对。</p></div><button class="icon-button" data-close="compare-dialog" aria-label="关闭版本比较">×</button></div><div class="compare-selectors"><label>之前<select id="compare-left"></select></label><label>之后<select id="compare-right"></select></label></div><p id="compare-summary" role="status"></p><div id="compare-content"></div></dialog>
+  <h1>Music Workbench</h1>
+  <p><a href="/welcome.html">开始创作 / Start creating</a></p>
+  <p><a href="/next.html">素材编辑器 / Asset editor</a></p>
 </body>
 </html>

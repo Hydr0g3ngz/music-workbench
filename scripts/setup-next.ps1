@@ -22,4 +22,4 @@ if (-not (Test-Path -LiteralPath $nextPython)) {
 if ($LASTEXITCODE -ne 0) { throw "The Next environment needs Python 3.11 / 3.12." }
 & $nextPython -m pip install -e ($nextRepo + "[workstation]")
 if ($LASTEXITCODE -ne 0) { throw "Next dependency installation failed." }
-Write-Host "Next is ready. Run Start-Music-Studio-Next.cmd. Neural models are installed separately."
+Write-Host "Music Workbench is ready. Run scripts/launch-workbench.ps1. Neural models are installed separately."

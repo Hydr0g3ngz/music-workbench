@@ -1,5 +1,31 @@
 # Changelog / 更新记录
 
+## 0.2.0.dev19 — Creation entry and product boundaries / 创作入口与产品边界（开发版）
+
+Workbench opens creation home at the root URL. Old asset bookmarks open its asset
+editor with their original IDs. Asset details retain a return link to the originating
+arrangement; branding, model guides, credits and downloads use Workbench names.
+The public CLI describes creation commands and registers only `music-workbench`.
+New default model paths belong to Workbench; explicit paths remain supported.
+Existing project formats, APIs and task history remain compatible.
+
+根地址统一进入创作首页；旧素材书签转到素材编辑器，保留工程返回链接。
+修正源码启动脚本、默认工作区与模型路径、素材编辑器品牌及错误的仓库链接。
+路线图围绕编排、可编辑 AI 声部和混音推进，整曲分析继续由独立 Music Studio 维护。
+
+See [product boundaries / 产品边界](docs/product-boundaries.md).
+
+## 0.2.0.dev18 — Selected clips and bounded model reuse / 片段处理与限时模型复用（开发版）
+
+Process only the selected source-frame range, restore results to the arrangement's
+position, and audition pinned input while correcting transcripts. Consecutive
+RoFormer, Demucs and Whisper tasks can reuse one model for up to 30 idle seconds,
+with cancellation, settings changes and waiting generation releasing the worker.
+Qwen recognition/alignment remain sequential and one-shot.
+
+工具按所选片段处理，保留帧范围与输入哈希；修正结果试听、MIDI 回填和变速后的时间起点。
+真实流程与单机速度记录见 [dev18](docs/releases/v0.2.0.dev18.md)。
+
 ## 0.2.0.dev17 — Vocal separation and word timing / 人声分离与逐字定位（开发版）
 
 Adds managed Windows CUDA packs for Mel-Band RoFormer KJ and Qwen3-ASR with

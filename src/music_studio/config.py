@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Literal
 
-from platformdirs import user_cache_path
+from platformdirs import user_data_path
 from pydantic import Field
 
 from .schema import Record
@@ -28,7 +28,7 @@ class Settings(Record):
     rhythm_checkpoint: Literal["small0", "final0", "fold2", "fold3", "fold4", "fold6"] = "small0"
     harmony_backend: Literal["stft", "cqt"] = "cqt"
     mixture_consistency: bool = True
-    model_dir: str = str(user_cache_path("music-studio", appauthor=False) / "models")
+    model_dir: str = str(user_data_path("MusicWorkbench", appauthor=False) / "AI" / "models")
     offline: bool = False
     threads: int = Field(default=4, ge=1, le=64)
     seed: int = Field(default=0, ge=0, le=4294967295)

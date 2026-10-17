@@ -4,6 +4,8 @@
 
 本地运行的开源音乐创作工作台。用采样乐器、MIDI、多轨编排、录音和混音制作音乐，也可以把本地 AI 生成、分离和转录的素材加入作品。
 
+整曲分析是独立产品 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。两个产品分别安装、保存和发布，详见[产品与数据边界](docs/product-boundaries.md)。
+
 [**下载 Windows 安装器**](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/Music-Workbench-0.2.0.dev14-Setup-x64.exe) · [36 秒有声演示](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/Music-Workbench-First-Sketch-Demo.mp4) · [入门教程](docs/first-sketch.md) · [文档目录](docs/README.md)
 
 Windows 10 22H2 / 11 x64 · 中文 / English · 开发预览版，安装器未签名

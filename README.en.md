@@ -4,6 +4,8 @@
 
 An open-source music workstation that runs locally. Create with sampled instruments, MIDI, multitrack arrangement, recording and mixing, and bring material from local AI generation, separation and transcription into your project.
 
+Full-song analysis is a separate product, [Music Studio](https://github.com/Hydr0g3ngz/music-studio), with its own installation, data and releases. See [product and data boundaries](docs/product-boundaries.md).
+
 [**Download Windows installer**](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/Music-Workbench-0.2.0.dev14-Setup-x64.exe) · [36-second demo with audio](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/Music-Workbench-First-Sketch-Demo.mp4) · [Beginner lesson](docs/first-sketch.md) · [Documentation](docs/README.en.md)
 
 Windows 10 22H2 / 11 x64 · English / 中文 · Development preview; unsigned installer

@@ -42,7 +42,7 @@ if (-not $ModelDir) { $ModelDir = Join-Path $nextRepo ".cache/models" }
 # This checkout must win over editable packages installed for the retained stable version.
 $env:PYTHONPATH = Join-Path $nextRepo "src"
 $env:PYTHONUTF8 = "1"
-$nextArguments = @("-X", "utf8", "-m", "music_studio", "ui", "--interface", $Interface, "--workspace", $Workspace, "--port", "$Port", "--model-dir", $ModelDir, "--offline")
+$nextArguments = @("-X", "utf8", "-m", "music_studio.workbench_cli", "ui", "--interface", $Interface, "--workspace", $Workspace, "--port", "$Port", "--model-dir", $ModelDir, "--offline")
 if (-not $LyricsPython) {
     $candidate = Join-Path $nextRepo ".artifacts/lyrics-env/Scripts/python.exe"
     if (Test-Path -LiteralPath $candidate) { $LyricsPython = $candidate }

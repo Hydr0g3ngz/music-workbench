@@ -142,7 +142,8 @@ const words = {
   local: ["音频处理在本机完成", "Audio is processed locally"],
   workspace: ["工作区", "Workspace"],
   newProject: ["新项目", "New project"],
-  classic: ["经典歌曲分析 ↗", "Classic song analysis ↗"],
+  creationHome: ["创作首页 ↗", "Creation home ↗"],
+  returnSession: ["返回创作工程 ↗", "Return to arrangement ↗"],
   welcomeTitle: [
     "从一段声音，开始创作。",
     "Start with a sound. Make it yours.",
@@ -166,10 +167,10 @@ const words = {
     "选一个目标，再按需要展开参数。",
     "Choose a task and open the details when you need them.",
   ],
-  principle3: ["界面与 Agent 同步", "One shared workspace"],
+  principle3: ["试听后再采用", "Audition before adoption"],
   principle3Copy: [
-    "共用项目、操作记录和版本，方便接着编辑。",
-    "The interface and agent share projects, versions and history.",
+    "先比较原音与处理结果，保留操作记录和可恢复版本。",
+    "Compare the original and result, with history and recoverable versions.",
   ],
   rename: ["重命名", "Rename"],
   delete: ["删除", "Delete"],
@@ -328,7 +329,8 @@ const words = {
   previewFail: ["预览失败", "Preview failed"],
   previewStart: ["开始渲染预览", "Preview rendering started"],
 };
-let language = localStorage.getItem("musicStudioNextLanguage") || "zh";
+const originSession = WorkbenchNavigation.identity(new URLSearchParams(location.search).get("session"));
+let language = localStorage.getItem("station-language") || localStorage.getItem("musicStudioNextLanguage") || "zh";
 if (!["zh", "en"].includes(language)) language = "zh";
 const t = (key) => words[key]?.[language === "en" ? 1 : 0] || key;
 const S = {
@@ -368,6 +370,8 @@ const element = (tag, text, cls) => {
 function translate() {
   document.documentElement.lang = language === "en" ? "en" : "zh-CN";
   $("lang").value = language;
+  $("return-workstation").href = WorkbenchNavigation.workstation(originSession);
+  $("return-workstation").textContent = t(originSession ? "returnSession" : "creationHome");
   document
     .querySelectorAll("[data-t]")
     .forEach((n) => (n.textContent = t(n.dataset.t)));
@@ -575,8 +579,7 @@ async function openProject(id) {
   $("editor").hidden = false;
   $("title").textContent = S.project.title;
   $("breadcrumb").textContent = S.project.title;
-  $("classic").href = `/?project=${id}`;
-  history.replaceState(null, "", `/next.html?project=${id}`);
+  history.replaceState(null, "", WorkbenchNavigation.editor(id, originSession));
   renderProjects();
   notice(t("preparing"));
   const session = await api(base());
@@ -1386,7 +1389,7 @@ $("delete").onclick = () =>
             else {
               $("editor").hidden = true;
               $("welcome").hidden = false;
-              history.replaceState(null, "", "/next.html");
+              history.replaceState(null, "", WorkbenchNavigation.editor(null, originSession));
             }
           }),
         true,
@@ -1500,7 +1503,7 @@ document.addEventListener("drop", (e) => {
 $("search").oninput = renderProjects;
 $("lang").onchange = () => {
   language = $("lang").value;
-  localStorage.setItem("musicStudioNextLanguage", language);
+  localStorage.setItem("station-language", language);
   translate();
 };
 function localized(value) {
@@ -2268,7 +2271,7 @@ $("models").onclick = async () => {
   try {
     await loadLocalModels();
     const guide = element("a", t("modelsSetup"));
-    guide.href = `https://github.com/Hydr0g3ngz/music-studio/blob/codex/audio-workbench-next/docs/next-models${language === "en" ? ".en" : ""}.md`;
+    guide.href = `https://github.com/Hydr0g3ngz/music-workbench/blob/main/docs/models${language === "en" ? ".en" : ""}.md`;
     guide.target = "_blank";
     guide.rel = "noopener noreferrer";
     const body = [element("p", t("modelHelp")), guide];

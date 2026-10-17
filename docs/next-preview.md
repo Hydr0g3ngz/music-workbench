@@ -1,8 +1,10 @@
-# 兼容素材编辑器（Next）
+# 素材编辑器
 
 [English](next-preview.en.md) · [文档目录](README.md) · [模型配置](next-models.md)
 
-Next 是保留的单素材编辑界面，适合转写改字、讲话清理、波形处理与实验性 MCP/Codex 操作。制作多轨音乐请使用 [Music Workbench 工作台](create-preview.md)；两种界面的工程记录不同。
+素材编辑器是 Music Workbench 的单素材处理界面，地址仍为 `next.html`，适合转写改字、讲话清理、波形处理与实验性 MCP/Codex 操作。制作多轨音乐请使用 [Music Workbench 工作台](create-preview.md)；两种界面的工程记录不同。
+
+从工程任务打开详情会保留「返回创作工程」链接。素材修改不会自动覆盖编排，仍需明确采用。整曲歌曲分析由独立的 Music Studio 提供。[产品与数据边界](product-boundaries.md)
 
 ## 可以做什么
 

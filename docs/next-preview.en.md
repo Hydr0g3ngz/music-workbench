@@ -1,10 +1,12 @@
-# Compatibility asset editor (Next)
+# Asset editor
 
 [中文](next-preview.md) · [Documentation](README.en.md) · [Model setup](next-models.en.md)
 
 Next is the retained single-asset editor for transcript correction, speech cleanup, waveform processing and experimental MCP/Codex tools. Use the [Music Workbench workstation](create-preview.en.md) for multitrack music; the two interfaces store different project records.
 
 ## Available tools
+
+Opening task details from an arrangement retains a **Return to arrangement** link. Asset edits do not automatically overwrite the arrangement; adoption remains explicit. Full-song analysis belongs to the separate Music Studio product. See [product and data boundaries](product-boundaries.md).
 
 - Import, waveform selection, trim, gain, fades, balance, reverse and separate previews.
 - Audition originals/candidates, explicitly adopt, undo/redo, reopen and export WAV.

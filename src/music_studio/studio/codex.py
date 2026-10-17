@@ -72,7 +72,7 @@ class CodexBridge:
                     {
                         "clientInfo": {
                             "name": "music_studio",
-                            "title": "Music Studio",
+                            "title": "Music Workbench · Asset editor",
                             "version": "0.2.0-dev",
                         },
                         "capabilities": {"experimentalApi": True},
@@ -265,7 +265,7 @@ class CodexBridge:
                 "ephemeral": True,
                 "dynamicTools": tools,
                 "developerInstructions": (
-                    "You are Music Studio's audio assistant for complete beginners. "
+                    "You assist beginners in Music Workbench's single-asset editor. "
                     f"Your only project is {project}. Use only the provided audio_* tools. "
                     "Read audio_get_session before every edit, including its current revision "
                     "and selection. "

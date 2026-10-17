@@ -747,7 +747,7 @@ class ArrangementService:
 
     def credits(self, key):
         state = self.get(key)
-        lines = [state["content"]["title"], "Music Studio — Sources / 素材来源", ""]
+        lines = [state["content"]["title"], "Music Workbench — Sources / 素材来源", ""]
         used = set()
         for track in state["content"]["tracks"]:
             if track["kind"] == "midi" and track["instrument"] in library.SAMPLED:
@@ -1283,7 +1283,7 @@ def router(studio, manager):
         return Response(
             service.credits(key),
             media_type="text/plain; charset=utf-8",
-            headers={"Content-Disposition": 'attachment; filename="music-studio-credits.txt"'},
+            headers={"Content-Disposition": 'attachment; filename="music-workbench-credits.txt"'},
         )
 
     @api.get("/projects/{key}/audio/{asset}")
@@ -1299,6 +1299,6 @@ def router(studio, manager):
         if not re.fullmatch(r"[a-f0-9]{16}\.(wav|mid|mwb)", filename):
             raise HTTPException(404)
         path = studio.safe_file(studio.root, ".arrangement-exports/" + filename)
-        return FileResponse(path, filename="music-studio-" + filename)
+        return FileResponse(path, filename="music-workbench-" + filename)
 
     return api

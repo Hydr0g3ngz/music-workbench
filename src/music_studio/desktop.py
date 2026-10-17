@@ -78,7 +78,9 @@ def run(workspace, settings, port=8920, open_browser=True, interface="create", c
     workspace = Path(workspace).resolve()
     workspace.mkdir(parents=True, exist_ok=True)
     lock = FileLock(str(workspace / ".workbench-server.lock"), timeout=0)
-    entry = {"create": "/welcome.html", "next": "/next.html"}.get(interface, "/")
+    entry = {"create": "/welcome.html", "next": "/next.html", "classic": "/welcome.html"}[
+        interface
+    ]
     try:
         lock.acquire()
     except Timeout:

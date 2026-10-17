@@ -26,6 +26,10 @@ music-workbench
 
 Source projects use `outputs/workbench`; the service selects an available port starting at 8920. Windows source users can also run `Start-Music-Workbench.cmd`.
 
+Windows 开发者也可使用 `scripts/launch-workbench.ps1`；更换工作区时加 `-Workspace <路径>`，不会自动导入另一个产品的数据。普通浏览器访问根地址会进入创作首页，旧的 `?project=` 素材书签转到素材编辑器。[产品与数据边界](docs/product-boundaries.md)
+
+Windows developers can also use `scripts/launch-workbench.ps1`, with `-Workspace <path>` for an existing workspace. It does not import another product's data. The root URL opens creation home; older `?project=` asset bookmarks open the asset editor. [Product and data boundaries](docs/product-boundaries.md).
+
 ## 保存作品 / Keep your work
 
 导出 **WAV** 分享音频，导出 **便携工程 `.mwb`** 保存可编辑编排及音频。安装版作品默认位于 `%LOCALAPPDATA%\MusicWorkbench\Projects`。更新前保存并备份工程，关闭使用同一工作区的旧版本。

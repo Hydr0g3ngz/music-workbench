@@ -126,7 +126,9 @@ def router(service: StudioService) -> APIRouter:
         path = call(
             service.safe_file, service.project_dir(project), f".studio/exports/{export_id}.wav"
         )
-        return FileResponse(path, media_type="audio/wav", filename=f"music-studio-{export_id}.wav")
+        return FileResponse(
+            path, media_type="audio/wav", filename=f"music-workbench-{export_id}.wav"
+        )
 
     @api.get("/recipe/{candidate}")
     def recipe(project: str, candidate: str):

@@ -79,7 +79,7 @@
       "Mono recording, no models required; input is never played through speakers. Arrangement pauses during capture; synchronized overdubbing and latency compensation are not available yet. Add or download your take before closing this page.",
     projects: "Sessions",
     new: "New",
-    previous: "Previous workbench ↗",
+    previous: "Asset editor ↗",
     export: "Export",
     assets: "Sound library",
     assetsTab: "Assets",
@@ -348,6 +348,7 @@
     }
     history.replaceState({}, "", `/station.html?session=${session.id}`);
     localStorage.setItem("station-session", session.id);
+    $("asset-editor").href = WorkbenchNavigation.editor(null, session.id);
     if (changedProject && duration(content()) > 0)
       s.zoom = Math.max(
         0.5,
@@ -1291,7 +1292,7 @@
                   )
                   .join("") ||
                 `<span class="task-state">${esc(t.status)}</span>`
-              }${["queued", "checking", "running", "cancelling"].includes(t.status) ? `<button data-cancel-task="${t.id}" data-project="${t.source_project}">${tr("取消", "Cancel")}</button>` : `<a class="task-artifact" href="/next.html?project=${t.source_project}" target="_blank" rel="noopener">${tr("详细结果与编辑 ↗", "Details and editing ↗")}</a>`}</div>`,
+              }${["queued", "checking", "running", "cancelling"].includes(t.status) ? `<button data-cancel-task="${t.id}" data-project="${t.source_project}">${tr("取消", "Cancel")}</button>` : `<a class="task-artifact" href="${WorkbenchNavigation.editor(t.source_project, s.session.id)}" target="_blank" rel="noopener">${tr("详细结果与编辑 ↗", "Details and editing ↗")}</a>`}</div>`,
           )
           .join("") ||
       `<p class="panel-copy">${tr("暂无任务。在 AI 模型面板生成音乐，或选中音频片段运行处理。", "No tasks yet. Generate music in Models, or select audio to process it.")}</p>`;
@@ -2240,7 +2241,7 @@
     await flush();
     const link = document.createElement("a");
     link.href = base() + "/credits";
-    link.download = "music-studio-credits.txt";
+    link.download = "music-workbench-credits.txt";
     link.click();
     $("export-dialog").close();
   });
