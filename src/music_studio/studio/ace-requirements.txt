@@ -20,5 +20,3 @@ pywavelets==1.9.0
 huggingface-hub==0.36.2
 numba==0.63.1
 setuptools==71.1.0
-
-
