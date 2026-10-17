@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/welcome.css" />
     <link rel="stylesheet" href="/ai-setup.css" />
     <script src="/ai-setup.js" defer></script>
+    <script src="/model-setup.js" defer></script>
   </head>
   <body>
     <main class="setup-page">
@@ -15,16 +16,11 @@
         ><button id="language">English</button>
       </header>
       <p class="eyebrow">YOUR COMPUTER. YOUR CREATIVE TOOLS.</p>
-      <h1 id="title">让 AI 加入你的创作。</h1>
+      <h1 id="title">AI 工具管理</h1>
       <p class="setup-intro" id="intro">
         准备一次，以后直接创作。软件会自动下载、配置并实际生成一段音乐来验证。
       </p>
-      <ol class="setup-steps">
-        <li id="step-check">检查电脑</li>
-        <li id="step-install">准备创作工具</li>
-        <li id="step-verify">生成音乐验证</li>
-      </ol>
-      <section class="setup-panel">
+      <section class="setup-panel" id="music-generation">
         <div class="setup-panel-top">
           <div>
             <h2>ACE-Step 1.5</h2>
@@ -32,6 +28,11 @@
           </div>
           <span id="badge">…</span>
         </div>
+        <ol class="setup-steps">
+          <li id="step-check">检查电脑</li>
+          <li id="step-install">准备创作工具</li>
+          <li id="step-verify">生成音乐验证</li>
+        </ol>
         <p id="hardware" aria-live="polite"></p>
         <p id="space"></p>
         <p id="reason" role="alert"></p>
@@ -73,6 +74,17 @@
         <details id="failure" hidden>
           <summary id="failure-title">查看错误详情</summary>
           <pre id="error"></pre>
+        </details>
+      </section>
+      <section id="tool-packs" aria-labelledby="tools-title">
+        <h2 id="tools-title">为你的下一步创作准备工具</h2>
+        <p id="tools-intro">按需安装，分轨、旋律和降噪也可以在 CPU 上运行。</p>
+        <p id="tools-error" role="alert"></p>
+        <div id="tool-pack-list"></div>
+        <details class="manual-models">
+          <summary id="manual-title">其他已接入的模型</summary>
+          <p id="manual-copy">Mel-Band RoFormer 与 Qwen3-ASR 目前需要单独手动配置。可在工作台的模型列表检查当前环境。</p>
+          <a id="manual-link" href="/station.html?tools=all">打开工作台模型列表 →</a>
         </details>
       </section>
       <footer>

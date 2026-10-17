@@ -2310,6 +2310,11 @@ $("models").onclick = async () => {
         check,
         details,
       );
+      if (model.setup_url && !model.runnable) {
+        const setup = element("a", localized(["安装运行环境与模型 →", "Set up runtime and model →"]));
+        setup.href = model.setup_url;
+        card.append(setup);
+      }
       if (model.installable_weights) {
         const installLabel = `${t("installCleanup")} · ${(model.download_bytes / 1024 ** 2).toFixed(2)} MiB`;
         const install = element("button", installLabel, "quiet");

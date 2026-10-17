@@ -88,6 +88,7 @@ class AISetup:
         self.cancelled = threading.Event()
         self.thread = None
         self.lock = FileLock(str(self.root / "setup.lock"), timeout=0, thread_local=False)
+        self.control_lock = FileLock(str(self.root / "control.lock"), timeout=10)
         # A second window can observe the job. Only an unlocked, abandoned job is interrupted.
         try:
             with self.lock:
@@ -100,7 +101,8 @@ class AISetup:
             pass
 
     def _state(self, state, **kwargs):
-        write_json(self.path, {"state": state, "updated_at": time.time(), **kwargs})
+        with self.control_lock:
+            write_json(self.path, {"state": state, "updated_at": time.time(), **kwargs})
 
     def status(self):
         try:
@@ -118,7 +120,7 @@ class AISetup:
         with self.guard:
             if self.thread and self.thread.is_alive():
                 return self.status()
-            check = preflight(self.root)
+            check = self.preflight()
             if not check["supported"]:
                 raise StudioError("AI setup requirements: " + ", ".join(check["reasons"]), 422)
             # The lock is explicitly shared with our worker thread; other windows observe it.
@@ -134,23 +136,22 @@ class AISetup:
             self.thread.start()
             return self.status()
 
+    def preflight(self):
+        return preflight(self.root)
+
+    def command(self):
+        return [
+            sys.executable, "-X", "utf8", "-m", "music_studio.studio.ai_install_worker",
+            "--root", str(self.root), "--owner-pid", str(os.getpid()),
+        ]
+
     def _run(self):
         try:
             try:
                 env = os.environ.copy()
                 env.update(PYTHONUTF8="1", PYTHONUNBUFFERED="1", PYTHONDONTWRITEBYTECODE="1")
                 code = run_owned(
-                    [
-                        sys.executable,
-                        "-X",
-                        "utf8",
-                        "-m",
-                        "music_studio.studio.ai_install_worker",
-                        "--root",
-                        str(self.root),
-                        "--owner-pid",
-                        str(os.getpid()),
-                    ],
+                    self.command(),
                     self.root / "setup.log",
                     env,
                     cancelled=lambda: (
@@ -160,7 +161,10 @@ class AISetup:
                 )
                 if code:
                     raise RuntimeError(log_tail(self.root / "setup.log", 1800))
-                self._state("ready")
+                with self.control_lock:
+                    if self.cancelled.is_set() or (self.root / "cancel.request").exists():
+                        raise TaskStopped()
+                    self._state("ready")
             finally:
                 self.lock.release()
         except Timeout:
@@ -172,11 +176,13 @@ class AISetup:
             self._state("failed", error=str(exc)[-2000:])
 
     def cancel(self):
-        with self.guard:
+        with self.guard, self.control_lock:
             if self.status()["state"] in ACTIVE:
+                # Publish before waking the worker, so its final state cannot be
+                # overwritten by a delayed cancellation from another window.
+                self._state("cancelling")
                 (self.root / "cancel.request").touch()
                 self.cancelled.set()
-                self._state("cancelling")
             return self.status()
 
     def close(self):

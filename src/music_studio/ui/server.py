@@ -506,11 +506,14 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
     from ..studio.codex import CodexBridge
     from ..studio.codex import router as codex_router
     from ..studio.http import router as studio_router
+    from ..studio.model_setup import ModelSetup
+    from ..studio.model_setup import router as model_setup_router
     from ..studio.service import StudioError, StudioService
 
     studio = StudioService(workspace, manager.settings)
     codex = CodexBridge(studio)
     ai_setup = AISetup()
+    model_setup = ModelSetup(studio.tasks.registry)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -520,6 +523,7 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
         finally:
             manager.close()
             ai_setup.close()
+            model_setup.close()
             codex.shutdown()
             studio.close()
 
@@ -542,6 +546,7 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
     app.include_router(arrangement_router(studio, manager))
     app.include_router(codex_router(codex))
     app.include_router(ai_setup_router(ai_setup))
+    app.include_router(model_setup_router(model_setup))
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "[::1]"])
 
     @app.get("/api/studio/models")

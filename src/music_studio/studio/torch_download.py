@@ -13,10 +13,12 @@ def file_hash(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def windows_wheel(package, python_tag, directory):
-    name = f"{package}-2.10.0+cu128-{python_tag}-{python_tag}-win_amd64.whl"
+def windows_wheel(package, python_tag, directory, *, version="2.10.0", flavor="cu128"):
+    if (version, flavor) not in (("2.10.0", "cu128"), ("2.5.1", "cpu")):
+        raise ValueError("Unsupported fixed Torch profile")
+    name = f"{package}-{version}+{flavor}-{python_tag}-{python_tag}-win_amd64.whl"
     with urllib.request.urlopen(
-        f"https://download.pytorch.org/whl/cu128/{package}/", timeout=30
+        f"https://download.pytorch.org/whl/{flavor}/{package}/", timeout=30
     ) as response:
         index = response.read().decode("utf-8")
     matches = [

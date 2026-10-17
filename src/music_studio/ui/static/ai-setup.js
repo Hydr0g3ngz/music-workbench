@@ -8,10 +8,10 @@
     actionError = "";
   const tr = (zh, en) => (lang === "zh" ? zh : en);
   const words = {
-    title: ["让 AI 加入你的创作。", "Bring AI into your music."],
+    title: ["AI 工具管理", "Your AI tools"],
     intro: [
-      "准备一次，以后直接创作。软件会自动下载、配置并实际生成一段音乐来验证。",
-      "Set up once, then create. The app downloads, configures and generates a real musical sketch to check everything works.",
+      "选择创作需要的工具，软件会准备独立环境、下载模型并实际处理音频来验证。",
+      "Choose tools for your music. The app prepares private environments, downloads models and checks them with real audio processing.",
     ],
     "step-check": ["检查电脑", "Check computer"],
     "step-install": ["准备创作工具", "Prepare tools"],

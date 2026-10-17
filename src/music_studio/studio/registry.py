@@ -265,7 +265,28 @@ class ModelRegistry:
             if slot == "inference"
             else None
         )
-        return str(Path(configured).expanduser().resolve()) if configured else sys.executable
+        if configured:
+            return str(Path(configured).expanduser().resolve())
+        managed = self.managed(spec)
+        if managed:
+            from .model_setup import bind_app
+
+            bind_app(managed["python"])
+            return managed["python"]
+        return sys.executable
+
+    def managed(self, spec):
+        # Explicit launch settings remain authoritative; installer users need no settings.
+        if spec["runtime"] == "inference" and self.settings.inference_python:
+            return None
+        from .model_setup import managed_runtime
+
+        key = next((k for k, value in CATALOG.items() if value is spec), None)
+        return managed_runtime(key) if key else None
+
+    def environment_settings(self, model):
+        managed = self.managed(self.spec(model))
+        return {"model_dir": managed["model_dir"]} if managed else {}
 
     def spec(self, model):
         if model not in CATALOG:
@@ -276,6 +297,11 @@ class ModelRegistry:
         spec = self.spec(model)
         try:
             python = self.python(spec)
+            managed = self.managed(spec)
+            if deep and managed:
+                from .model_setup import pack_for, packs_root, verify_files
+
+                verify_files(managed, packs_root() / pack_for(model))
             if spec["runtime"] == "separation":
                 from .separation import runtime
 
@@ -283,7 +309,7 @@ class ModelRegistry:
         except (OSError, ValueError, KeyError) as error:
             return {
                 "state": "missing",
-                "error": "Run python scripts/setup_separation.py: " + str(error),
+                "error": str(error),
                 "weights": False,
             }
         if not Path(python).is_file():
@@ -356,11 +382,13 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
                     "-c",
                     script,
                     json.dumps(spec),
-                    self.settings.model_dir,
+                    self.environment_settings(model).get("model_dir", self.settings.model_dir),
                     "1" if deep else "0",
                 ],
                 log,
-                child_environment(self.settings.model_dir),
+                child_environment(
+                    self.environment_settings(model).get("model_dir", self.settings.model_dir)
+                ),
                 timeout=90,
                 cancelled=cancelled,
             )
@@ -388,12 +416,21 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
         # Serialize optional native imports so several clients cannot flood GPU initialization.
         with self.lock:
             found = self._probe(model, deep, cancelled)
+            found.setdefault("checked_at", time.time())
             self.health[model] = found
         return self.describe(model, found)
 
     def describe(self, model, health=None):
+        from .model_setup import pack_for
+
         spec = self.spec(model)
         found = health or self.health.get(model)
+        managed = self.managed(spec)
+        if managed and (not found or found.get("checked_at", 0) < managed["installed_at"]):
+            # Setup already ran every capability offline. Enable the UI immediately;
+            # require() still performs a fresh deep check before the first task.
+            found = {"state": "verified", "weights": True, "checked_at": 0,
+                     "cuda": False, "source": "offline-install-verification"}
         if found is None:
             # No model runtime is imported merely by opening the page.
             found = {"state": "unchecked", "weights": None}
@@ -402,6 +439,10 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
             **{k: v for k, v in spec.items() if k != "imports"},
             "health": found,
             "offline": True,
+            "setup_pack": pack_for(model),
+            "setup_url": (
+                "/ai-setup.html#" + pack_for(model) if pack_for(model) else None
+            ),
             "max_duration_seconds": 7200 if spec["stage"] in ("inspect", "loudness") else 600,
             "runnable": found["state"] == "verified" and found.get("weights") is True,
             "resource_note": "One local task at a time; memory depends on audio, "
@@ -424,7 +465,9 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
         from .cleanup import download
 
         with self.lock:
-            download(self.settings.model_dir, model)
+            download(
+                self.environment_settings(model).get("model_dir", self.settings.model_dir), model
+            )
             self.health.pop(model, None)
         return self.check(model)
 
@@ -444,5 +487,7 @@ print('MUSIC_STUDIO_HEALTH:'+json.dumps(result))
                 if health["state"] == "missing"
                 else "Pinned model weights are not cached"
             )
-            raise StudioError(reason + ". See docs/next-models.md; no download was started.", 503)
+            if result.get("setup_url"):
+                reason += ". Open AI setup to prepare this tool: " + result["setup_url"]
+            raise StudioError(reason + ". No download was started.", 503)
         return self.spec(model)

@@ -1,5 +1,17 @@
 # Changelog / 更新记录
 
+## 0.2.0.dev15 — Local AI tool packs / 本地 AI 工具包（开发版）
+
+Bilingual AI tool management adds private CPU environments for Demucs, CREPE,
+Whisper small, DPDFNet2 and GTCRN. Installation checks pinned checkpoints and runs
+real offline inference before publishing availability. Pause/retry and interrupted
+setup recovery retain completed downloads. Workstation and asset-editor model cards
+link directly to setup; explicitly configured runtimes retain priority.
+
+新增分轨、旋律、转写与语音清理自动工具包，无需系统 Python 或独立显卡。
+结果沿用现有试听、加入轨道、音符采用及转写改字流程。修复多个窗口取消安装时
+状态可能停在“正在暂停”的竞态。RoFormer 与 Qwen3-ASR 仍需手动配置。
+
 ## 0.2.0.dev14 — Your first sketch / 五步完成第一段音乐
 
 An in-app bilingual lesson follows real playback, mute/solo, note edits, mixing and

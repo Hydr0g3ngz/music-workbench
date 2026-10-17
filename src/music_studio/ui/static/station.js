@@ -1183,7 +1183,7 @@
     $("model-list").innerHTML = s.models
       .map(
         (m) =>
-          `<div class="model-card"><strong>${esc(m.title[s.lang === "zh" ? 0 : 1])}</strong><small>${esc(m.description[s.lang === "zh" ? 0 : 1])}</small>${m.id === "mel-band-roformer-kj" && !m.runnable ? `<details class="model-setup"><summary>${tr("安装与诊断", "Setup and diagnostics")}</summary><p>${tr("首次使用需安装独立环境与约 913 MB 权重；启动和推理不自动下载。", "First use requires a separate runtime and ~913 MB weights. Startup and inference never download.")}</p><code>python scripts/setup_separation.py</code>${m.health.error ? `<p>${esc(m.health.error)}</p>` : ""}</details>` : ""}<div class="model-actions"><span>${esc(m.health.state)} · ${m.health.weights ? tr("权重已缓存", "weights cached") : tr("权重待检查", "check weights")}</span><button data-check-model="${m.id}">${tr("检查", "Check")}</button><button data-run-model="${m.id}" ${m.runnable ? "" : "disabled"}>${tr("运行", "Run")}</button></div></div>`,
+          `<div class="model-card"><strong>${esc(m.title[s.lang === "zh" ? 0 : 1])}</strong><small>${esc(m.description[s.lang === "zh" ? 0 : 1])}</small>${m.id === "mel-band-roformer-kj" && !m.runnable ? `<details class="model-setup"><summary>${tr("安装与诊断", "Setup and diagnostics")}</summary><p>${tr("首次使用需安装独立环境与约 913 MB 权重；启动和推理不自动下载。", "First use requires a separate runtime and ~913 MB weights. Startup and inference never download.")}</p><code>python scripts/setup_separation.py</code>${m.health.error ? `<p>${esc(m.health.error)}</p>` : ""}</details>` : ""}${m.setup_url && !m.runnable ? `<a class="model-setup-link" href="${esc(m.setup_url)}">${tr("安装此工具 →", "Set up this tool →")}</a>` : ""}<div class="model-actions"><span>${esc(m.health.state)} · ${m.health.weights ? tr("权重已缓存", "weights cached") : tr("权重待检查", "check weights")}</span><button data-check-model="${m.id}">${tr("检查", "Check")}</button><button data-run-model="${m.id}" ${m.runnable ? "" : "disabled"}>${tr("运行", "Run")}</button></div></div>`,
       )
       .join("");
   }
@@ -2559,6 +2559,9 @@
     const exists = sessions.find((p) => p.id === key) || sessions[0];
     if (exists) accept(exists);
     else await create();
+    if (new URLSearchParams(location.search).has("tools")) {
+      view("models", true);
+    }
     if (start) {
       if (start === "example") tutorialPanel.show();
       const clean = new URL(location.href);

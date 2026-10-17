@@ -256,6 +256,7 @@ class TaskManager:
             directory = self.service.studio_dir(project, f"tasks/{key}")
             request_file = directory / "request.json"
             request = read_json(request_file)
+            request["settings"].update(self.registry.environment_settings(task["model"]))
             request["owner_pid"] = os.getpid()
             write_json(request_file, request)
             self._status(key, "running", runtime=self.registry.describe(task["model"])["health"])

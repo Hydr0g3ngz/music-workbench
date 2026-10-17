@@ -138,6 +138,18 @@
 [hidden] {
   display: none !important;
 }
+#tool-packs { margin-top: 40px; }
+#tools-intro { color: #c8d6d0; line-height: 1.8; }
+.tool-pack { margin-top: 20px; scroll-margin: 24px; }
+.tool-pack h3 { margin: 0; font-size: 23px; }
+.tool-badge { background: #30453a; color: #d6f3dd; padding: 6px 12px; border-radius: 6px; white-space: nowrap; font-size: 13px; }
+.tool-pack .tool-meta, .tool-pack .tool-verification { font-size: 14px; }
+.tool-pack .tool-error, #tools-error { color: #ffcf9d; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tool-error:empty, #tools-error:empty { display: none; }
+.tool-pack progress { width: 100%; accent-color: #b8f3cc; }
+.tool-pack .setup-actions { flex-wrap: wrap; }
+.tool-directory { overflow-wrap: anywhere; }
+.manual-models { padding: 24px 0; color: #c8d6d0; line-height: 1.8; }
 @media (max-width: 600px) {
   .setup-steps {
     gap: 12px;
