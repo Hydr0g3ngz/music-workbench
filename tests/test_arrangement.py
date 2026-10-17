@@ -38,7 +38,7 @@ def test_demo_real_audio_midi_export_and_reopen(client, tmp_path):
     prefix = f"/api/workstation/projects/{state['id']}"
     assert len(state["content"]["tracks"]) == 4
     assert len(state["assets"]) == 1
-    assert state["content"]["title"] == "Midnight Sketch"
+    assert state["content"]["title"] == "Session"
     for kind in ("wav", "mid"):
         export = client.post(prefix + "/export/" + kind, json={"revision": state["revision"]})
         assert export.status_code == 200, export.text
@@ -105,7 +105,7 @@ def test_history_conflicts_bounds_and_recoverable_delete(client):
     conflict = client.put(prefix, json={"revision": state["revision"], "content": previous})
     assert conflict.status_code == 409
     undone = client.post(prefix + "/history/undo", json={"revision": changed["revision"]}).json()
-    assert undone["content"]["title"] == "Midnight Sketch"
+    assert undone["content"]["title"] == "Session"
     redone = client.post(prefix + "/history/redo", json={"revision": undone["revision"]}).json()
     assert redone["content"]["title"] == "Changed"
     invalid = redone["content"]

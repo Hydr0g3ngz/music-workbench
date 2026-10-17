@@ -1,0 +1,57 @@
+.volume-dialog {
+  width: min(820px, 95vw);
+  max-height: 90vh;
+}
+.volume-body {
+  padding: 20px;
+  overflow: auto;
+  max-height: 75vh;
+}
+.volume-body p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.volume-body label {
+  display: grid;
+  gap: 7px;
+  flex: 1;
+}
+.volume-body select,
+.volume-body input {
+  width: 100%;
+  padding: 8px;
+  background: #18212a;
+  border: 1px solid #45525d;
+  border-radius: 6px;
+}
+.volume-body hr {
+  margin: 24px 0;
+  border: 0;
+  border-top: 1px solid #35404b;
+}
+.volume-row,
+.volume-presets {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  margin: 10px 0;
+}
+.volume-row button {
+  margin-bottom: 2px;
+}
+#volume-plot {
+  width: 100%;
+  height: 200px;
+  background: #131a22;
+  border: 1px solid #35404b;
+  border-radius: 10px;
+  touch-action: none;
+}
+#volume-plot circle {
+  cursor: grab;
+}
+#volume-points {
+  max-height: 180px;
+  overflow: auto;
+  margin-bottom: 16px;
+}

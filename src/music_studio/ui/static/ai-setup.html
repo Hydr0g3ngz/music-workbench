@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Music Workbench · AI</title>
+    <link rel="stylesheet" href="/welcome.css" />
+    <link rel="stylesheet" href="/ai-setup.css" />
+    <script src="/ai-setup.js" defer></script>
+  </head>
+  <body>
+    <main class="setup-page">
+      <header class="welcome-top">
+        <a href="/welcome.html">← Music Workbench</a
+        ><button id="language">English</button>
+      </header>
+      <p class="eyebrow">YOUR COMPUTER. YOUR CREATIVE TOOLS.</p>
+      <h1 id="title">让 AI 加入你的创作。</h1>
+      <p class="setup-intro" id="intro">
+        准备一次，以后直接创作。软件会自动下载、配置并实际生成一段音乐来验证。
+      </p>
+      <ol class="setup-steps">
+        <li id="step-check">检查电脑</li>
+        <li id="step-install">准备创作工具</li>
+        <li id="step-verify">生成音乐验证</li>
+      </ol>
+      <section class="setup-panel">
+        <div class="setup-panel-top">
+          <div>
+            <h2>ACE-Step 1.5</h2>
+            <p id="features">文字生成音乐 · 参考变奏 · 局部重绘</p>
+          </div>
+          <span id="badge">…</span>
+        </div>
+        <p id="hardware" aria-live="polite"></p>
+        <p id="space"></p>
+        <p id="reason" role="alert"></p>
+        <div class="install-progress" hidden>
+          <p id="stage" aria-live="polite"></p>
+          <progress id="progress" max="1" value="0"></progress>
+          <p id="progress-hint"></p>
+        </div>
+        <div class="setup-actions">
+          <button id="install" class="primary" disabled>检查中…</button
+          ><button id="cancel" hidden>暂停准备</button
+          ><a id="create" href="/welcome.html" hidden>开始创作 →</a>
+        </div>
+        <p class="setup-note" id="note">
+          首次需要联网，预计下载 8–12 GB。请预留 35 GB
+          可用空间，并保持软件打开。之后音乐在本机生成，无需账号。
+        </p>
+        <div id="verification" hidden>
+          <h3 id="preview-title">这台电脑生成的第一段音乐</h3>
+          <audio controls preload="none"></audio>
+          <p id="preview-copy">
+            验证通过后即可生成自己的素材，音乐质量仍由你试听和选择。
+          </p>
+        </div>
+        <details>
+          <summary id="details-title">存放位置与模型说明</summary>
+          <p id="directory"></p>
+          <p id="details-copy">
+            AI
+            工具单独保存，升级或卸载程序不会删除你的作品与模型。暂停后可继续，已下载并校验的文件会复用。
+          </p>
+          <a
+            href="https://github.com/ace-step/ACE-Step-1.5"
+            target="_blank"
+            rel="noreferrer"
+            >ACE-Step · MIT ↗</a
+          >
+        </details>
+        <details id="failure" hidden>
+          <summary id="failure-title">查看错误详情</summary>
+          <pre id="error"></pre>
+        </details>
+      </section>
+      <footer>
+        <a href="/welcome.html" id="skip">先用示例、录音和乐器创作 →</a
+        ><span id="local">你的工程和音频不会上传。</span>
+      </footer>
+    </main>
+  </body>
+</html>

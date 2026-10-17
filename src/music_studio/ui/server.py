@@ -500,6 +500,8 @@ class JobManager:
 
 def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=analyze) -> FastAPI:
     manager = JobManager(workspace, settings or Settings(), analyzer=analyzer)
+    from ..studio.ai_setup import AISetup
+    from ..studio.ai_setup import router as ai_setup_router
     from ..studio.arrangement import router as arrangement_router
     from ..studio.codex import CodexBridge
     from ..studio.codex import router as codex_router
@@ -508,6 +510,7 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
 
     studio = StudioService(workspace, manager.settings)
     codex = CodexBridge(studio)
+    ai_setup = AISetup()
 
     @asynccontextmanager
     async def lifespan(app):
@@ -516,6 +519,7 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
             yield
         finally:
             manager.close()
+            ai_setup.close()
             codex.shutdown()
             studio.close()
 
@@ -527,9 +531,17 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
 
     app.state.manager = manager
     app.state.studio = studio
+    @app.get("/api/workstation/instance")
+    def instance():
+        from ..desktop import workspace_id
+
+        return {"product": "music-workbench", "version": __version__,
+                "workspace": workspace_id(workspace), "ready": True}
+
     app.include_router(studio_router(studio))
     app.include_router(arrangement_router(studio, manager))
     app.include_router(codex_router(codex))
+    app.include_router(ai_setup_router(ai_setup))
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "[::1]"])
 
     @app.get("/api/studio/models")
@@ -950,13 +962,6 @@ def create_app(workspace: Path, settings: Settings | None = None, *, analyzer=an
 def serve(
     workspace: Path, settings: Settings, port: int, open_browser: bool, interface: str = "create"
 ):
-    import uvicorn
+    from ..desktop import run
 
-    if not 1024 <= port <= 65535:
-        raise ValueError("Port must be between 1024 and 65535")
-    if open_browser:
-        import webbrowser
-
-        entry = {"next": "/next.html", "create": "/station.html"}.get(interface, "/")
-        threading.Timer(1.0, lambda: webbrowser.open(f"http://127.0.0.1:{port}{entry}")).start()
-    uvicorn.run(create_app(workspace, settings), host="127.0.0.1", port=port)
+    return run(workspace, settings, port, open_browser, interface)

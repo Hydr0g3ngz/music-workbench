@@ -8,6 +8,10 @@
     typeof module !== "undefined" && module.exports
       ? require("./station-timing.js")
       : root.StationTiming;
+  const Envelope =
+    typeof module !== "undefined" && module.exports
+      ? require("./station-envelope.js")
+      : root.StationEnvelope;
   const uid = () =>
     typeof crypto !== "undefined"
       ? crypto.randomUUID().replaceAll("-", "").slice(0, 16)
@@ -42,6 +46,10 @@
     right.duration -= first;
     right.fade_in = 0;
     right.fade_out = Math.min(right.fade_out, right.duration);
+    if ((clip.volume_points || []).length) {
+      left.volume_points = Envelope.crop(clip, 0, first);
+      right.volume_points = Envelope.crop(clip, first, right.duration);
+    }
     return [left, right];
   }
   function midiBuffer(ctx, clip, bpm, instrument) {
@@ -616,9 +624,23 @@
                   clip.fade_out ? (clip.duration - s) / clip.fade_out : 1,
                 ),
             ) * amp;
-          level.gain.setValueAtTime(envelope(skip), begins);
-          for (const s of points.slice(1))
-            level.gain.linearRampToValueAtTime(envelope(s), begins + s - skip);
+          if (
+            (clip.volume_points || []).length ||
+            clip.fade_curve === "equal_power"
+          ) {
+            const count = Math.max(2, Math.ceil(length * 400) + 1);
+            const curve = Float32Array.from({ length: count }, (_, i) =>
+              Envelope.value(clip, skip + (i * length) / (count - 1)),
+            );
+            level.gain.setValueCurveAtTime(curve, begins, length);
+          } else {
+            level.gain.setValueAtTime(envelope(skip), begins);
+            for (const s of points.slice(1))
+              level.gain.linearRampToValueAtTime(
+                envelope(s),
+                begins + s - skip,
+              );
+          }
           source.start(begins, clip.offset + skip, length);
           this.nodes.push(source);
         }

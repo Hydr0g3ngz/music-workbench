@@ -1,0 +1,61 @@
+.learn-hero {
+  padding: 64px 0 44px;
+  max-width: 800px;
+}
+.learn-hero h1 {
+  font-size: clamp(30px, 4vw, 48px);
+  margin: 14px 0;
+  letter-spacing: -1px;
+}
+.learn-hero p {
+  line-height: 1.8;
+  color: #c4d3d6;
+}
+.learn-start {
+  background: #b1d8bd;
+  color: #15271c;
+  border: 0;
+  margin: 22px 0 10px;
+  font-weight: 650;
+  padding: 14px 20px;
+}
+.learn-hero small {
+  display: block;
+  color: #bacbd0;
+}
+.learn-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+.learn-grid section {
+  background: #1a252b;
+  border: 1px solid #394a50;
+  border-radius: 12px;
+  padding: 28px;
+}
+.learn-grid h2 {
+  font-size: 21px;
+  margin: 14px 0;
+}
+.learn-grid p {
+  color: #c8d5d8;
+  font-size: 15px;
+  line-height: 1.9;
+}
+.learn-wide {
+  grid-column: 1 / -1;
+}
+.learn-grid a {
+  color: #b1d8bd;
+  text-decoration: underline;
+}
+@media (max-width: 760px) {
+  .learn-grid {
+    grid-template-columns: 1fr;
+  }
+  .learn-hero {
+    padding-top: 36px;
+  }
+}

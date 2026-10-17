@@ -6,7 +6,14 @@
     previewEngine = new StationEngine(),
     generationAudio = new Audio(),
     colors = ["#b69aff", "#86c9bc", "#e7b985", "#8cabed", "#d592b5"];
-  let recordingPanel, timingPanel;
+  let recordingPanel,
+    timingPanel,
+    workflowPanel,
+    compositionPanel,
+    envelopePanel,
+    fitPanel,
+    auditionPanel,
+    tutorialPanel;
   const s = {
     session: null,
     track: null,
@@ -35,6 +42,10 @@
   let generationAudioKey = null,
     generationSubmitting = false;
   const words = {
+    generationKey: "Key",
+    generationMode: "Generation mode",
+    generationStrength: "Reference strength",
+    generationRegion: "Use loop range duration",
     cancel: "Cancel",
     timingTitle: "Loop and metronome",
     timingCopy:
@@ -139,8 +150,8 @@
       "Export the arrangement with track effects, levels, pan, clip fades and output limiting.",
     mixExport: "Stereo mix · 44.1 kHz",
     midiExport: "Instrument tracks · Notes, velocity and tempo",
-    projectFile: "Project snapshot",
-    projectExport: "JSON arrangement; audio assets remain on this computer",
+    projectFile: "Portable project · MWB",
+    projectExport: "Arrangement + audio + credits; restore in Projects",
   };
   const chinese = new WeakMap(),
     tr = (zh, en) => (s.lang === "zh" ? zh : en);
@@ -175,6 +186,8 @@
       ? Math.round(value / (beatSeconds() / 4)) * (beatSeconds() / 4)
       : value;
   function toast(message, error = false) {
+    const host = document.querySelector("dialog[open]") || document.body;
+    if ($("toast").parentElement !== host) host.append($("toast"));
     $("toast").textContent = message;
     $("toast").classList.toggle("error", error);
     $("toast").hidden = false;
@@ -215,7 +228,7 @@
   function guarded(fn) {
     return async (...args) => {
       try {
-        await fn(...args);
+        return await fn(...args);
       } catch (e) {
         toast(e.message, true);
       }
@@ -258,6 +271,7 @@
         : tr("✓ 已保存到本机", "✓ Saved locally");
   }
   function dirty() {
+    tutorialPanel?.observe();
     s.dirty = true;
     s.change++;
     savedLabel();
@@ -315,6 +329,7 @@
       s.generations = [];
     }
     s.session = session;
+    tutorialPanel?.attach(session.id);
     s.dirty = false;
     s.change = 0;
     if (selectLast) {
@@ -330,7 +345,7 @@
     localStorage.setItem("station-session", session.id);
     if (changedProject && duration(content()) > 0)
       s.zoom = Math.max(
-        12,
+        0.5,
         Math.min(
           38,
           ($("arranger").clientWidth - headWidth() - 15) /
@@ -401,6 +416,12 @@
     renderGrooves();
     updateHistoryButtons();
     savedLabel();
+    workflowPanel?.render();
+    compositionPanel?.render();
+    envelopePanel?.render();
+    fitPanel?.render();
+    auditionPanel?.render();
+    tutorialPanel?.render();
     $("session-summary").textContent = tr(
       `${content().tracks.length} 轨道 · ${s.session.assets.length} 音频素材`,
       `${content().tracks.length} tracks · ${s.session.assets.length} audio assets`,
@@ -456,7 +477,9 @@
     $("split").disabled = !selectedClip();
     $("duplicate").disabled = !selectedClip();
     $("delete-clip").disabled = !selectedClip();
+    fitPanel?.render();
     for (const t of content().tracks) for (const c of t.clips) drawClip(t, c);
+    workflowPanel?.render();
   }
   function drawClip(t, c) {
     const canvas = document.querySelector(`[data-wave="${c.id}"]`);
@@ -580,6 +603,7 @@
   const field = (label, key, value, attrs = "") =>
     `<label class="field-row"><span>${label}</span><input type="number" data-field="${key}" value="${Number(value.toFixed(6))}" ${attrs.replace(/step="[^"]+"/, 'step="any"')}></label>`;
   function renderInspector() {
+    workflowPanel?.render();
     const t = selectedTrack(),
       c = selectedClip();
     if (!t) {
@@ -610,6 +634,8 @@
         "beforeend",
         `<section class="inspector-section"><h3>${tr("选中音符", "SELECTED NOTE")}</h3>${field(tr("音高 · MIDI", "Pitch · MIDI"), "note.pitch", note.pitch, 'min="0" max="127" step="1"')}${field(tr("开始 · 拍", "Start · beats"), "note.start", note.start, 'min="0" max="3000" step=".25"')}${field(tr("时长 · 拍", "Length · beats"), "note.length", note.length, 'min=".001" max="3000" step=".25"')}${field(tr("力度", "Velocity"), "note.velocity", note.velocity, 'min="1" max="127" step="1"')}</section>`,
       );
+    workflowPanel?.enhanceInspector();
+    envelopePanel?.render();
   }
   const instrumentName = (k) =>
     s.library?.instruments.find((i) => i.id === k)?.title[
@@ -660,6 +686,8 @@
       .join("");
   }
   function stopPreview() {
+    fitPanel?.stop();
+    auditionPanel?.stop();
     previewEngine.pause();
     generationAudio.pause();
     clearTimeout(previewTimer);
@@ -788,6 +816,7 @@
   }
   function dock(name) {
     s.dock = name;
+    document.body.classList.toggle("piano-open", name === "piano");
     document.body.classList.toggle("effects-open", name === "effects");
     if (name === "effects") renderEffects();
     for (const key of ["mixer", "effects", "piano", "tasks"]) {
@@ -927,6 +956,7 @@
     toast(tr("导入操作完成", "Import complete"));
   }
   async function play() {
+    const tutorialProject = s.session.id;
     stopPreview();
     if (engine.playing || starting) {
       pause();
@@ -951,6 +981,7 @@
         s.position,
       );
       if (ok) {
+        tutorialPanel?.observe("listen", tutorialProject);
         s.position = engine.position;
         $("play").textContent = "Ⅱ";
         $("audio-status").textContent = tr("正在播放", "Playing");
@@ -1031,6 +1062,7 @@
     }).join("");
     $("piano").innerHTML =
       `<div class="piano-grid" style="width:${beats * beatWidth}px;height:${(high - low + 1) * 14}px;--note-step:${beatWidth / 4}px" data-beat-width="${beatWidth}" data-high="${high}" data-low="${low}">${keys}${c.notes.map((n, i) => `<button class="piano-note" data-note="${i}" aria-label="MIDI ${n.pitch}, ${n.start.toFixed(2)} beats" title="${tr("双击删除", "Double-click to remove")}" style="left:${n.start * beatWidth}px;top:${(high - n.pitch) * 14 + 1}px;width:${Math.max(4, n.length * beatWidth - 2)}px"></button>`).join("")}</div>`;
+    workflowPanel?.enhancePiano();
   }
   async function loadModels() {
     try {
@@ -1055,8 +1087,8 @@
         )
       : health
         ? tr(
-            "尚未安装。终端运行：python scripts/setup_ace.py，完成后重启工作台。",
-            "Not installed. Run python scripts/setup_ace.py, then restart the workbench.",
+            "本地 AI 生成尚未配置。可先用乐器和录音创作，或返回首页查看 AI 准备说明。",
+            "Local AI generation is not configured. Start with instruments or recording, or see AI setup on Home.",
           )
         : tr(
             "打开模型面板以检查本地环境",
@@ -1098,7 +1130,7 @@
               ? `${status} · ${t.progress.message}`
               : status,
           url = `${base()}/generations/${t.id}`;
-        return `<div class="task-row generation-task"><span><strong>✦ ${esc(t.model)} · ${t.parameters.duration}s</strong><small>${esc(t.parameters.prompt)}</small><small>${esc(detail)}</small>${t.metrics ? `<small>${t.metrics.total_seconds}s · ${t.metrics.peak_allocated_mib} MiB · Seed ${t.parameters.seed}</small>` : ""}</span>${t.status === "complete" ? `<button data-preview-generation="${t.id}">${playing ? "■ " + tr("停止", "Stop") : "▶ " + tr("试听", "Audition")}</button><button data-adopt-generation="${t.id}">${tr("加入工程", "Add track")}</button><a class="task-artifact" href="${url}/audio" download="ace-step-${t.id}.wav">WAV ↧</a>` : pending ? `<button data-cancel-generation="${t.id}">${tr("取消", "Cancel")}</button>` : ""}<button data-info-generation="${t.id}">${tr("参数与诊断", "Details")}</button></div>`;
+        return `<div class="task-row generation-task"><span><strong>✦ ${esc(t.model)} · ${t.parameters.duration}s</strong><small>${esc(t.user_prompt || t.parameters.prompt)}</small>${t.composition_context ? `<small>${tr("蓝图", "Blueprint")} r${t.composition_context.revision} · ${esc(t.composition_context.section?.name || tr("整首", "Whole piece"))}</small>` : ""}<small>${esc(detail)}</small>${t.metrics ? `<small>${t.metrics.total_seconds}s · ${t.metrics.peak_allocated_mib} MiB · Seed ${t.parameters.seed}</small>` : ""}</span>${t.status === "complete" ? `<button data-preview-generation="${t.id}">${playing ? "■ " + tr("停止", "Stop") : "▶ " + tr("试听", "Audition")}</button><button data-adopt-generation="${t.id}">${tr("加入播放头", "Add at playhead")}</button>${t.parameters.mode === "repaint" ? `<button data-adopt-generation="${t.id}" data-replace-source>${tr("采用重绘 · 可撤销", "Apply repaint · undoable")}</button>` : ""}${t.composition_context?.section ? `<button data-adopt-section-generation="${t.id}" title="${tr("放在原段落起点，保留素材全长；可继续裁剪", "Place at the original section start, retaining the full clip; trim afterward")}">${tr("加入段落起点", "Add at section start")}</button>` : ""}<a class="task-artifact" href="${url}/audio" download="ace-step-${t.id}.wav">WAV ↧</a>` : pending ? `<button data-cancel-generation="${t.id}">${tr("取消", "Cancel")}</button>` : ""}<button data-info-generation="${t.id}">${tr("参数与诊断", "Details")}</button></div>`;
       })
       .join("");
   }
@@ -1212,7 +1244,11 @@
   function canReplaceStems(task) {
     const clips = s.session?.content?.tracks?.flatMap((t) => t.clips) || [];
     const clip = clips.find((c) => c.id === task.source_clip?.id);
-    return clip && JSON.stringify(clip) === JSON.stringify(task.source_clip);
+    return (
+      clip &&
+      JSON.stringify(clip) === JSON.stringify(task.source_clip) &&
+      (!task.fit || task.fit.project_bpm === content().bpm)
+    );
   }
   function renderTasks() {
     $("task-count").textContent = [...s.tasks, ...s.generations].filter((t) =>
@@ -1223,12 +1259,12 @@
         s.tasks
           .map(
             (t) =>
-              `<div class="task-row"><span><strong>${esc(t.model)}</strong><small>${esc(t.error || taskLabel(t.status))}</small>${t.source_clip ? `<small>${esc(t.source_clip.name)} · ${t.source_clip.start.toFixed(2)}s · ${tr("完整素材处理，加入时保留片段裁剪", "Full source processed; clip trim retained on replacement")}</small>` : ""}</span>${t.status === "complete" && t.stage === "separate" && t.source_clip ? `<button data-adopt-stems="${t.id}" ${canReplaceStems(t) ? "" : "disabled"} title="${tr("源片段更改或移除后，需要先撤销再替换", "Undo source clip changes or removal before replacing")}">${tr("用分轨替换片段", "Replace clip with stems")}</button>` : ""}${
+              `<div class="task-row"><span><strong>${esc(t.model)}</strong><small>${esc(t.error || taskLabel(t.status))}</small>${t.source_clip ? `<small>${esc(t.source_clip.name)} · ${t.source_clip.start.toFixed(2)}s · ${tr("完整素材处理，采用时保留片段范围", "Full source processed; clip bounds retained on adoption")}</small>` : ""}</span>${t.status === "complete" && ["separate", "transform"].includes(t.stage) && t.source_clip ? `<button data-adopt-stems="${t.id}" ${canReplaceStems(t) ? "" : "disabled"} title="${tr("源片段更改或移除后，需要先撤销再替换", "Undo source clip changes or removal before replacing")}">${t.stage === "transform" ? tr("采用适配结果", "Adopt fitted result") : tr("用分轨替换片段", "Replace clip with stems")}</button>` : ""}${t.status === "complete" && t.stage === "melody" && t.source_clip ? `<button data-adopt-melody="${t.id}">${tr("旋律加入乐器轨", "Add melody as notes")}</button>` : ""}${
                 t.artifacts
                   .map((a) =>
                     a.kind === "audio"
                       ? `<button data-preview-task="${a.id}" data-project="${t.source_project}">${previewKey === "task:" + a.id ? "■" : "▶"} ${esc(taskLabel(a.role))}</button><button data-attach-task="${a.id}" data-project="${t.source_project}">${esc(taskLabel(a.role))} · ${tr("加入工程", "Add track")}</button>`
-                      : `<a class="task-artifact" href="/api/projects/${t.source_project}/studio/artifacts/${a.id}?download=true" download>${esc(taskLabel(a.role))} ↧</a>`,
+                      : `${a.role === "musical-analysis" ? `<button data-musical-report="${a.id}" data-project="${t.source_project}">${tr("查看素材分析", "View analysis")}</button>` : ""}<a class="task-artifact" href="/api/projects/${t.source_project}/studio/artifacts/${a.id}?download=true" download>${esc(taskLabel(a.role))} ↧</a>`,
                   )
                   .join("") ||
                 `<span class="task-state">${esc(t.status)}</span>`
@@ -1262,9 +1298,15 @@
     if (!$("project-dialog").open) $("project-dialog").showModal();
   }
   async function exportFile(kind) {
+    const tutorialProject = s.session.id;
     await flush();
     const button = $("export-" + (kind === "mid" ? "midi" : "wav"));
     button.disabled = true;
+    $("export-feedback").textContent = tr(
+      "正在渲染与测量输出，请稍候…",
+      "Rendering and measuring output…",
+    );
+    $("export-feedback").setAttribute("aria-busy", "true");
     try {
       toast(tr("正在导出…", "Rendering export…"));
       const result = await request(base() + "/export/" + kind, {
@@ -1274,10 +1316,19 @@
       link.href = result.url;
       link.download = "";
       link.click();
-      $("export-dialog").close();
+      if (result.measurements) {
+        const levels = result.measurements.levels,
+          loudness = result.measurements.loudness;
+        const peak =
+          levels.peak_dbfs === null ? "−∞" : levels.peak_dbfs.toFixed(1);
+        $("export-feedback").textContent =
+          `${tr("导出就绪", "Export ready")} · ${levels.duration.toFixed(2)}s · ${peak} dBFS · ${loudness?.integrated_lufs == null ? tr("LUFS 不可用", "LUFS unavailable") : loudness.integrated_lufs.toFixed(1) + " LUFS"} · ${loudness?.true_peak_dbtp == null ? "" : loudness.true_peak_dbtp.toFixed(1) + " dBTP"}`;
+      } else $("export-dialog").close();
       toast(tr("导出完成", "Export ready"));
+      if (kind === "wav") tutorialPanel?.observe("export", tutorialProject);
     } finally {
       button.disabled = false;
+      $("export-feedback").setAttribute("aria-busy", "false");
     }
   }
   document
@@ -1324,6 +1375,9 @@
     const ratio = content().bpm / bpm;
     if (
       (content().loop && (content().loop.end * 60) / bpm > 600 + 1e-9) ||
+      (content().sections || []).some(
+        (section) => (section.end * 60) / bpm > 600 + 1e-9,
+      ) ||
       content().tracks.some(
         (t) =>
           t.kind === "midi" &&
@@ -1336,8 +1390,8 @@
       $("bpm").value = content().bpm;
       return toast(
         tr(
-          "调速后的 MIDI 或循环区间超出 10 分钟范围，请先缩短工程",
-          "MIDI or loop range would exceed 10 minutes; shorten the session first",
+          "调速后的 MIDI、段落或循环区间超出 10 分钟范围，请先缩短工程",
+          "MIDI, section or loop range would exceed 10 minutes; shorten the session first",
         ),
         true,
       );
@@ -1351,6 +1405,7 @@
             c.start *= ratio;
             c.fade_in = Math.min(30, c.fade_in * ratio);
             c.fade_out = Math.min(30, c.fade_out * ratio);
+            for (const point of c.volume_points || []) point.time *= ratio;
           }
       content().bpm = bpm;
       renderGenerationHealth();
@@ -1494,7 +1549,7 @@
     if (s.dock === "piano") renderPiano();
   };
   $("zoom-out").onclick = () => {
-    s.zoom = Math.max(12, s.zoom / 1.3);
+    s.zoom = Math.max(0.5, s.zoom / 1.3);
     renderTracks();
     if (s.dock === "piano") renderPiano();
   };
@@ -1554,6 +1609,7 @@
       oldStart = c.start,
       oldDuration = c.duration,
       resizing = e.target.classList.contains("clip-handle");
+    const originalPoints = structuredClone(c.volume_points || []);
     let moved = false;
     const move = (event) => {
       const delta = (event.clientX - startX) / s.zoom;
@@ -1575,6 +1631,11 @@
         );
         c.fade_in = Math.min(c.fade_in, c.duration);
         c.fade_out = Math.min(c.fade_out, c.duration - c.fade_in);
+        c.volume_points = StationEnvelope.crop(
+          { ...c, volume_points: originalPoints },
+          0,
+          c.duration,
+        );
         el.style.width = `${Math.max(12, c.duration * s.zoom)}px`;
       } else {
         c.start = Math.max(
@@ -1733,7 +1794,11 @@
         ),
       );
     }
-    edit(() => (obj[key] = value), kind === "track");
+    edit(() => {
+      if (kind === "clip" && key === "duration")
+        obj.volume_points = StationEnvelope.crop(obj, 0, value);
+      obj[key] = value;
+    }, kind === "track");
     if (kind === "note") renderPiano();
   });
   $("inspector-content").oninput = $("inspector-content").onchange;
@@ -1908,13 +1973,35 @@
     toast(tr("任务已加入本地队列", "Task queued locally"));
   });
   $("tasks").onclick = guarded(async (e) => {
+    const report = e.target.closest("[data-musical-report]");
+    if (report)
+      return workflowPanel.showReport(
+        report.dataset.project,
+        report.dataset.musicalReport,
+      );
+    const melody = e.target.closest("[data-adopt-melody]");
+    if (melody) {
+      stopPreview();
+      pause();
+      await flush();
+      accept(
+        await request(
+          `${base()}/processing/${melody.dataset.adoptMelody}/adopt-melody`,
+          { revision: s.session.revision },
+        ),
+        { selectLast: true },
+      );
+      dock("piano");
+      return;
+    }
     const generation = e.target.closest(
-      "[data-preview-generation], [data-adopt-generation], [data-cancel-generation], [data-info-generation]",
+      "[data-preview-generation], [data-adopt-generation], [data-adopt-section-generation], [data-cancel-generation], [data-info-generation]",
     );
     if (generation) {
       const id =
         generation.dataset.previewGeneration ||
         generation.dataset.adoptGeneration ||
+        generation.dataset.adoptSectionGeneration ||
         generation.dataset.cancelGeneration ||
         generation.dataset.infoGeneration;
       if (generation.dataset.infoGeneration) {
@@ -1934,13 +2021,19 @@
           await request(`${base()}/generations/${id}/adopt`, {
             revision: s.session.revision,
             at: snap(s.position),
+            target_section: !!generation.dataset.adoptSectionGeneration,
+            replace_source: generation.hasAttribute("data-replace-source"),
           }),
           { selectLast: true },
         );
         toast(
           tr(
-            "生成草稿已加入新轨道，可撤销",
-            "Draft added as a new track; you can undo",
+            generation.hasAttribute("data-replace-source")
+              ? "局部重绘已采用，可撤销恢复原片段"
+              : "生成草稿已加入新轨道，可撤销",
+            generation.hasAttribute("data-replace-source")
+              ? "Repaint applied; undo restores the original clip"
+              : "Draft added as a new track; you can undo",
           ),
         );
       }
@@ -2003,9 +2096,54 @@
     $("generation-lyrics").required = !$("generation-instrumental").checked;
   };
   $("open-generation").onclick = guarded(async () => {
+    $("generation-key").innerHTML =
+      '<option value="">Auto</option>' +
+      StationEdit.keyNames
+        .flatMap((k) =>
+          ["major", "minor"].map(
+            (mode) => `<option value="${k} ${mode}">${k} ${mode}</option>`,
+          ),
+        )
+        .join("");
+    $("generation-key").value = content().key || "";
+    const reference = selectedClip();
+    const canVary =
+      reference?.asset && reference.duration >= 10 && reference.duration <= 60;
+    $("generation-mode").querySelector('[value="cover"]').disabled = !canVary;
+    $("generation-mode").querySelector('[value="repaint"]').disabled = !canVary;
+    if (canVary) {
+      $("repaint-start").value = Math.min(4, reference.duration / 3);
+      $("repaint-end").value = Math.min(8, (reference.duration * 2) / 3);
+      $("repaint-end").max = reference.duration;
+    }
+    if (!canVary) $("generation-mode").value = "text2music";
+    $("generation-context").textContent = tr(
+      `工程 ${content().bpm} BPM · ${content().key || "未指定调性"}。这些是生成条件，采用前仍需分析和试听。`,
+      `Session ${content().bpm} BPM · ${content().key || "unspecified key"}. These are requested conditions; analyze and audition the output.`,
+    );
+    if (canVary)
+      $("generation-context").textContent += tr(
+        ` 变奏参考：${reference.name}，${reference.duration.toFixed(2)} 秒。`,
+        ` Variation source: ${reference.name}, ${reference.duration.toFixed(2)} s.`,
+      );
+    compositionPanel.prepareGeneration();
     $("generation-dialog").showModal();
     await loadModels();
   });
+  $("generation-use-region").onclick = () => {
+    const loop = content().loop || { start: 0, end: 16 };
+    const seconds = ((loop.end - loop.start) * 60) / content().bpm;
+    const length = Math.max(10, Math.min(60, Math.round(seconds)));
+    const option = document.createElement("option");
+    option.value = length;
+    option.textContent = length + " s · region";
+    $("generation-duration").append(option);
+    $("generation-duration").value = length;
+    $("generation-context").textContent = tr(
+      `范围 ${seconds.toFixed(2)} 秒 → 请求 ${length} 秒（模型支持整数 10–60 秒），采用时需裁剪。`,
+      `Range ${seconds.toFixed(2)} s → requested ${length} s (integer 10–60 s supported); trim on adoption.`,
+    );
+  };
   document.querySelectorAll("[data-generation-preset]").forEach(
     (button) =>
       (button.onclick = () => {
@@ -2033,16 +2171,7 @@
           );
         await request(base() + "/generations", {
           revision: s.session.revision,
-          prompt: $("generation-prompt").value,
-          lyrics: $("generation-lyrics").value,
-          instrumental: $("generation-instrumental").checked,
-          duration: Number($("generation-duration").value),
-          bpm: Math.round(content().bpm),
-          seed: Number($("generation-seed").value),
-          steps: Number($("generation-steps").value),
-          language: $("generation-instrumental").checked
-            ? "unknown"
-            : $("generation-language").value,
+          ...compositionPanel.generationPayload(),
         });
         if (s.session.id === project) {
           $("generation-dialog").close();
@@ -2092,18 +2221,27 @@
     $("export-dialog").close();
   });
   $("export-project").onclick = guarded(async () => {
-    await flush();
-    const url = URL.createObjectURL(
-      new Blob([JSON.stringify(s.session, null, 2)], {
-        type: "application/json",
-      }),
+    const button = $("export-project");
+    button.disabled = true;
+    $("export-feedback").textContent = tr(
+      "正在打包工程与音频…",
+      "Packing project and audio…",
     );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "music-studio-session.json";
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    $("export-dialog").close();
+    $("export-feedback").setAttribute("aria-busy", "true");
+    try {
+      await flush();
+      const result = await request(base() + "/pack", {
+        revision: s.session.revision,
+      });
+      const link = document.createElement("a");
+      link.href = result.url;
+      link.download = "";
+      link.click();
+      $("export-dialog").close();
+    } finally {
+      button.disabled = false;
+      $("export-feedback").setAttribute("aria-busy", "false");
+    }
   });
   document
     .querySelectorAll(".close-dialog")
@@ -2142,7 +2280,7 @@
       e.preventDefault();
       $(e.shiftKey ? "redo" : "undo").click();
     }
-    if (e.key === "Delete" || e.key === "Backspace") {
+    if (!e.defaultPrevented && (e.key === "Delete" || e.key === "Backspace")) {
       e.preventDefault();
       removeClip();
     }
@@ -2153,6 +2291,18 @@
       e.returnValue = "";
     }
   });
+  window.WorkbenchDesktop = {
+    async prepareClose() {
+      if (recordingPanel?.busy() || recordingPanel?.hasUnsavedTake())
+        throw Error(
+          tr(
+            "请先完成录音并保留录音结果",
+            "Finish and keep your recording first",
+          ),
+        );
+      await flush();
+    },
+  };
   engine.onerror = (error) => {
     pause();
     toast(error.message, true);
@@ -2264,6 +2414,138 @@
       });
     },
   });
+  workflowPanel = StationWorkflow.mount({
+    $,
+    s,
+    tr,
+    esc,
+    uid,
+    content,
+    selectedClip,
+    selectedTrack,
+    mutate,
+    renderAll,
+    renderPiano,
+    renderInspector,
+    pause,
+    seek,
+    request,
+    base,
+    flush,
+    accept,
+    dock,
+    pollTasks,
+    toast,
+    guarded,
+    engine,
+    headWidth,
+    openBeatFit: (report, clip) => fitPanel.open(report, clip),
+  });
+  compositionPanel = StationCompositionUI.mount({
+    $,
+    s,
+    tr,
+    esc,
+    content,
+    uid,
+    mutate,
+    flush,
+    request,
+    base,
+    guarded,
+    toast,
+    selectedClip,
+    selectedTrack,
+    seek,
+  });
+  envelopePanel = StationEnvelopeUI.mount({
+    $,
+    tr,
+    esc,
+    content,
+    selectedClip,
+    mutate,
+    flush,
+    guarded,
+    toast,
+  });
+  fitPanel = StationFitUI.mount({
+    $,
+    s,
+    tr,
+    esc,
+    content,
+    selectedClip,
+    flush,
+    request,
+    base,
+    guarded,
+    pause,
+    stopPreview,
+    pollTasks,
+    dock,
+    toast,
+  });
+  auditionPanel = StationAudition.mount({
+    $,
+    s,
+    tr,
+    esc,
+    selectedClip,
+    content,
+    request,
+    base,
+    flush,
+    guarded,
+    pollTasks,
+    pause,
+    stopPreview,
+  });
+  tutorialPanel = StationTutorial.mount({
+    document,
+    storage: localStorage,
+    tr,
+    content,
+    action: guarded(async (step) => {
+      if (step === "listen") return "#play";
+      if (step === "layers") return "[data-toggle='solo']";
+      if (step === "melody") {
+        const track = content().tracks.find(
+          (t) => t.kind === "midi" && t.clips.length,
+        );
+        if (!track)
+          return toast(
+            tr(
+              "先从首页打开可编辑示例，或添加一个乐器片段。",
+              "Open the editable example from Home, or add an instrument clip first.",
+            ),
+          );
+        s.track = track.id;
+        s.clip = track.clips[0].id;
+        renderAll();
+        dock("piano");
+        return "#piano";
+      }
+      if (step === "balance") {
+        dock("mixer");
+        return "#mixer";
+      }
+      if (step === "export") {
+        $("export-dialog").showModal();
+        return "#export-wav";
+      }
+      if (step === "manual") {
+        await flush();
+        location.href = "/learn.html";
+      }
+      if (step === "ai") {
+        await flush();
+        if (s.generationHealth?.available) $("open-generation").click();
+        else location.href = "/ai-setup.html";
+      }
+    }),
+  });
+  $("open-tutorial").onclick = () => tutorialPanel.show();
   guarded(async () => {
     localize();
     s.library = await request("/api/workstation/library");
@@ -2273,9 +2555,19 @@
       key =
         new URLSearchParams(location.search).get("session") ||
         localStorage.getItem("station-session");
+    const start = new URLSearchParams(location.search).get("start");
     const exists = sessions.find((p) => p.id === key) || sessions[0];
     if (exists) accept(exists);
     else await create();
+    if (start) {
+      if (start === "example") tutorialPanel.show();
+      const clean = new URL(location.href);
+      clean.searchParams.delete("start");
+      history.replaceState({}, "", clean);
+      if (start === "ai") $("open-generation").click();
+      if (start === "recording")
+        document.querySelector('[data-view="assets"]').click();
+    }
     animate();
     setInterval(() => {
       if (

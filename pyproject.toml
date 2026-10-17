@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "music-workbench-local"
-version = "0.2.0.dev7"
+version = "0.2.0.dev14"
 description = "Local music workstation: composition, arrangement, mixing and open audio models."
 keywords = ["audio", "music", "speech-enhancement", "transcription", "midi", "mcp", "local-first"]
 readme = "README.md"
@@ -22,6 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+workstation = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "python-multipart>=0.0.20,<0.1", "av>=14,<17", "pyebur128==0.1.1"]
 audio = ["av>=14,<17", "pyebur128==0.1.1", "sherpa-onnx==1.13.8"]
 cleanup = ["av>=14,<17", "pyebur128==0.1.1", "sherpa-onnx==1.13.8"]
 agent = ["mcp>=1.28,<2"]

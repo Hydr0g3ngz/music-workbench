@@ -12,7 +12,12 @@ def inspect_midi(raw):
     if len(raw) > 8 * 1024 * 1024:
         raise StudioError("MIDI upload limit is 8 MiB", 413)
     try:
-        midi = mido.MidiFile(file=io.BytesIO(raw), clip=False)
+        # MIDI has no text-encoding flag. Prefer Unicode files we export while
+        # retaining names in older Latin-1 files without dropping metadata.
+        try:
+            midi = mido.MidiFile(file=io.BytesIO(raw), clip=False, charset="utf-8")
+        except UnicodeDecodeError:
+            midi = mido.MidiFile(file=io.BytesIO(raw), clip=False, charset="latin-1")
         if midi.type == 2 or midi.ticks_per_beat <= 0:
             raise StudioError("Independent type-2 sequences and SMPTE MIDI are not supported")
         if len(midi.tracks) > 128:

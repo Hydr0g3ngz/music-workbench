@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Music Workbench · 开始创作</title>
+    <link rel="stylesheet" href="/welcome.css" />
+    <script defer src="/welcome.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="wordmark" href="/welcome.html">◒ music workbench</a>
+        <div>
+          <span id="local-status">LOCAL / 本地创作</span
+          ><button id="welcome-language">English</button>
+        </div>
+      </header>
+      <section class="welcome-hero">
+        <div>
+          <p class="eyebrow">A LITTLE IDEA. YOUR NEXT TRACK.</p>
+          <h1 id="welcome-title">从一个小灵感，<br />做出自己的音乐。</h1>
+          <p id="welcome-intro">
+            不必先懂乐理。先听一段、改一个音，再让想法长成作品。
+          </p>
+          <p class="privacy" id="welcome-privacy">
+            作品自动保存在本机 · 基础创作无需登录或下载模型
+          </p>
+        </div>
+        <div class="record-art" aria-hidden="true">
+          <div class="record">
+            <span>PLAY<br />MAKE<br />REPEAT</span>
+          </div>
+          <div class="bars">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+      </section>
+      <section class="start-grid" aria-label="开始方式">
+        <button id="start-example" class="start-card featured">
+          <span class="card-number">01 / START HERE</span
+          ><strong id="example-title">跟着做出第一段音乐</strong>
+          <p id="example-copy">
+            五步跟练：试听、认识音轨、改一个音、调混音、导出。无需乐理基础。
+          </p>
+          <span class="card-foot" id="example-foot"
+            >无需模型，立即开始 ↗</span
+          ></button
+        ><button id="start-recording" class="start-card">
+          <span class="card-number">02 / YOUR SOUND</span
+          ><strong id="recording-title">从自己的录音开始</strong>
+          <p id="recording-copy">
+            导入哼唱、乐器或音频片段，剪辑、叠加与混音。
+          </p>
+          <span class="card-foot" id="recording-foot"
+            >WAV · MP3 · FLAC… ↗</span
+          ></button
+        ><button id="start-ai" class="start-card">
+          <span class="card-number">03 / CO-CREATE</span
+          ><strong id="ai-title">和本地 AI 一起创作</strong>
+          <p id="ai-copy">
+            描述音乐、生成素材、做参考变奏或局部重绘，再由你编排。
+          </p>
+          <span class="card-foot" id="ai-foot">正在检查本地模型…</span>
+        </button>
+      </section>
+      <section class="recent">
+        <div class="section-title">
+          <h2 id="recent-title">接着上次的灵感</h2>
+          <button id="start-empty">空白工程 ＋</button>
+        </div>
+        <div id="recent-projects"></div>
+      </section>
+      <p id="welcome-error" role="alert"></p>
+      <p class="welcome-handbook">
+        <a href="/learn.html" id="welcome-handbook"
+          >入门手册 / Beginner guide ↗</a
+        >
+      </p>
+      <footer>
+        <span id="welcome-footer"
+          >你决定音乐的方向。AI 是工具，作品属于你的创作过程。</span
+        ><a
+          href="https://github.com/Hydr0g3ngz/music-workbench"
+          target="_blank"
+          rel="noreferrer"
+          >GitHub ↗</a
+        >
+      </footer>
+    </main>
+  </body>
+</html>

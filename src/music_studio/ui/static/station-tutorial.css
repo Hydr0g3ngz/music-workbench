@@ -1,0 +1,120 @@
+.creation-lesson {
+  position: fixed;
+  left: 64px;
+  bottom: 38px;
+  width: 318px;
+  max-width: calc(100vw - 80px);
+  max-height: calc(100dvh - 95px);
+  overflow: auto;
+  z-index: 25;
+  color: #f1f3fa;
+  background: #232630;
+  border: 1px solid #8f82b5;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px #0008;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.creation-lesson header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #42414e;
+  font-weight: 600;
+}
+.creation-lesson header button {
+  padding: 0 7px;
+  font-size: 19px;
+}
+.lesson-body {
+  padding: 16px;
+}
+.creation-lesson.collapsed .lesson-body {
+  display: none;
+}
+.creation-lesson h2 {
+  margin: 12px 0 8px;
+  font-size: 18px;
+}
+.creation-lesson p {
+  color: #d6d8e3;
+  margin: 0 0 14px;
+}
+.creation-lesson .lesson-evidence {
+  font-size: 12px;
+  color: #bcdcc9;
+  margin: 10px 0;
+}
+.creation-lesson .lesson-primary {
+  display: block;
+  padding: 9px 12px;
+  background: #c5b3ff;
+  color: #251c37;
+  border-radius: 6px;
+  font-weight: 650;
+}
+.lesson-nav {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 14px 0;
+}
+.lesson-nav button {
+  padding: 3px 0;
+}
+.creation-lesson .lesson-manual {
+  display: block;
+  font-size: 12px;
+  color: #d0c2ff;
+  text-decoration: underline;
+  margin-top: 12px;
+  padding: 0;
+}
+.creation-lesson small {
+  display: block;
+  font-size: 11px;
+  margin-top: 8px;
+  color: #bfc0d0;
+}
+.lesson-dots {
+  display: flex;
+  gap: 5px;
+}
+.lesson-dots i {
+  height: 4px;
+  flex: 1;
+  background: #525363;
+  border-radius: 3px;
+}
+.lesson-dots .current {
+  background: #d2c3ff;
+}
+.lesson-dots .done {
+  background: #9cd6b0;
+}
+.lesson-dots .skipped {
+  background: #c9ad79;
+}
+.lesson-highlight {
+  outline: 3px solid #b6e9c4 !important;
+  outline-offset: 3px;
+}
+@media (max-height: 740px) {
+  .creation-lesson {
+    width: 294px;
+  }
+  .lesson-body {
+    padding: 12px 16px;
+  }
+  .creation-lesson h2 {
+    font-size: 16px;
+    margin-top: 8px;
+  }
+}
+@media (max-width: 760px) {
+  .creation-lesson {
+    left: 52px;
+    bottom: 32px;
+  }
+}

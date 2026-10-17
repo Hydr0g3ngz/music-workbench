@@ -19,6 +19,48 @@ from .process import TaskStopped, log_tail, run_owned
 from .service import StudioError
 
 CATALOG = {
+    "musical-analysis": {
+        "title": ["素材速度、调性与电平分析", "Material tempo, key & levels"],
+        "description": [
+            "Librosa 全局估计；报告节拍与调性分差。可能存在半速/倍速与转调误判。"
+            "DSP，无神经权重。",
+            "Global librosa estimates with beats and key margin. Tempo/key may be ambiguous. "
+            "DSP, no neural weights.",
+        ],
+        "runtime": "inference",
+        "imports": ["librosa", "scipy", "soundfile"],
+        "stage": "musical",
+        "device": "cpu",
+        "license": "ISC (librosa)",
+        "source": "https://github.com/librosa/librosa",
+    },
+    "time-pitch": {
+        "title": ["素材独立变速与变调", "Independent time & pitch"],
+        "description": [
+            "Librosa 相位声码器；生成候选后试听替换，可撤销。DSP，复杂音乐可能出现瞬态失真。",
+            "Librosa phase vocoder. Audition before reversible replacement. "
+            "DSP; transients may smear.",
+        ],
+        "runtime": "inference",
+        "imports": ["librosa", "scipy", "soundfile"],
+        "stage": "transform",
+        "device": "cpu",
+        "license": "ISC (librosa)",
+        "source": "https://github.com/librosa/librosa",
+    },
+    "demucs-four-stems": {
+        "title": ["四分轨 · 鼓 / 贝斯 / 人声 / 其他", "Four stems · drums / bass / vocals / other"],
+        "description": [
+            "Demucs htdemucs；对齐四条音轨，可独立编排、混音与替换。",
+            "Demucs htdemucs. Four aligned stems for rearrangement and mixing.",
+        ],
+        "runtime": "inference",
+        "imports": ["torch", "torchaudio", "demucs.pretrained", "demucs.apply"],
+        "stage": "separate",
+        "license": "MIT",
+        "weight_id": "955717e8-8726e21a",
+        "source": "https://github.com/facebookresearch/demucs",
+    },
     "mel-band-roformer-kj": {
         "title": [
             "分离人声与伴奏 · Mel-Band RoFormer",

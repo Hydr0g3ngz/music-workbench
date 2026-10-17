@@ -1,0 +1,228 @@
+.workflow-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--line);
+  background: #20212a;
+  flex-shrink: 0;
+}
+.workflow-toolbar button,
+.note-tools button,
+.section-list button {
+  border: 1px solid #444353;
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-size: 10px;
+  color: #d5cce9;
+  background: #292834;
+}
+.workflow-toolbar button:last-child {
+  margin-left: auto;
+  color: #b7ded5;
+}
+.note-tools {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  background: #24232e;
+  border-bottom: 1px solid #494354;
+  padding: 7px 10px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 100%;
+  font-size: 10px;
+  min-height: 38px;
+}
+.note-tools small {
+  color: #a9a4b8;
+  width: 100%;
+  font-size: 9px;
+}
+.note-tools label {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.note-tools input {
+  width: 55px;
+}
+.note-tools input,
+.note-tools select {
+  background: #171720;
+  border: 1px solid #484153;
+  color: #e6dcf4;
+  border-radius: 4px;
+  padding: 4px;
+}
+.piano-note {
+  touch-action: none;
+  cursor: move;
+  opacity: calc(0.45 + var(--velocity, 1) * 0.55);
+}
+.piano-note.note-selected {
+  background: #e5d7ff;
+  box-shadow: 0 0 0 1px #fff;
+  opacity: 1;
+}
+.note-resize {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 7px;
+  height: 100%;
+  cursor: ew-resize;
+  border-right: 2px solid #fff9;
+}
+.scale-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: #a884ee0b;
+  pointer-events: none;
+}
+.note-marquee {
+  position: absolute;
+  border: 1px solid #c9b4ff;
+  background: #b48cff28;
+  pointer-events: none;
+  z-index: 5;
+}
+.section-band {
+  position: absolute;
+  top: 14px;
+  height: 16px;
+  line-height: 14px;
+  background: #71618766;
+  border-left: 2px solid #bd9eea;
+  color: #eee4ff;
+  font-size: 9px;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 5px;
+  z-index: 2;
+}
+#section-dialog,
+#material-dialog {
+  width: min(640px, 94vw);
+}
+.workflow-fields {
+  display: flex;
+  gap: 14px;
+  align-items: end;
+  margin: 16px 0;
+}
+.workflow-fields label {
+  flex: 1;
+}
+.workflow-fields input,
+#section-form input {
+  display: block;
+  width: 100%;
+  background: #242430;
+  border: 1px solid #454154;
+  padding: 9px;
+  color: #eee5ff;
+  border-radius: 5px;
+  margin-top: 7px;
+  font: inherit;
+}
+.workflow-fields button {
+  border: 1px solid #625475;
+  padding: 9px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.section-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 15px 0;
+}
+.section-list > div {
+  display: flex;
+}
+.section-list button + button {
+  color: #efb2b2;
+}
+.workflow-models {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.workflow-models button {
+  padding: 12px;
+  border: 1px solid #51485f;
+  border-radius: 7px;
+  text-align: left;
+  background: #292533;
+  font-size: 12px;
+}
+.workflow-models small {
+  display: block;
+  color: #a39aaf;
+  margin-top: 5px;
+  font-size: 10px;
+}
+.analysis-summary {
+  display: flex;
+  gap: 25px;
+  font-size: 24px;
+  margin: 20px 0;
+}
+#material-body pre {
+  font-size: 10px;
+  max-height: 220px;
+  overflow: auto;
+  color: #b5bbca;
+}
+#section-feedback {
+  font-size: 11px;
+  color: #a9d5c6;
+  margin-top: 10px;
+}
+.musical-position {
+  padding-top: 0;
+}
+body.piano-open {
+  --dock-height: min(430px, 48vh);
+}
+.task-row {
+  flex-wrap: wrap;
+}
+.task-row > span:first-child {
+  flex: 1 1 100%;
+}
+.task-row button {
+  flex-shrink: 0;
+}
+.piano-grid {
+  isolation: isolate;
+}
+.piano-note {
+  z-index: 2;
+}
+.piano-key {
+  z-index: 3;
+}
+@media (max-width: 900px) {
+  .workflow-toolbar {
+    padding: 5px 8px;
+    gap: 4px;
+  }
+  .workflow-toolbar button {
+    font-size: 9px;
+    padding: 5px;
+  }
+  .workflow-fields {
+    flex-wrap: wrap;
+  }
+  .note-tools {
+    gap: 4px;
+  }
+}

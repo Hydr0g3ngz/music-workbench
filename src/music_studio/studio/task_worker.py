@@ -83,7 +83,7 @@ def execute(request):
 
         random.seed(config["seed"])
         np.random.seed(config["seed"])
-    if stage not in ("inspect", "rhythm", "loudness", "denoise"):
+    if stage not in ("inspect", "rhythm", "loudness", "denoise", "musical", "transform"):
         import torch
 
         torch.manual_seed(config["seed"])
@@ -108,7 +108,21 @@ def execute(request):
     def artifact(role, kind, relative, mime):
         artifacts.append({"role": role, "kind": kind, "file": relative, "mime": mime})
 
-    if stage == "inspect":
+    if stage == "musical":
+        from .musical import analyze
+
+        write_json(output / "musical.json", analyze(source))
+        artifact("musical-analysis", "json", "musical.json", "application/json")
+    elif stage == "transform":
+        from .musical import transform
+
+        report = transform(
+            source, output / "transformed.wav", config["time_ratio"], config["pitch_shift"]
+        )
+        write_json(output / "transform.json", report)
+        artifact("transformed", "audio", "transformed.wav", "audio/wav")
+        artifact("transform-report", "json", "transform.json", "application/json")
+    elif stage == "inspect":
         from .dsp import inspect_audio
 
         write_json(output / "levels.json", inspect_audio(source))
@@ -141,7 +155,12 @@ def execute(request):
         report = separate(source, output, config)
         write_json(output / "separation.json", report)
         artifact("separation-report", "json", "separation.json", "application/json")
-        for role in ("vocals", "instrumental"):
+        roles = (
+            ("drums", "bass", "vocals", "other")
+            if model == "demucs-four-stems"
+            else ("vocals", "instrumental")
+        )
+        for role in roles:
             artifact(role, "audio", f"audio/{role}.wav", "audio/wav")
     elif stage == "lyrics":
         from ..backends.lyrics import transcribe

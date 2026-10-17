@@ -1,5 +1,88 @@
 # Changelog / 更新记录
 
+## 0.2.0.dev14 — Your first sketch / 五步完成第一段音乐
+
+An in-app bilingual lesson follows real playback, mute/solo, note edits, mixing and
+successful WAV rendering. Resume per project, collapse/close, go back, explicitly skip,
+or repeat without changing the music. Completion distinguishes performed and skipped
+actions. An offline beginner handbook covers the track roles, piano roll, mix/export
+and the optional local-AI path. Home creates an independent editable example.
+
+软件内新增五步跟练与离线中英入门手册，实际操作后点亮步骤；进度按工程保留。
+Windows 安装器、自带运行时、高 DPI 修复、ACE-Step 自动环境等 dev8–dev13 改进
+一并进入本次公开预览版，原有工程与独立 Music Studio 项目保留。
+
+## 0.2.0.dev13 — Windows app and guided AI setup / 安装即用与 AI 自动配置
+
+Per-user Windows installer with a bundled basic runtime and offline WebView2 prerequisite.
+The workstation opens in one native window. Add per-monitor V2 DPI awareness, reset zoom,
+display diagnostics, higher-contrast secondary text and a pixel-density-aware beat-fit waveform.
+
+Graphical ACE-Step preparation checks GPU/disk, installs a separate embedded Python/CUDA
+environment, verifies pinned source/checkpoints, and publishes readiness only after a real
+12-second generation. Pause/retry/close recovery retain verified downloads. Other model
+environments still use their documented setup paths. Projects/models remain outside program files.
+
+新增 Windows 安装器、独立软件窗口与高 DPI 显示；AI 自动配置首批支持 ACE-Step，
+需要兼容 NVIDIA 显卡。基础创作无需 Python 或命令行，模型下载在软件内单独进行。
+
+
+## 0.2.0.dev11 — Start creating locally / 更容易开始创作
+
+Windows portable preview with application-local CPython, native bilingual launcher, readiness checks, workspace reuse, project/log shortcuts and browser fallback. Beginner Home provides editable examples, imports, model-aware AI setup guidance and recent projects. Models remain separate.
+
+Editable clip volume curves, linear/equal-power crossfades, crop/split/time-fit persistence, WAV rendering and project/history coverage. Actual ACE-Step region repaint pins dry source audio and context, preserves outside samples, supports in-place adoption and undo, and is accessible from transition editing.
+
+本地便携版、新手首页、音量曲线、交叉淡化及真实 AI 局部重绘。当前仍为开发预览；基础创作无需系统 Python，AI 环境另行配置。
+
+## 0.2.0.dev10 — Fit and compare material / 素材对拍与比较
+
+Beat-fit waveform, manual anchors, half/double-time choices, two-beat BPM calibration and
+previewable constant-tempo candidates. Alignment preserves pickups and checks the source clip
+and project tempo before adoption. Matched candidate A/B supports clips, generation and linked
+processing results with equal windows, integrated LUFS attenuation and preview peak headroom.
+Playback sources stay pinned across polling; source audio and arrangement settings are retained.
+Fix replay after A/B switching at the end and playback error state.
+
+新增对拍校准与等响度候选比较；支持从素材分析进入、参考拍对齐、原素材保留与撤销。
+两者均属于 DSP / 测量能力，不新增 AI 模型或自动强拍保证。
+见 [操作、基准与限制](docs/material-fitting.md)。
+
+## 0.2.0.dev9 — Intention to arrangement / 从意图到编排
+
+Editable project briefs, palettes, motifs, harmonic direction and section roles/relative energy.
+Three previewable structure sketches, deterministic layout observations and reversible edge fades.
+ACE-Step text/reference tasks read saved intentions through a shared preview/queue compiler;
+tasks pin full context, project revision and SHA256. Target placement rejects changed timing.
+Chinese/English UI, history and portable projects retain the optional metadata.
+
+将 Ableton、Berklee 的编曲方法落实为蓝图、段落发展和编排检查；AI 提示词读取同一作品上下文，
+可在生成前预览、生成后追溯。规则与模型生成明确区分，不对作品质量自动打分。
+详见 [方法与操作](docs/arranging-methods.md)。
+
+## 0.2.0.dev8 — AI production workflow / AI 创作流程
+
+Direct note drag/resize, multi-selection, group transpose/quantization/velocity, copy/paste,
+sections, cross-track range copying, bar positioning, scale hints and fit-to-song view.
+ACE-Step reference variations pin the selected cropped audio with hashes; Demucs four-part
+separation and CREPE-to-editable-MIDI adoption join the reversible arrangement workflow.
+Material tempo/key estimates and time/pitch editing are explicitly labeled DSP.
+Portable `.mwb` archives contain audio/arrangement/credits with checked restoration;
+WAV exports report sample levels plus optional LUFS/true peak. Packaging shows busy feedback.
+Reference generation and derived MIDI retain source attribution.
+
+补齐音符直接编辑、框选与批量操作、段落复制、小节定位和适配整首。
+新增参考变奏、四声部分离、单旋律 MIDI 入轨、DSP 素材适配、包含音频的便携工程与恢复，
+以及导出响度反馈。完成第二首 64 秒、9 轨 AI 创作实走，新目录恢复后 WAV 逐字节一致；
+浏览器输出捕获覆盖全曲，160 项 Python 与 56 项前端测试通过。仍无听感质量评级。
+详见 [创作记录](docs/creations/radio-through-the-clouds.md) 与 [工作流](docs/ai-production-workflow.md)。
+
+Original 32-bar composition walkthrough reorders the roadmap around note entry, sections,
+musical positioning, model-result compatibility and portable projects. Fix MIDI export for
+Chinese/Unicode track names; reimport recognizes UTF-8 with a legacy Latin-1 fallback.
+Failed MIDI writes remove partial download files, as WAV export already does.
+新增原创作品实走记录与验收方向；修复中文/Unicode 轨道名的 MIDI 导出、重新导入及失败残留。
+
 ## 0.2.0.dev7 — Loop and metronome / 循环与节拍器
 
 Custom beat-based loop ranges, selected-clip/whole-arrangement shortcuts, a visible ruler range,

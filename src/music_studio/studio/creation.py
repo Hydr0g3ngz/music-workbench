@@ -6,6 +6,7 @@ import re
 import threading
 import time
 from pathlib import Path
+from typing import Literal
 
 from filelock import FileLock, Timeout
 from pydantic import Field, model_validator
@@ -13,6 +14,7 @@ from pydantic import Field, model_validator
 from ..io import read_json, sha256, write_json
 from . import dsp
 from .arrangement import Attach, Origin, uid
+from .composition import ContextRequest, compile_context
 from .models import RevisionRequest
 from .process import TaskStopped, log_tail, run_owned
 from .registry import child_environment
@@ -28,7 +30,7 @@ COMPONENTS = (
 PENDING = ("queued", "checking", "running", "cancelling")
 
 
-class Generate(RevisionRequest):
+class Generate(RevisionRequest, ContextRequest):
     prompt: str = Field(min_length=3, max_length=1200)
     lyrics: str = Field(default="", max_length=4000)
     instrumental: bool = True
@@ -38,29 +40,41 @@ class Generate(RevisionRequest):
     steps: int = Field(default=8, ge=1, le=16)
     language: str = Field(default="unknown", pattern=r"^(unknown|zh|en|ja|ko)$")
     key: str = Field(default="", max_length=30)
+    mode: Literal["text2music", "cover", "repaint"] = "text2music"
+    source_clip: str | None = Field(default=None, pattern=r"^[a-f0-9]{16}$")
+    reference_strength: float = Field(default=0.65, ge=0, le=1)
+    repaint_start: float = Field(default=0, ge=0, le=59.5)
+    repaint_end: float = Field(default=4, ge=0.5, le=60)
+    repaint_blend: float = Field(default=0.1, ge=0, le=0.25)
 
     @model_validator(mode="after")
     def validate_text(self):
         self.prompt = self.prompt.strip()
         if len(self.prompt) < 3 or (not self.instrumental and not self.lyrics.strip()):
             raise ValueError("Describe the music; vocal drafts also need lyrics")
+        if (self.mode != "text2music") != (self.source_clip is not None):
+            raise ValueError("Audio variation requires a selected source clip")
+        if self.mode == "repaint" and self.repaint_end - self.repaint_start < 0.5:
+            raise ValueError("Select at least half a second to repaint")
         return self
 
 
 class Adopt(RevisionRequest):
     at: float = Field(default=0, ge=0, le=599)
+    target_section: bool = False
+    replace_source: bool = False
 
 
 def runtime():
-    config_path = Path(
-        os.environ.get("MUSIC_STUDIO_ACE_CONFIG", ".artifacts/acestep-runtime.json")
-    ).resolve()
-    if not config_path.is_file():
+    from .ai_setup import config_path
+
+    path = config_path()
+    if not path.is_file():
         raise StudioError(
-            "ACE-Step is not installed. Run python scripts/setup_ace.py, then restart the UI.",
+            "Local AI is not installed. Open AI setup from Home to install it.",
             503,
         )
-    config = read_json(config_path)
+    config = read_json(path)
     if not isinstance(config, dict) or any(
         not isinstance(config.get(key), str) or not config[key]
         for key in ("python", "source", "checkpoints", "source_revision", "model_revision")
@@ -180,6 +194,47 @@ class CreationManager:
             "profile": config.get("profile", "bf16-offload"),
             "worker_sha256": sha256(Path(__file__).with_name("ace_worker.py")),
         }
+        state = self.arrangement.get(project)
+        if state["revision"] != request.revision:
+            raise StudioError("Session changed; save before generating", 409)
+        compiled = compile_context(state, request.prompt, request)
+        if compiled["context"]:
+            data["user_prompt"] = request.prompt
+            data["composition_context"] = compiled["context"]
+            data["parameters"]["prompt"] = compiled["prompt"]
+            # Context has one authoritative tempo/key, identical to the pinned project.
+            data["parameters"]["bpm"] = round(state["content"]["bpm"])
+            data["parameters"]["key"] = state["content"].get("key", "")
+        if request.mode != "text2music":
+            import soundfile as sf
+
+            clip = next(
+                (
+                    c
+                    for t in state["content"]["tracks"]
+                    for c in t["clips"]
+                    if c["id"] == request.source_clip and c["asset"]
+                ),
+                None,
+            )
+            if not clip or not 10 <= clip["duration"] <= 60:
+                raise StudioError("Select a 10–60 second audio clip for variation")
+            if request.mode == "repaint" and request.repaint_end > clip["duration"]:
+                raise StudioError("Repaint region exceeds the selected clip")
+            path = self.arrangement.asset_path(project, clip["asset"])
+            target = self.directory(key) / "reference.wav"
+            with sf.SoundFile(path) as source:
+                source.seek(round(clip["offset"] * source.samplerate))
+                audio = source.read(
+                    round(clip["duration"] * source.samplerate), dtype="float32", always_2d=True
+                )
+                sf.write(target, audio, source.samplerate, subtype="FLOAT")
+            data["reference"] = {
+                "sha256": sha256(target),
+                "clip": clip,
+                "source_sha256": sha256(path),
+            }
+            data["parameters"]["duration"] = round(clip["duration"])
         with self.studio.transaction() as db:
             row = self.arrangement.row(db, project)
             self.studio._check_revision(row, request.revision)
@@ -198,6 +253,29 @@ class CreationManager:
             )
         self.wake.set()
         return self.get(project, key)
+
+    def preview(self, project, request):
+        state = self.arrangement.get(project)
+        if state["revision"] != request.revision:
+            raise StudioError("Session changed; save before previewing", 409)
+        compiled = compile_context(state, request.prompt, request)
+        duration = request.duration
+        if request.mode != "text2music":
+            clip = next(
+                (c for t in state["content"]["tracks"] for c in t["clips"]
+                 if c["id"] == request.source_clip and c["asset"]), None
+            )
+            if not clip or not 10 <= clip["duration"] <= 60:
+                raise StudioError("Select a 10–60 second audio clip for variation")
+            duration = round(clip["duration"])
+            if request.mode == "repaint" and request.repaint_end > clip["duration"]:
+                raise StudioError("Repaint region exceeds the selected clip")
+        return {
+            **compiled,
+            "bpm": round(state["content"]["bpm"]) if request.use_blueprint else request.bpm,
+            "key": state["content"].get("key", "") if request.use_blueprint else request.key,
+            "duration": duration,
+        }
 
     def _status(self, identity, status, **changes):
         with self.studio.transaction() as db:
@@ -245,17 +323,26 @@ class CreationManager:
                 raise StudioError("Generation backend changed while queued; submit a new draft")
             config = task["runtime"]
             worker = {**task, "output": str(directory / "output"), "owner_pid": os.getpid()}
+            if task.get("reference"):
+                reference = self.studio.safe_file(directory, "reference.wav")
+                if sha256(reference) != task["reference"]["sha256"]:
+                    raise StudioError("Pinned reference audio checksum changed")
+                worker["reference_audio"] = str(reference)
             write_json(directory / "worker.json", worker)
             self._status(key, "running")
+            arguments = [config["python"], "-X", "utf8", "-m",
+                         "music_studio.studio.ace_worker", str(directory / "worker.json")]
+            if config.get("managed"):
+                # Use the current app's worker after an app upgrade, while keeping
+                # sys.path in the isolated AI environment for all dependencies.
+                arguments = [config["python"], "-X", "utf8", "-c",
+                             "import music_studio,runpy,sys;"
+                             "music_studio.__path__=[sys.argv.pop(1)];"
+                             "runpy.run_module('music_studio.studio.ace_worker',run_name='__main__')",
+                             str(Path(__file__).resolve().parents[1]),
+                             str(directory / "worker.json")]
             code = run_owned(
-                [
-                    config["python"],
-                    "-X",
-                    "utf8",
-                    "-m",
-                    "music_studio.studio.ace_worker",
-                    str(directory / "worker.json"),
-                ],
+                arguments,
                 directory / "worker.log",
                 child_environment(config["checkpoints"]),
                 cancelled=lambda: self.cancelled(key),
@@ -267,6 +354,16 @@ class CreationManager:
                 raise TaskStopped("Generation cancelled")
             result = read_json(directory / "output/result.json")
             generated = self.studio.safe_file(directory / "output", result["file"])
+            if task["parameters"].get("mode") == "repaint":
+                from .repaint import splice
+
+                options = task["parameters"]
+                spliced = directory / "output/repaint-spliced.wav"
+                result["metrics"]["repaint"] = splice(
+                    directory / "reference.wav", generated, spliced,
+                    options["repaint_start"], options["repaint_end"], options["repaint_blend"],
+                )
+                generated = spliced
             info = dsp.inspect_audio(generated)
             if not 1 <= info["duration"] <= 70:
                 raise StudioError("Generation duration is outside the supported draft range")
@@ -343,25 +440,83 @@ class CreationManager:
 
     def adopt(self, project, identity, request):
         task = self.get(project, identity)
+        at = request.at
+        if request.target_section:
+            pinned = (task.get("composition_context") or {}).get("section")
+            state = self.arrangement.get(project)
+            current = next(
+                (s for s in state["content"].get("sections", [])
+                 if pinned and s["id"] == pinned["id"]), None
+            )
+            if (
+                not current
+                or any(current[k] != pinned[k] for k in ("start", "end"))
+                or state["content"]["bpm"] != task["composition_context"]["bpm"]
+            ):
+                raise StudioError("Target section timing changed; add at the playhead instead", 409)
+            at = current["start"] * 60 / state["content"]["bpm"]
         self.audio(project, identity)
+        reference = task.get("reference")
+        original = (reference or {}).get("clip", {}).get("origin") or {}
+        details = (
+            f"Model {MODEL_REVISION}; source {SOURCE_REVISION}; task {identity}. "
+            + f"Profile {task.get('profile', 'bf16')}; worker {task.get('worker_sha256', '')}. "
+        )
+        if reference:
+            details += (
+                f"Reference SHA256 {reference['sha256']}; "
+                f"original audio SHA256 {reference['source_sha256']}; "
+                + "original attribution: "
+                + json.dumps(original, ensure_ascii=False)[:1500]
+                + ". "
+            )
+        if context := task.get("composition_context"):
+            details += (
+                f"Blueprint context SHA256 {context['sha256']}; "
+                f"project {context['project']} revision {context['revision']}. "
+            )
+        details += json.dumps({k: v for k, v in task["parameters"].items() if k != "lyrics"})
+        origin = Origin(
+            title=f"ACE-Step 1.5 Turbo · Seed {task['parameters']['seed']}",
+            author=("Generated locally with ACE-Step; " + original.get("author", ""))[:1000],
+            license=("Model: MIT; reference: " + original.get("license", "unspecified")
+                     if reference else "Model: MIT")[:150],
+            source_url="https://github.com/ACE-Step/ACE-Step-1.5",
+            sha256=task["sha256"], details=details[:3000],
+        )
+        if request.replace_source:
+            if task["parameters"].get("mode") != "repaint" or not reference:
+                raise StudioError("Only region repaint can replace its source clip")
+            from ..io import fingerprint
+            from .arrangement import Arrangement
+
+            state = self.arrangement.get(project)
+            content = Arrangement.model_validate(state["content"])
+            clip = next((c for t in content.tracks for c in t.clips
+                         if c.id == reference["clip"]["id"]), None)
+            # Default-filled fields allow older project snapshots to compare correctly.
+            from .arrangement import Clip
+
+            if not clip or clip != Clip.model_validate(reference["clip"]):
+                raise StudioError("Source clip changed; add this candidate on a new track", 409)
+            audio = task["audio"]
+            asset = {
+                "id": fingerprint({"project": task["source_project"], "asset": "source"})[:16],
+                "source_project": task["source_project"], "source_asset": "source",
+                "name": "AI region repaint", "duration": audio["duration"],
+                "waveform": dsp.peaks(self.audio(project, identity), 480),
+            }
+            clip.asset, clip.offset, clip.origin = asset["id"], 0, origin
+            return self.arrangement.update(project, request.revision, content, asset)
         return self.arrangement.attach(
             project,
             Attach(
                 revision=request.revision,
                 source_project=task["source_project"],
                 asset="source",
-                at=request.at,
+                at=at,
             ),
-            origin=Origin(
-                title=f"ACE-Step 1.5 Turbo · Seed {task['parameters']['seed']}",
-                author="Generated locally with ACE-Step",
-                license="Model: MIT",
-                source_url="https://github.com/ACE-Step/ACE-Step-1.5",
-                sha256=task["sha256"],
-                details=f"Model {MODEL_REVISION}; source {SOURCE_REVISION}; task {identity}. "
-                + f"Profile {task.get('profile', 'bf16')}; worker {task.get('worker_sha256', '')}. "
-                + json.dumps({k: v for k, v in task["parameters"].items() if k != "lyrics"})[:2300],
-            ),
+            origin=origin,
         )
 
     def close(self):

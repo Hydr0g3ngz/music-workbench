@@ -53,8 +53,13 @@ jobs:
         with:
           name: release-packages
           path: dist
-      - name: Publish preview release
+      - name: Prepare preview draft without replacing reviewed release assets
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_TAG" dist/* --verify-tag --prerelease --title "Music Workbench $RELEASE_TAG · Preview" --notes-file "docs/releases/$RELEASE_TAG.md"
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Existing release retained; validation artifacts are available in this workflow."
+          else
+            gh release create "$RELEASE_TAG" dist/* --verify-tag --draft --prerelease --title "Music Workbench $RELEASE_TAG · Preview" --notes-file "docs/releases/$RELEASE_TAG.md"
+          fi

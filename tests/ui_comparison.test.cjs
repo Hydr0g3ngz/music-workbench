@@ -93,3 +93,18 @@ test("closing releases both sources and a late playback promise cannot continue"
   assert.equal(a.src, "");
   assert.equal(b.src, "");
 });
+
+test("switching at the end permits replay and failed playback clears the playing state", async () => {
+  const { a, b, player } = setup();
+  b.currentTime = 30;
+  await player.select("a");
+  await player.play();
+  assert.equal(a.currentTime, 0);
+  assert.equal(player.desiredPlaying, true);
+  player.pause();
+  a.play = async () => {
+    throw new Error("decode failed");
+  };
+  await assert.rejects(() => player.play(), /decode failed/);
+  assert.equal(player.desiredPlaying, false);
+});

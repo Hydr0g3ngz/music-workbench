@@ -1,0 +1,296 @@
+#composition-dialog {
+  width: min(1040px, 95vw);
+  max-width: 1040px;
+}
+#composition-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 88vh;
+}
+#composition-dialog .dialog-heading {
+  flex-shrink: 0;
+}
+#composition-dialog .dialog-heading small {
+  color: #a7a2b9;
+  font-size: 9px;
+  letter-spacing: 1.7px;
+}
+#composition-body {
+  padding: 0 22px 24px;
+  overflow: auto;
+  min-height: 0;
+  max-height: none;
+}
+.composition-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0 14px;
+  border-bottom: 1px solid #393746;
+}
+.composition-tabs button {
+  flex: 1;
+  background: #25242f;
+  color: #b5b1c5;
+  padding: 12px 8px;
+  border: 1px solid #3e3b4e;
+  border-radius: 7px;
+}
+.composition-tabs button[aria-pressed="true"] {
+  background: #3b3152;
+  color: #ece0ff;
+  border-color: #9d7cce;
+}
+.composition-intro {
+  color: #a9a4b6;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 15px 0 20px;
+}
+.composition-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(225px, 1fr);
+  gap: 25px;
+}
+.composition-field,
+.composition-template > label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  color: #d6d0e3;
+  margin: 0 0 16px;
+}
+.composition-field textarea,
+.composition-field select,
+.composition-template select,
+#section-intention-form select,
+.generation-blueprint select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #454152;
+  background: #17171f;
+  color: #e3ddec;
+  border-radius: 6px;
+  padding: 10px;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.6;
+}
+.composition-field textarea:focus {
+  border-color: #b69aff;
+  outline: none;
+}
+.composition-field textarea::placeholder {
+  color: #797387;
+}
+.composition-note {
+  border-left: 1px solid #403a4e;
+  padding: 10px 0 10px 24px;
+  color: #bdb4cb;
+}
+.composition-kicker {
+  font-size: 9px;
+  color: #b69aff;
+  letter-spacing: 1.8px;
+}
+.composition-note h3 {
+  color: #e8def4;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.composition-note p,
+.composition-template p,
+.composition-observations {
+  font-size: 12px;
+  line-height: 1.9;
+}
+.composition-note a {
+  display: block;
+  margin-top: 18px;
+  font-size: 11px;
+  color: #b9a4d5;
+  line-height: 1.6;
+}
+.composition-note button,
+.composition-actions button,
+.composition-template button {
+  padding: 9px 11px;
+  border-radius: 5px;
+  border: 1px solid #534b63;
+  background: #302a3e;
+  color: #e2d9f0;
+  font-size: 11px;
+}
+.composition-template {
+  background: #23222d;
+  border: 1px solid #3c384a;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.composition-template h3 {
+  margin: 0 0 14px;
+  font-size: 13px;
+}
+.composition-template > small {
+  display: block;
+  font-size: 10px;
+  color: #9f96ae;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.composition-check {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 9px;
+  color: #c5bbd3;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.composition-check input {
+  width: auto !important;
+  accent-color: #b69aff;
+}
+.composition-arc {
+  display: flex;
+  gap: 3px;
+  min-height: 95px;
+  align-items: end;
+  margin: 15px 0;
+}
+.composition-arc > div {
+  min-width: 0;
+  background: #59446f;
+  border-top: 2px solid #b498d8;
+  height: calc(48px + var(--energy) * 12px);
+  padding: 5px 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  border-radius: 4px 4px 0 0;
+  text-align: center;
+}
+.composition-arc span {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.composition-arc b {
+  font-size: 12px;
+  margin: 4px 0;
+  color: #eadcf8;
+}
+.composition-arc small {
+  font-size: 9px;
+  color: #c7b5d9;
+}
+.composition-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.composition-save-hint {
+  display: block;
+  color: #9e96ad;
+  font-size: 10px;
+  margin-top: 12px;
+}
+.composition-table {
+  overflow: auto;
+}
+.composition-table table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11px;
+  text-align: left;
+}
+.composition-table th {
+  color: #a89bb9;
+  font-weight: normal;
+}
+.composition-table td,
+.composition-table th {
+  border-bottom: 1px solid #35313f;
+  padding: 10px 6px;
+}
+.composition-table button {
+  border: 0;
+  background: transparent;
+  color: #d8c5ec;
+  padding: 0;
+  text-align: left;
+}
+.composition-observations {
+  color: #bfb4cc;
+  margin: 18px 0;
+}
+.generation-blueprint {
+  border: 1px solid #4c405e;
+  border-radius: 8px;
+  padding: 14px;
+  margin: 16px 0;
+  background: #25212f;
+}
+#generation-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+}
+#generation-dialog .dialog-heading,
+.generation-footer {
+  flex-shrink: 0;
+}
+#generation-dialog .generation-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.generation-scroll {
+  overflow: auto;
+  min-height: 0;
+  padding-right: 7px;
+}
+.generation-footer {
+  padding-top: 8px;
+  border-top: 1px solid #494052;
+}
+.generation-blueprint .workflow-fields {
+  margin-top: 14px;
+}
+.generation-blueprint .workflow-fields label {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+}
+#generation-compiled-prompt {
+  white-space: pre-wrap;
+  max-height: 210px;
+  overflow: auto;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #c9b9dc;
+  border-top: 1px solid #494052;
+  padding-top: 12px;
+}
+@media (max-width: 760px) {
+  .composition-columns {
+    grid-template-columns: 1fr;
+  }
+  .composition-note {
+    border-left: 0;
+    border-top: 1px solid #403a4e;
+    padding: 16px 0 0;
+  }
+  .composition-tabs button {
+    font-size: 10px;
+  }
+  .workflow-toolbar {
+    flex-wrap: wrap;
+  }
+}

@@ -125,6 +125,78 @@ def test_sampled_piano_wav_contains_expected_transposed_pitch(client):
     assert next(original.glob("*.mid")).read_bytes() == raw
 
 
+def test_unicode_track_names_survive_midi_export_and_reimport(client):
+    state = project(client)
+    prefix = f"/api/workstation/projects/{state['id']}"
+    raw = midi_bytes(
+        [
+            [
+                mido.Message("note_on", note=74, velocity=82),
+                mido.Message("note_off", note=74, time=720),
+            ]
+        ]
+    )
+    state = client.post(prefix + "/midi?revision=0", files={"file": ("theme.mid", raw)}).json()
+    name = "归途 · 主旋律 / Lead 🎹"
+    state["content"]["tracks"][0]["name"] = name
+    state = client.put(
+        prefix, json={"revision": state["revision"], "content": state["content"]}
+    ).json()
+    response = client.post(prefix + "/export/mid", json={"revision": state["revision"]})
+    assert response.status_code == 200, response.text
+    data = client.get(response.json()["url"]).content
+    exported = mido.MidiFile(file=io.BytesIO(data), charset="utf-8")
+    assert [m.name for t in exported.tracks for m in t if m.type == "track_name"] == [name]
+    assert sum(m.type == "note_on" for t in exported.tracks for m in t) == 1
+    fresh = project(client)
+    imported = client.post(
+        f"/api/workstation/projects/{fresh['id']}/midi?revision=0",
+        files={"file": ("roundtrip.mid", data)},
+    )
+    assert imported.status_code == 200, imported.text
+    track = imported.json()["content"]["tracks"][0]
+    assert track["name"] == name
+    assert track["clips"][0]["notes"][0]["velocity"] == 82
+
+
+def test_legacy_latin1_midi_names_still_import(client):
+    raw = midi_bytes(
+        [
+            [
+                mido.MetaMessage("track_name", name="Café"),
+                mido.Message("note_on", note=60, velocity=70),
+                mido.Message("note_off", note=60, time=480),
+            ]
+        ]
+    )
+    state = project(client)
+    result = client.post(
+        f"/api/workstation/projects/{state['id']}/midi?revision=0",
+        files={"file": ("legacy.mid", raw)},
+    )
+    assert result.status_code == 200, result.text
+    assert result.json()["content"]["tracks"][0]["name"] == "Café"
+
+
+def test_failed_midi_write_does_not_leave_partial_download(client, tmp_path, monkeypatch):
+    state = project(client)
+    prefix = f"/api/workstation/projects/{state['id']}"
+    raw = midi_bytes(
+        [[mido.Message("note_on", note=60), mido.Message("note_off", note=60, time=480)]]
+    )
+    state = client.post(prefix + "/midi?revision=0", files={"file": ("theme.mid", raw)}).json()
+
+    def failed_save(_midi, filename=None, **_kwargs):
+        library.Path(filename).write_bytes(b"MThd")
+        raise ValueError("Interrupted MIDI encoding")
+
+    monkeypatch.setattr(mido.MidiFile, "save", failed_save)
+    response = client.post(prefix + "/export/mid", json={"revision": state["revision"]})
+    assert response.status_code == 422
+    assert not list((tmp_path / ".arrangement-exports").glob("*.mid"))
+    assert client.get(prefix).json()["content"] == state["content"]
+
+
 def test_tempo_changes_sustain_and_channels_preserve_performance_time(client):
     raw = midi_bytes(
         [

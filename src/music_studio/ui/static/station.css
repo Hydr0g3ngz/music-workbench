@@ -6,13 +6,22 @@
   --panel2: #22232d;
   --line: #30313e;
   --text: #edeef5;
-  --muted: #9294a8;
+  --muted: #b0b2c4;
   --accent: #b7a0ff;
   --track-head: 188px;
   --px-sec: 38px;
   --dock-height: 206px;
-  font-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+  font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
   font-size: 13px;
+}
+.ai-setup-link {
+  display: block;
+  padding: 10px 8px;
+  margin-bottom: 12px;
+  border: 1px solid #4c4e62;
+  border-radius: 6px;
+  color: #d4c6ff;
+  font-weight: 600;
 }
 * {
   box-sizing: border-box;

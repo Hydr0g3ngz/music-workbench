@@ -1,0 +1,62 @@
+{
+  "project": "987b68afd124492d",
+  "task": "fda3aae79c3849d2",
+  "region_seconds": [
+    6,
+    10
+  ],
+  "outside_samples_identical": true,
+  "inside_rms_change": 0.2482551485300064,
+  "adopt_in_place": true,
+  "undo_redo": true,
+  "metrics": {
+    "load_seconds": 56.797,
+    "generation_seconds": 18.296,
+    "total_seconds": 75.093,
+    "device": "NVIDIA GeForce RTX 4070 Laptop GPU",
+    "torch": "2.10.0+cu128",
+    "language_model": false,
+    "offload": true,
+    "quantization": "int8_weight_only",
+    "grad_enabled": false,
+    "cpu_threads": 8,
+    "checkpoint_backend": "pread",
+    "resident_ram_mib": 5867.6,
+    "peak_allocated_mib": 3326.0,
+    "peak_reserved_mib": 3422.0,
+    "available_ram_mib": 2588.9,
+    "cuda_free_mib": 6318.0,
+    "private_commit_mib": 11539.9,
+    "peak_private_commit_mib": 18264.3,
+    "available_system_commit_mib": 7167.3,
+    "peak_resident_ram_mib": 8329.5,
+    "repaint": {
+      "start_frame": 264600,
+      "end_frame": 441000,
+      "sample_rate": 44100,
+      "blend_frames": 4410,
+      "outside_region_unchanged": true,
+      "changed_region_rms": 0.2482551485300064
+    }
+  },
+  "revision_after_redo": 5,
+  "reference_sha256": "3641b04b06ce5210469c197af3d059b909d12b19bc2f67240ba5b2d2c532fe3f",
+  "candidate_sha256": "1122176e8778bb6cf747e33ed937cc520e5471a4d4f21dd749266045582d5bb1",
+  "composition_context": {
+    "compiler_version": 1,
+    "project": "987b68afd124492d",
+    "revision": 2,
+    "bpm": 108.0,
+    "key": "",
+    "blueprint": {
+      "brief": "A warm signal breaking through clouds, hopeful and intimate.",
+      "palette": "Soft piano, restrained drums and warm analog pad.",
+      "motif": "Preserve the surrounding theme and rhythm.",
+      "harmony": "Keep the existing harmonic direction."
+    },
+    "section": null,
+    "development": "transition",
+    "neighbors": {},
+    "sha256": "7619dcdd7c1537467021ca99ea4eb1420f51d2dbc4a0a8dec2530e656eaceb83"
+  }
+}

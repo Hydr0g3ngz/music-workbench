@@ -1,0 +1,181 @@
+#fit-dialog,
+#audition-dialog {
+  width: min(900px, 94vw);
+  max-width: 900px;
+}
+#fit-dialog[open],
+#audition-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 90vh;
+}
+#fit-dialog .dialog-heading,
+#audition-dialog .dialog-heading {
+  flex-shrink: 0;
+}
+#fit-dialog .dialog-heading small,
+#audition-dialog .dialog-heading small {
+  color: #ad9bbb;
+  letter-spacing: 1.5px;
+  font-size: 9px;
+}
+#fit-body,
+#audition-body {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 8px;
+}
+#fit-wave {
+  display: block;
+  width: 100%;
+  height: 160px;
+  border-radius: 6px;
+  border: 1px solid #4c4359;
+  cursor: crosshair;
+}
+.fit-wave-caption {
+  display: flex;
+  justify-content: space-between;
+  color: #9e92ae;
+  font-size: 10px;
+  margin: 6px 0 18px;
+}
+#fit-body label,
+#audition-body label {
+  font-size: 11px;
+  color: #c7bdd3;
+}
+#fit-body input,
+#fit-body select,
+#audition-body input[type="number"],
+#audition-body select {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: #17171f;
+  color: #ded4e9;
+  border: 1px solid #4c4359;
+  border-radius: 5px;
+  padding: 9px;
+  margin-top: 7px;
+}
+#fit-body .workflow-fields label,
+#audition-body .workflow-fields label {
+  flex: 1;
+  min-width: 110px;
+}
+.fit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+}
+.fit-actions button,
+#fit-calculate-bpm {
+  border: 1px solid #4c4359;
+  background: #302a3d;
+  border-radius: 5px;
+  color: #d8cce6;
+  font-size: 11px;
+  padding: 9px;
+}
+#fit-body details {
+  border-top: 1px solid #45404f;
+  padding: 15px 0;
+  margin-top: 15px;
+  font-size: 11px;
+  color: #baaccb;
+}
+.fit-summary {
+  background: #2f293e;
+  border-left: 3px solid #ab88d9;
+  padding: 13px;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 18px 0 8px;
+}
+.fit-summary:empty {
+  display: none;
+}
+#fit-error,
+#audition-error {
+  color: #f0a5ae;
+  font-size: 12px;
+  line-height: 1.7;
+}
+#fit-submit,
+#audition-prepare {
+  padding: 11px 18px;
+}
+#audition-align-fit {
+  border: 1px solid #53445f;
+  color: #cbb7df;
+  background: #2b2436;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 11px;
+  margin: 0 10px 10px 0;
+}
+.audition-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 18px 0;
+}
+.audition-pair label {
+  min-width: 0;
+}
+.audition-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+.audition-switch button {
+  border: 1px solid #60516f;
+  background: #30293e;
+  color: #dfcfee;
+  border-radius: 7px;
+  padding: 13px 32px;
+}
+.audition-switch button[aria-pressed="true"] {
+  background: #76589c;
+  color: white;
+  border-color: #b99ae2;
+}
+#audition-seek {
+  width: 100%;
+  accent-color: #b69aff;
+}
+.audition-time {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+  font-size: 11px;
+  color: #baaccb;
+}
+#audition-measurements {
+  font-size: 11px;
+  color: #b8acc5;
+}
+#audition-measurements p {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #3d354b;
+  flex-wrap: wrap;
+}
+#audition-measurements span {
+  margin-left: auto;
+}
+@media (max-width: 700px) {
+  .audition-pair {
+    grid-template-columns: 1fr;
+  }
+  .workflow-toolbar {
+    flex-wrap: wrap;
+  }
+}

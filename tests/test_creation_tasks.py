@@ -1,3 +1,4 @@
+import io
 import json
 import sys
 import threading
@@ -53,6 +54,186 @@ def completed_worker(arguments, log_path, environment, **kwargs):
     return 0
 
 
+def test_repaint_candidate_keeps_outside_audio_and_replaces_only_unchanged_source(
+    fake_runtime, tmp_path, monkeypatch
+):
+    def repaint_worker(arguments, log_path, environment, **kwargs):
+        request = read_json(Path(arguments[-1]))
+        audio, rate = sf.read(request['reference_audio'], dtype='float32', always_2d=True)
+        output = log_path.parent / 'output'
+        output.mkdir()
+        sf.write(output / 'generated.wav', -audio, rate, subtype='FLOAT')
+        write_json(output / 'result.json', {'file':'generated.wav','metrics':{'fixture':True}})
+        return 0
+
+    monkeypatch.setattr(creation, 'run_owned', repaint_worker)
+    with TestClient(create_app(tmp_path), base_url='http://127.0.0.1') as client:
+        state = client.post('/api/workstation/projects', json={}).json()
+        prefix = '/api/workstation/projects/' + state['id']
+        original = np.column_stack([np.sin(np.arange(44100*12)*.01)*.1]*2).astype('float32')
+        stream = io.BytesIO()
+        sf.write(stream,original,44100,format='WAV',subtype='FLOAT')
+        state = client.post(prefix+'/import?revision=0',
+                            files={'file':('reference.wav',stream.getvalue())}).json()
+        source = state['content']['tracks'][0]['clips'][0]
+        response = client.post(prefix+'/generations',json={
+            'revision':state['revision'],'prompt':'Airy transition','mode':'repaint',
+            'source_clip':source['id'],'repaint_start':4,'repaint_end':8,
+        })
+        assert response.status_code == 202, response.text
+        task=wait_for(client,prefix,{'complete','failed'})
+        assert task['status']=='complete',task
+        actual,_=sf.read(io.BytesIO(client.get(prefix+'/generations/'+task['id']+'/audio').content),
+                         dtype='float32',always_2d=True)
+        assert np.array_equal(original[:4*44100],actual[:4*44100])
+        assert np.array_equal(original[8*44100:],actual[8*44100:])
+        endpoint=prefix+'/generations/'+task['id']+'/adopt'
+        adopted=client.post(endpoint,json={'revision':state['revision'],'replace_source':True})
+        assert adopted.status_code==200,adopted.text
+        adopted=adopted.json()
+        replacement=adopted['content']['tracks'][0]['clips'][0]
+        assert len(adopted['content']['tracks'])==1
+        assert replacement['id']==source['id'] and replacement['asset']!=source['asset']
+        undo=client.post(prefix+'/history/undo',json={'revision':adopted['revision']}).json()
+        assert undo['content']==state['content']
+        undo['content']['tracks'][0]['clips'][0]['start']=1
+        changed=client.put(prefix,json={'revision':undo['revision'],'content':undo['content']}).json()
+        assert client.post(endpoint,json={'revision':changed['revision'],
+                                          'replace_source':True}).status_code==409
+
+
+def test_blueprint_preview_is_the_queued_model_prompt_and_survives_later_edits(
+    fake_runtime, tmp_path, monkeypatch
+):
+    monkeypatch.setattr(creation, "run_owned", completed_worker)
+    lock = FileLock(str(tmp_path / ".studio-tasks.lock"), timeout=0)
+    with lock, TestClient(create_app(tmp_path), base_url="http://127.0.0.1") as client:
+        state = client.post("/api/workstation/projects", json={}).json()
+        prefix = f"/api/workstation/projects/{state['id']}"
+        state["content"].update(
+            blueprint={"brief": "City sunrise", "motif": "Three short notes"},
+            sections=[
+                {
+                    "id": "1234567890abcdef",
+                    "name": "Theme",
+                    "start": 16,
+                    "end": 48,
+                    "role": "theme",
+                    "energy": 3,
+                }
+            ],
+        )
+        state = client.put(prefix, json={"revision": 0, "content": state["content"]}).json()
+        payload = {
+            "revision": 1,
+            "prompt": "Soft jazz piano",
+            "use_blueprint": True,
+            "section_id": "1234567890abcdef",
+            "development": "develop",
+        }
+        preview = client.post(prefix + "/generation-preview", json=payload).json()
+        task = client.post(prefix + "/generations", json=payload).json()
+        assert task["parameters"]["prompt"] == preview["prompt"]
+        assert task["composition_context"] == preview["context"]
+        assert task["user_prompt"] == payload["prompt"]
+        state["content"]["blueprint"]["motif"] = "Four long notes"
+        state = client.put(prefix, json={"revision": 1, "content": state["content"]}).json()
+        assert (
+            client.get(prefix + "/generations").json()[0]["composition_context"]
+            == (preview["context"])
+        )
+    with TestClient(create_app(tmp_path), base_url="http://127.0.0.1") as client:
+        task = wait_for(client, prefix, {"complete", "failed"})
+        assert task["status"] == "complete", task
+        adopted = client.post(
+            f"{prefix}/generations/{task['id']}/adopt",
+            json={
+                "revision": 2,
+                "target_section": True,
+            },
+        ).json()
+        clip = adopted["content"]["tracks"][0]["clips"][0]
+        assert clip["start"] == 16 * 60 / adopted["content"]["bpm"]
+        assert preview["context"]["sha256"] in clip["origin"]["details"]
+        adopted["content"]["sections"][0]["start"] += 4
+        changed = client.put(prefix, json={"revision": 3, "content": adopted["content"]}).json()
+        assert (
+            client.post(
+                f"{prefix}/generations/{task['id']}/adopt",
+                json={
+                    "revision": changed["revision"],
+                    "target_section": True,
+                },
+            ).status_code
+            == 409
+        )
+
+
+def test_reference_variation_pins_only_selected_audio_and_keeps_source_unchanged(
+    fake_runtime, tmp_path, monkeypatch
+):
+    monkeypatch.setattr(creation, "run_owned", completed_worker)
+    lock = FileLock(str(tmp_path / ".studio-tasks.lock"), timeout=0)
+    with lock, TestClient(create_app(tmp_path), base_url="http://127.0.0.1") as client:
+        state = client.post("/api/workstation/projects", json={}).json()
+        prefix = f"/api/workstation/projects/{state['id']}"
+        audio = io.BytesIO()
+        samples = np.column_stack([np.linspace(-0.1, 0.1, 44100 * 12)] * 2)
+        sf.write(audio, samples, 44100, format="WAV", subtype="FLOAT")
+        state = client.post(
+            prefix + "/import?revision=0", files={"file": ("reference.wav", audio.getvalue())}
+        ).json()
+        clip = state["content"]["tracks"][0]["clips"][0]
+        clip.update(offset=1, duration=10)
+        clip["origin"] = {
+            "title": "Original reference",
+            "author": "Reference creator",
+            "license": "CC BY 4.0",
+            "source_url": "https://example.com/reference",
+            "details": "Original credit. " + "x" * 2800,
+        }
+        state = client.put(
+            prefix, json={"revision": state["revision"], "content": state["content"]}
+        ).json()
+        payload = {
+            "revision": state["revision"],
+            "prompt": "A restrained variation",
+            "mode": "cover",
+            "source_clip": clip["id"],
+            "duration": 30,
+        }
+        preview = client.post(prefix + "/generation-preview", json=payload)
+        assert preview.status_code == 200 and preview.json()["duration"] == 10
+        response = client.post(prefix + "/generations", json=payload)
+        assert response.status_code == 202, response.text
+        task = response.json()
+        pinned, rate = sf.read(tmp_path / ".creation-tasks" / task["id"] / "reference.wav")
+        assert rate == 44100 and len(pinned) == 10 * 44100
+        np.testing.assert_allclose(pinned, samples[44100 : 44100 * 11], atol=1e-6)
+        assert task["parameters"]["duration"] == 10
+        assert task["reference"]["clip"]["origin"]["author"] == "Reference creator"
+        assert client.get(prefix).json() == state
+        for extra in ({"source_clip": None}, {"source_clip": "../bad"}, {"source_clip": "0" * 16}):
+            assert client.post(prefix + "/generations", json={**payload, **extra}).status_code in (
+                422,
+                404,
+            )
+        lock.release()
+        task = wait_for(client, prefix, {"complete", "failed"})
+        assert task["status"] == "complete", task
+        adopted = client.post(
+            f"{prefix}/generations/{task['id']}/adopt",
+            json={"revision": state["revision"]},
+        )
+        assert adopted.status_code == 200, adopted.text
+        origin = adopted.json()["content"]["tracks"][-1]["clips"][0]["origin"]
+        assert "Reference creator" in origin["author"]
+        assert "CC BY 4.0" in origin["license"]
+        assert task["reference"]["sha256"] in origin["details"]
+        assert "https://example.com/reference" in origin["details"]
+        assert len(origin["details"]) <= 3000
+
+
 def test_generation_stays_a_draft_until_adopt_and_keeps_provenance(
     fake_runtime, monkeypatch, tmp_path
 ):
@@ -80,6 +261,17 @@ def test_generation_stays_a_draft_until_adopt_and_keeps_provenance(
         clip = updated["content"]["tracks"][0]["clips"][0]
         assert clip["start"] == 1.5
         assert clip["origin"]["sha256"] == task["sha256"]
+        comparison = client.post(
+            prefix + "/comparisons",
+            json={
+                "revision": updated["revision"],
+                "a": "clip:" + clip["id"],
+                "b": "generation:" + task["id"],
+                "duration": 1,
+            },
+        )
+        assert comparison.status_code == 200, comparison.text
+        assert comparison.json()["a"]["audio_sha256"] == comparison.json()["b"]["audio_sha256"]
         assert creation.MODEL_REVISION in clip["origin"]["details"]
         assert (
             client.post(

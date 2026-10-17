@@ -15,6 +15,7 @@ build/
 dist/
 .coverage
 htmlcov/
+Music Workbench.exe
 *.log
 .env
 *.wav

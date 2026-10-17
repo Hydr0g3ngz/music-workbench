@@ -22,9 +22,14 @@ def separate(source: Path, output: Path, config: dict) -> dict:
     mean, std = reference.mean(), reference.std()
     segment = config["segment_seconds"]
     warnings = []
+    four_stems = config.get("four_stems", False)
     if not torch.isfinite(std) or std < 1e-8:
         vocals = np.zeros_like(data)
         accompaniment = data
+        stems = {
+            role: (data if role == "other" else np.zeros_like(data))
+            for role in ("drums", "bass", "vocals", "other")
+        }
     else:
         normalized = (wave - mean) / std
         while True:
@@ -59,6 +64,20 @@ def separate(source: Path, output: Path, config: dict) -> dict:
         if config.get("mixture_consistency"):
             # Residual accompaniment preserves exact mixture reconstruction and timing.
             accompaniment = data - vocals
+        stems = {role: estimates[i].numpy().T for i, role in enumerate(model.sources)}
+        if four_stems and config.get("mixture_consistency"):
+            stems["other"] += data - sum(stems.values())
+    if four_stems:
+        for role, values in stems.items():
+            write_stem(output / f"audio/{role}.wav", values, rate, len(data))
+        return {
+            "backend": "demucs",
+            "model": config["separation_model"],
+            "segment_seconds": segment,
+            "warnings": warnings,
+            "mixture_consistency": config.get("mixture_consistency", False),
+            "files": [f"audio/{role}.wav" for role in stems],
+        }
     write_stem(output / "audio/vocals.wav", vocals, rate, len(data))
     write_stem(output / "audio/instrumental.wav", accompaniment, rate, len(data))
     return {

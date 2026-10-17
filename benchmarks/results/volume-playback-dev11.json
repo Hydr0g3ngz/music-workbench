@@ -1,0 +1,12 @@
+{
+  "project": "987b68afd124492d",
+  "revision": 7,
+  "full_duration_seconds": 30.88888888888889,
+  "overlap_seconds": 1.1111111111111112,
+  "browser_capture_seconds": 33.18,
+  "rms_10ms_correlation": 0.9936646857128955,
+  "unexpected_silent_10ms_windows": 0,
+  "curve": "equal_power",
+  "volume_automation": true,
+  "measurement": "Web Audio master tap encoded to Opus, aligned to WAV; not listening quality"
+}

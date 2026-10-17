@@ -72,6 +72,8 @@ class TaskManager:
         if self.stopping.is_set():
             raise StudioError("Task queue is closing", 503)
         spec = self.registry.spec(request.model)
+        if spec["stage"] != "transform" and (request.time_ratio != 1 or request.pitch_shift != 0):
+            raise StudioError("Time/pitch parameters require the time-pitch capability")
         if spec["stage"] != "denoise" and request.strength != 1:
             raise StudioError("Cleanup strength is only supported by speech cleanup models")
         if spec.get("device") == "cpu" and request.device == "cuda":
@@ -94,6 +96,8 @@ class TaskManager:
             import soundfile as sf
 
             info = sf.info(source)
+            if spec["stage"] == "transform" and info.duration / request.time_ratio > 600:
+                raise StudioError("Transformed source would exceed the 10-minute limit")
             limit = self.registry.describe(request.model)["max_duration_seconds"]
             if info.duration > limit:
                 raise StudioError(
@@ -121,10 +125,13 @@ class TaskManager:
                 asr_revision="536b0662742c02347bc0e980a01041f333bce120",
                 rhythm_backend="librosa_percussive",
                 separation_model="htdemucs",
+                four_stems=request.model == "demucs-four-stems",
                 pitch_backend="crepe",
                 lyrics_alignment="native",
                 language=request.language,
                 cleanup_strength=request.strength,
+                time_ratio=request.time_ratio,
+                pitch_shift=request.pitch_shift,
             )
             if request.model == "qwen3-asr":
                 config.update(
@@ -142,6 +149,8 @@ class TaskManager:
                 "created_at": time.time(),
                 "device": device,
                 "strength": request.strength if spec["stage"] == "denoise" else None,
+                "time_ratio": request.time_ratio,
+                "pitch_shift": request.pitch_shift,
                 "input_audio": dsp.inspect_audio(snapshot),
                 "artifacts": [],
                 "error": None,
@@ -303,8 +312,11 @@ class TaskManager:
                 }
                 if record["kind"] == "audio":
                     record["audio"] = dsp.inspect_audio(file)
+                    expected = dict(task["input_audio"])
+                    if task["stage"] == "transform":
+                        expected["frames"] = round(expected["frames"] / task["time_ratio"])
                     if any(
-                        record["audio"][field] != task["input_audio"][field]
+                        record["audio"][field] != expected[field]
                         for field in ("frames", "sample_rate", "channels")
                     ):
                         raise StudioError(

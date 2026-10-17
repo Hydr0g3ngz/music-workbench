@@ -18,7 +18,7 @@ Python 3.11/3.12 和额外磁盘空间。当前仅实测 Windows 11、RTX 4070 L
 
 ```powershell
 py -3.12 scripts/setup_ace.py
-.\Start-Music-Studio-Create.cmd
+.\Start-Music-Workbench.cmd
 ```
 
 Linux 使用 `python3.12 scripts/setup_ace.py`。Linux 路径已实现但尚未完成实机推理验收。
@@ -29,8 +29,13 @@ Linux 使用 `python3.12 scripts/setup_ace.py`。Linux 路径已实现但尚未�
 
 默认使用 Turbo、INT8 线性层权重、BF16、SDPA、CPU offload、8 步、单候选，
 不加载 5Hz 语言模型，不编译，也不使用 Flash Attention。先尝试 12–20 秒器乐。
-界面提供 10–60 秒请求范围；30/60 秒和人声歌词质量尚未在本轮验收，不能当作已验证能力。
+界面提供 10–60 秒请求范围；已实际运行 12/20/32 秒器乐，60 秒和人声歌词质量尚未验收。
 工程 BPM 作为生成条件传入，输出不保证准确对拍，也不会自动拉伸。
+
+新增参考变奏：先选中 10–60 秒音频片段，在生成面板选择「参考变奏」。
+worker 使用的是所选片段实际裁切后的固定副本，记录音频/来源哈希及参数；源素材不改动。
+可继承工程调性与循环长度，但生成条件不等于结果验证。32 秒实际创作及资源记录见
+[《云隙电台》](creations/radio-through-the-clouds.md)，操作入口见[工作流](ai-production-workflow.md)。
 
 ## 固定版本与来源
 
@@ -82,6 +87,11 @@ CUDA 已分配/预留峰值 3152.1/3226 MiB，驻留 RAM 峰值 10936.1 MiB，�
 这些检查覆盖功能连接，不是完整混音制作或听感验收。
 
 ## 故障与数据
+
+开启「使用已保存的创作蓝图与段落目标」，会将作品意图、音色、动机、和声方向与段落任务
+加入实际提示词，BPM/调性跟随已保存工程。可先「预览实际提示词」，再提交任务。
+规则负责组装，本地 ACE-Step 负责音频生成；没有新增语言模型，也不保证结果满足意图。
+详见 [编曲方法与流程](arranging-methods.md)。
 
 「参数与诊断」提供错误和资源指标；完整日志在工作区 `.creation-tasks/<id>/worker.log`，
 阶段内存记录在 `output/resources.jsonl`。不要只看最后一句 CUDA OOM：Windows 系统提交量不足也可能造成该错误。

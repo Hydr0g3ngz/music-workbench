@@ -83,6 +83,11 @@ def verify_next():
                 "station-timing.js",
                 "station-timing-ui.js",
                 "station-timing.css",
+                "station-tutorial.js",
+                "station-tutorial.css",
+                "learn.html",
+                "learn.js",
+                "learn.css",
             ):
                 assert client.get("/" + asset).status_code == 200
             for asset in ("next.js", "next.css", "transport.js", "comparison.js"):
@@ -186,6 +191,17 @@ def verify_create():
                 "station.html",
                 "station.js",
                 "station-engine.js",
+                "station-edit.js",
+                "station-workflow.js",
+                "station-workflow.css",
+                "station-composition.js",
+                "station-composition-ui.js",
+                "station-composition.css",
+                "station-fit.js",
+                "station-fit-ui.js",
+                "station-audition-ui.js",
+                "station-material.css",
+                "comparison.js",
                 "station-library.css",
                 "effects-dsp.js",
                 "station-worklet.js",
@@ -247,8 +263,44 @@ def verify_create():
             assert not undo.json()["content"]["loop"]["enabled"]
             undo = client.post(prefix + "/history/undo", json={"revision": undo.json()["revision"]})
             assert not undo.json()["content"]["limiter"]["enabled"]
+            raw = io.BytesIO()
+            tone = np.sin(np.arange(44100) * 2 * np.pi * 440 / 44100) * 0.1
+            sf.write(raw, np.column_stack([tone, tone]), 44100, format="WAV", subtype="FLOAT")
+            imported = client.post(
+                prefix + f"/import?revision={undo.json()['revision']}",
+                files={"file": ("fixture.wav", raw.getvalue())},
+            )
+            assert imported.status_code == 200, imported.text
+            state = imported.json()
+            clip = state["content"]["tracks"][-1]["clips"][0]
+            fit = client.post(
+                prefix + "/fit-preview",
+                json={
+                    "revision": state["revision"],
+                    "clip": clip["id"],
+                    "fit": {
+                        "source_bpm": state["content"]["bpm"],
+                        "source_anchor": 0,
+                        "target_beat": 8,
+                    },
+                },
+            )
+            assert fit.status_code == 200 and fit.json()["time_ratio"] == 1
+            pair = client.post(
+                prefix + "/comparisons",
+                json={
+                    "revision": state["revision"],
+                    "a": "clip:" + clip["id"],
+                    "b": "clip:" + clip["id"],
+                    "duration": 1,
+                },
+            )
+            assert pair.status_code == 200, pair.text
+            assert pair.json()["matching_available"]
+            assert client.get(pair.json()["a"]["url"]).status_code == 200
     print(
-        "PASS: Create installed UI, samples, groove, timing, effects/tails/limiter/history and WAV"
+        "PASS: Create installed UI, samples, timing, effects/history/WAV, "
+        "beat fit and candidate A/B"
     )
 
 

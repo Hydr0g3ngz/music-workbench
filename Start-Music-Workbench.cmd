@@ -1,4 +1,4 @@
 @echo off
 setlocal
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\launch-next.ps1" -Interface create -Workspace outputs/workbench -Port 8920 %*
-if errorlevel 1 pause
+if not exist "%~dp0Music Workbench.exe" powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\build-launcher.ps1"
+if exist "%~dp0Music Workbench.exe" start "" "%~dp0Music Workbench.exe" %*

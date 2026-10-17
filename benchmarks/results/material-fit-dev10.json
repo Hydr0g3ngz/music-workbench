@@ -1,0 +1,55 @@
+{
+  "fixture": "Synthetic decaying sine pulses; exact beat times, not a model output",
+  "source_bpm": 100,
+  "project_bpm": 120,
+  "source_anchor_seconds": 0.37,
+  "source_beat_times": [
+    0.37,
+    0.97,
+    1.5699999999999998,
+    2.17,
+    2.77,
+    3.37,
+    3.9699999999999998,
+    4.57,
+    5.17,
+    5.77,
+    6.37,
+    6.97,
+    7.569999999999999,
+    8.17,
+    8.77,
+    9.37,
+    9.969999999999999,
+    10.569999999999999,
+    11.169999999999998,
+    11.77
+  ],
+  "fit": {
+    "version": 1,
+    "project_bpm": 120,
+    "options": {
+      "source_bpm": 100.0,
+      "tempo_multiplier": 1,
+      "source_anchor": 0.37,
+      "target_beat": 8.0
+    },
+    "effective_source_bpm": 100.0,
+    "time_ratio": 1.2,
+    "start": 3.6916666666666664,
+    "offset": 0.0,
+    "duration": 10.0,
+    "target_seconds": 4.0,
+    "method": "User-confirmed anchor and constant-tempo DSP; no automatic downbeat detection"
+  },
+  "sample_rate": 44100,
+  "frames": 441000,
+  "max_abs_pulse_peak_error_ms": 22.02947845804948,
+  "first_to_last_drift_ms": 9.478458049885674,
+  "thresholds": {
+    "max_abs_peak_error_ms": 40,
+    "max_abs_drift_ms": 20
+  },
+  "passed": true,
+  "limits": "Peak timing is affected by the phase vocoder. A single synthetic fixture does not measure general beat/downbeat detection or perceptual quality."
+}

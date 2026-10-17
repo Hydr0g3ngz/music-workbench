@@ -1,0 +1,152 @@
+.setup-page {
+  max-width: 980px;
+}
+.setup-page h1 {
+  font-size: clamp(32px, 4vw, 48px);
+  margin: 12px 0 18px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+.setup-intro {
+  color: #d0dcda;
+  max-width: 700px;
+  line-height: 1.8;
+}
+.setup-steps {
+  display: flex;
+  padding: 0;
+  list-style: none;
+  counter-reset: setup;
+  gap: 24px;
+  margin: 32px 0;
+  color: #c1d4d1;
+}
+.setup-steps li {
+  counter-increment: setup;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.setup-steps li:before {
+  content: counter(setup);
+  border: 1px solid #59877d;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  color: #c7f0dd;
+}
+.setup-steps .active:before {
+  background: #b8f3cc;
+  color: #142a21;
+}
+.setup-panel {
+  border: 1px solid #40574f;
+  background: #182820;
+  padding: 30px;
+  border-radius: 16px;
+}
+.setup-panel-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+}
+.setup-panel h2 {
+  margin: 0;
+  font-size: 23px;
+}
+.setup-panel p {
+  line-height: 1.7;
+  color: #c8d6d0;
+}
+#badge {
+  padding: 6px 12px;
+  background: #30453a;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: #d6f3dd;
+}
+#reason {
+  color: #ffcf9d;
+}
+.setup-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 26px 0 18px;
+}
+.setup-actions button {
+  padding: 12px 22px;
+}
+.setup-actions .primary {
+  color: #10251b;
+  background: #b8f3cc;
+  border-color: #b8f3cc;
+  font-weight: 700;
+}
+.setup-actions button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.setup-panel .setup-note,
+.setup-panel details p {
+  font-size: 14px;
+  color: #b8c7bf;
+}
+.setup-panel details {
+  margin-top: 24px;
+  border-top: 1px solid #40574f;
+  padding-top: 16px;
+}
+.setup-panel summary {
+  cursor: pointer;
+  color: #d9e4df;
+}
+#directory {
+  overflow-wrap: anywhere;
+}
+.install-progress progress {
+  width: 100%;
+  accent-color: #b8f3cc;
+  height: 10px;
+}
+.install-progress p {
+  margin-bottom: 8px;
+}
+#progress-hint {
+  font-size: 13px;
+}
+#verification {
+  border-top: 1px solid #40574f;
+  margin-top: 24px;
+  padding-top: 12px;
+}
+#verification audio {
+  width: min(100%, 560px);
+}
+#error {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 220px;
+  overflow: auto;
+  color: #efd2bc;
+  font-size: 12px;
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 600px) {
+  .setup-steps {
+    gap: 12px;
+    font-size: 12px;
+  }
+  .setup-panel {
+    padding: 20px;
+  }
+  .setup-panel-top {
+    flex-wrap: wrap;
+  }
+}

@@ -20,6 +20,10 @@ from pydantic import Field, model_validator
 from ..io import fingerprint
 from . import dsp, library, midi_import
 from . import effects as mix_effects
+from .composition import Blueprint, Role
+from .envelope import VolumePoint
+from .envelope import envelope as clip_envelope
+from .fitting import FitOptions
 from .models import RevisionRequest, StrictModel
 from .service import StudioError
 
@@ -58,6 +62,8 @@ class Clip(StrictModel):
     gain_db: float = Field(default=0, ge=-60, le=12)
     fade_in: float = Field(default=0, ge=0, le=30)
     fade_out: float = Field(default=0, ge=0, le=30)
+    fade_curve: Literal["linear", "equal_power"] = "linear"
+    volume_points: list[VolumePoint] = Field(default_factory=list, max_length=128)
     notes: list[Note] = Field(default_factory=list, max_length=512)
     origin: Origin | None = None
 
@@ -65,6 +71,11 @@ class Clip(StrictModel):
     def bounds(self):
         if self.start + self.duration > 600 or self.fade_in + self.fade_out > self.duration:
             raise ValueError("Clip end or fade is outside the supported timeline")
+        if any(p.time > self.duration for p in self.volume_points) or any(
+            b.time <= a.time
+            for a, b in zip(self.volume_points, self.volume_points[1:], strict=False)
+        ):
+            raise ValueError("Volume points must be ordered, unique and inside the clip")
         return self
 
 
@@ -100,6 +111,22 @@ class Metronome(StrictModel):
     accent: bool = True
 
 
+class Section(StrictModel):
+    id: str = Field(pattern=ID)
+    name: str = Field(min_length=1, max_length=80)
+    start: float = Field(ge=0, le=2999.75)
+    end: float = Field(gt=0, le=3000)
+    role: Role = "free"
+    energy: int | None = Field(default=None, ge=1, le=5)
+    intention: str = Field(default="", max_length=240)
+
+    @model_validator(mode="after")
+    def bounds(self):
+        if self.end - self.start < 0.25:
+            raise ValueError("Section must span at least a quarter beat")
+        return self
+
+
 class Arrangement(StrictModel):
     format: Literal["music-studio-arrangement"] = "music-studio-arrangement"
     version: Literal[1] = 1
@@ -109,12 +136,19 @@ class Arrangement(StrictModel):
     limiter: mix_effects.Limiter = Field(default_factory=mix_effects.Limiter)
     loop: Loop = Field(default_factory=Loop)
     metronome: Metronome = Field(default_factory=Metronome)
+    key: str = Field(default="", pattern=r"^$|^(C|C#|D|Eb|E|F|F#|G|Ab|A|Bb|B) (major|minor)$")
+    sections: list[Section] = Field(default_factory=list, max_length=64)
+    blueprint: Blueprint = Field(default_factory=Blueprint)
     tracks: list[Track] = Field(default_factory=list, max_length=32)
 
     @model_validator(mode="after")
     def timing_bounds(self):
         if self.loop.end * 60 / self.bpm > 600 + 1e-9:
             raise ValueError("Loop end exceeds the 10-minute timeline")
+        if any(s.end * 60 / self.bpm > 600 + 1e-9 for s in self.sections):
+            raise ValueError("Section exceeds the 10-minute timeline")
+        if len({s.id for s in self.sections}) != len(self.sections):
+            raise ValueError("Section identifiers must be unique")
         return self
 
 
@@ -142,6 +176,9 @@ class PatternRequest(RevisionRequest):
 class ProcessClip(RevisionRequest):
     clip: str = Field(pattern=ID)
     model: str = Field(min_length=1, max_length=80)
+    time_ratio: float = Field(default=1, ge=0.5, le=2)
+    pitch_shift: int = Field(default=0, ge=-12, le=12)
+    fit: FitOptions | None = None
 
 
 def synth_note(times, note, instrument):
@@ -166,6 +203,9 @@ class ArrangementService:
             db.execute("""CREATE TABLE IF NOT EXISTS arrangement_processing (
                 task TEXT PRIMARY KEY, session TEXT NOT NULL, source_project TEXT NOT NULL,
                 clip TEXT NOT NULL
+            )""")
+            db.execute("""CREATE TABLE IF NOT EXISTS arrangement_fits (
+                task TEXT PRIMARY KEY, session TEXT NOT NULL, data TEXT NOT NULL
             )""")
 
     def row(self, db, key, deleted=False):
@@ -365,6 +405,14 @@ class ArrangementService:
         )
         if not clip or not clip["asset"]:
             raise StudioError("Select an audio clip")
+        fit = None
+        if request.fit:
+            from .fitting import plan
+
+            if request.model != "time-pitch":
+                raise StudioError("Beat alignment applies only to time/pitch candidates")
+            fit = plan(clip, state["content"]["bpm"], request.fit)
+            request.time_ratio = fit["time_ratio"]
         asset = next(a for a in state["assets"] if a["id"] == clip["asset"])
         source_project = asset["source_project"]
         task = self.studio.tasks.submit(
@@ -373,6 +421,8 @@ class ArrangementService:
                 revision=self.studio.session(source_project)["revision"],
                 model=request.model,
                 asset=asset["source_asset"],
+                time_ratio=request.time_ratio,
+                pitch_shift=request.pitch_shift,
             ),
         )
         with self.studio.transaction() as db:
@@ -380,17 +430,49 @@ class ArrangementService:
                 "INSERT INTO arrangement_processing VALUES (?,?,?,?)",
                 (task["id"], key, source_project, json.dumps(clip)),
             )
+            if fit:
+                db.execute(
+                    "INSERT INTO arrangement_fits VALUES (?,?,?)",
+                    (task["id"], key, json.dumps(fit)),
+                )
         return task
+
+    def fit_preview(self, key, request):
+        from .fitting import plan
+
+        state = self.get(key)
+        if state["revision"] != request.revision:
+            raise StudioError("Session changed; save before fitting", 409)
+        clip = next(
+            (
+                c
+                for t in state["content"]["tracks"]
+                for c in t["clips"]
+                if c["id"] == request.clip and c["asset"]
+            ),
+            None,
+        )
+        if not clip:
+            raise StudioError("Select an audio clip")
+        return plan(clip, state["content"]["bpm"], request.fit)
 
     def processing(self, key):
         self.get(key)
         with self.studio.connection() as db:
-            rows = list(db.execute("SELECT * FROM arrangement_processing WHERE session=?", (key,)))
+            rows = list(
+                db.execute(
+                    "SELECT p.*,f.data AS fit FROM arrangement_processing p "
+                    "LEFT JOIN arrangement_fits f ON p.task=f.task AND p.session=f.session "
+                    "WHERE p.session=?",
+                    (key,),
+                )
+            )
         return [
             {
                 **self.studio.tasks.get(r["source_project"], r["task"]),
                 "source_project": r["source_project"],
                 "source_clip": json.loads(r["clip"]),
+                "fit": json.loads(r["fit"]) if r["fit"] else None,
             }
             for r in rows
         ]
@@ -402,9 +484,15 @@ class ArrangementService:
         if state["revision"] != revision:
             raise StudioError("Session changed; reload before adopting stems", 409)
         task = next((t for t in self.processing(key) if t["id"] == task_id), None)
-        if not task or task["status"] != "complete" or task["stage"] != "separate":
-            raise StudioError("Completed separation task required")
+        if (
+            not task
+            or task["status"] != "complete"
+            or task["stage"] not in ("separate", "transform")
+        ):
+            raise StudioError("Completed separation or time/pitch task required")
         content = Arrangement.model_validate(state["content"])
+        if task.get("fit") and content.bpm != task["fit"]["project_bpm"]:
+            raise StudioError("Project tempo changed; prepare a new beat-fit candidate", 409)
         pair = next(
             ((t, c) for t in content.tracks for c in t.clips if c.id == task["source_clip"]["id"]),
             None,
@@ -415,17 +503,30 @@ class ArrangementService:
             )
         track, clip = pair
         artifacts = {a["role"]: a for a in task["artifacts"] if a["kind"] == "audio"}
-        if set(artifacts) != {"vocals", "instrumental"}:
-            raise StudioError("Both aligned stems are required")
+        roles = (
+            ("transformed",)
+            if task["stage"] == "transform"
+            else ("drums", "bass", "vocals", "other")
+            if task["model"] == "demucs-four-stems"
+            else ("vocals", "instrumental")
+        )
+        if set(artifacts) != set(roles):
+            raise StudioError("All aligned results are required")
         additions = []
-        for role in ("vocals", "instrumental"):
+        for role in roles:
             artifact = artifacts[role]
             path, record = self.studio.tasks.artifact_path(task["source_project"], artifact["id"])
             if sha256(path) != record["sha256"]:
                 raise StudioError("Stem checksum changed")
             info = dsp.inspect_audio(path)
+            ratio = task.get("time_ratio", 1) if task["stage"] == "transform" else 1
             if any(
                 info[f] != task["input_audio"][f] for f in ("frames", "sample_rate", "channels")
+            ) and not (
+                task["stage"] == "transform"
+                and info["sample_rate"] == RATE
+                and info["channels"] == 2
+                and abs(info["frames"] - round(task["input_audio"]["frames"] / ratio)) <= 1
             ):
                 raise StudioError("Stem timeline does not match the input")
             identity = fingerprint(
@@ -443,6 +544,16 @@ class ArrangementService:
             )
             replacement = clip.model_copy(deep=True)
             replacement.id, replacement.asset, replacement.name = uid(), identity, role
+            if task["stage"] == "transform":
+                replacement.offset /= ratio
+                replacement.duration /= ratio
+                replacement.fade_in /= ratio
+                replacement.fade_out /= ratio
+                for point in replacement.volume_points:
+                    point.time /= ratio
+                replacement.name = clip.name + " · fitted"
+                if task.get("fit"):
+                    replacement.start = task["fit"]["start"]
             spec = self.studio.tasks.registry.spec(task["model"])
             replacement.origin = Origin(
                 title=clip.name + " · " + role,
@@ -451,12 +562,13 @@ class ArrangementService:
                 source_url=clip.origin.source_url if clip.origin else "",
                 sha256=record["sha256"],
                 details=(
-                    f"Separator {task['model']}; model license {spec['license']}; "
+                    f"Processor {task['model']}; model license {spec['license']}; "
                     + f"{spec['source']}. "
                     + "Separation task "
                     + task_id
                     + "; source "
                     + task["input_sha256"]
+                    + ("; beat fit " + json.dumps(task["fit"]) if task.get("fit") else "")
                     + (
                         ". Original attribution: " + clip.origin.model_dump_json()
                         if clip.origin
@@ -466,6 +578,8 @@ class ArrangementService:
             )
             stem_track = track.model_copy(deep=True)
             stem_track.id, stem_track.name, stem_track.clips = uid(), role, [replacement]
+            if task["stage"] == "transform":
+                stem_track.name = track.name + " · fitted"
             stem_track.color = COLORS[(len(content.tracks) + len(additions)) % len(COLORS)]
             content.tracks.append(stem_track)
         track.clips.remove(clip)
@@ -631,6 +745,74 @@ class ArrangementService:
             lines.append("")
         return "\n".join(lines)
 
+    def adopt_melody(self, key, task_id, revision):
+        from ..io import read_json, sha256
+
+        state = self.get(key)
+        if state["revision"] != revision:
+            raise StudioError("Session changed; reload before adopting notes", 409)
+        task = next((t for t in self.processing(key) if t["id"] == task_id), None)
+        if not task or task["stage"] != "melody" or task["status"] != "complete":
+            raise StudioError("Completed melody task required")
+        artifact = next(a for a in task["artifacts"] if a["role"] == "melody")
+        path, record = self.studio.tasks.artifact_path(task["source_project"], artifact["id"])
+        if sha256(path) != record["sha256"]:
+            raise StudioError("Melody checksum changed")
+        source = Clip.model_validate(task["source_clip"])
+        beat = 60 / state["content"]["bpm"]
+        notes = []
+        for n in read_json(path)["notes"]:
+            start = max(n["start"], source.offset)
+            end = min(n["end"], source.offset + source.duration)
+            if end <= start:
+                continue
+            notes.append(
+                Note(
+                    pitch=n["pitch"],
+                    start=(start - source.offset) / beat,
+                    length=(end - start) / beat,
+                    velocity=80,
+                )
+            )
+        if not notes:
+            raise StudioError("No melody notes within this clip")
+        if len(notes) > 512:
+            raise StudioError("More than 512 notes; use a shorter source clip")
+        content = Arrangement.model_validate(state["content"])
+        spec = self.studio.tasks.registry.spec(task["model"])
+        content.tracks.append(
+            Track(
+                id=uid(),
+                name=source.name + " · melody",
+                kind="midi",
+                instrument="vcsl-marimba",
+                gain_db=-9,
+                color=COLORS[len(content.tracks) % len(COLORS)],
+                clips=[
+                    Clip(
+                        id=uid(),
+                        name=source.name + " · melody",
+                        start=source.start,
+                        duration=source.duration,
+                        notes=notes,
+                        origin=Origin(
+                            title=source.name + " · estimated melody",
+                            author=source.origin.author if source.origin else "",
+                            source_url=source.origin.source_url if source.origin else "",
+                            sha256=record["sha256"],
+                            license=source.origin.license if source.origin else "unspecified",
+                            details=(
+                                f"{task['model']}; {spec['source']}; task {task_id}; "
+                                "monophonic estimates, not score ground truth. "
+                                + (source.origin.details if source.origin else "")
+                            )[:3000],
+                        ),
+                    )
+                ],
+            )
+        )
+        return self.update(key, revision, Arrangement.model_validate(content.model_dump()))
+
     def asset_path(self, key, identity):
         asset = next((a for a in self.get(key)["assets"] if a["id"] == identity), None)
         if not asset:
@@ -663,7 +845,8 @@ class ArrangementService:
             key, Attach(revision=state["revision"], source_project=record["id"], asset="source")
         )
         content = Arrangement.model_validate(state["content"])
-        content.title = "Midnight Sketch"
+        if content.title == "Untitled session":
+            content.title = "Midnight Sketch"
         content.tracks[0].name = "Dusty drums"
         content.tracks[0].color = COLORS[2]
         content.tracks[0].gain_db = -3
@@ -722,21 +905,30 @@ class ArrangementService:
         folder.mkdir(exist_ok=True)
         identity = uid()
         target = folder / f"{identity}.{kind}"
-        if kind == "mid":
-            self.export_midi(content, target)
-        elif kind == "wav":
-            try:
-                self.render(key, content, target)
-            except Exception:
-                target.unlink(missing_ok=True)
-                raise
-        else:
+        if kind not in ("mid", "wav"):
             raise StudioError("Unsupported export format")
+        measurements = None
+        try:
+            if kind == "mid":
+                self.export_midi(content, target)
+            else:
+                self.render(key, content, target)
+                measurements = {"levels": dsp.inspect_audio(target)}
+                try:
+                    from .loudness import measure
+
+                    measurements["loudness"] = measure(target)
+                except (ImportError, ValueError) as error:
+                    measurements["loudness_unavailable"] = str(error)
+        except Exception:
+            target.unlink(missing_ok=True)
+            raise
         return {
             "url": f"/api/workstation/exports/{identity}.{kind}",
             "revision": revision,
             "name": content.title,
             "kind": kind,
+            "measurements": measurements,
         }
 
     def render(self, key, content, target):
@@ -794,13 +986,8 @@ class ArrangementService:
                                 data = self.synth_block(
                                     relative + clip.offset, clip, content.bpm, track.instrument
                                 )
-                        envelope = np.ones(len(data))
-                        if clip.fade_in:
-                            envelope *= np.minimum(relative / clip.fade_in, 1)
-                        if clip.fade_out:
-                            envelope *= np.minimum((clip.duration - relative) / clip.fade_out, 1)
-                        gain = 10 ** (clip.gain_db / 20)
-                        track_mix[start - base : stop - base] += data * envelope[:, None] * gain
+                        envelope = clip_envelope(relative, clip)
+                        track_mix[start - base : stop - base] += data * envelope[:, None]
                     track_mix = racks[track.id].process(track_mix)
                     gain = 10 ** ((track.gain_db + content.master_db) / 20)
                     mixed += dsp.balance(track_mix, track.pan) * gain
@@ -837,10 +1024,24 @@ class ArrangementService:
     def export_midi(content, target):
         import mido
 
-        midi = mido.MidiFile(ticks_per_beat=480)
+        midi = mido.MidiFile(ticks_per_beat=480, charset="utf-8")
         conductor = mido.MidiTrack()
         conductor.append(mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(content.bpm)))
         conductor.append(mido.MetaMessage("time_signature", numerator=4, denominator=4))
+        if content.key:
+            tonic, mode = content.key.split()
+            # The key signature format permits Eb/Bb/Ab and F#/C# minor.
+            major_alias = {"C#": "Db", "F#": "Gb", "Ab": "Ab"}
+            minor_alias = {"Eb": "D#", "Ab": "G#", "Bb": "Bb"}
+            tonic = (minor_alias if mode == "minor" else major_alias).get(tonic, tonic)
+            conductor.append(
+                mido.MetaMessage("key_signature", key=tonic + ("m" if mode == "minor" else ""))
+            )
+        previous = 0
+        for marker in sorted(content.sections, key=lambda s: s.start):
+            tick = round(marker.start * 480)
+            conductor.append(mido.MetaMessage("marker", text=marker.name, time=tick - previous))
+            previous = tick
         midi.tracks.append(conductor)
         instrument_index = 0
         for track in content.tracks:
@@ -904,7 +1105,9 @@ class ArrangementRoute(APIRoute):
 
 def router(studio, manager):
     service = ArrangementService(studio, manager)
+    from .audition import Compare
     from .creation import Adopt, CreationManager, Generate
+    from .fitting import FitPreview
 
     creation = CreationManager(service)
     studio._creation_manager = creation
@@ -921,6 +1124,10 @@ def router(studio, manager):
     @api.post("/projects/{key}/generations", status_code=202)
     def generate(key: str, request: Generate):
         return creation.submit(key, request)
+
+    @api.post("/projects/{key}/generation-preview")
+    def generation_preview(key: str, request: Generate):
+        return creation.preview(key, request)
 
     @api.post("/projects/{key}/generations/{identity}/cancel")
     def cancel_generation(key: str, identity: str):
@@ -957,6 +1164,18 @@ def router(studio, manager):
     @api.post("/projects", status_code=201)
     def create(request: Create):
         return service.create(request)
+
+    @api.post("/projects/import-pack", status_code=201)
+    def import_pack(file: UploadFile):
+        from .project_pack import restore_pack
+
+        return restore_pack(service, file)
+
+    @api.post("/projects/{key}/pack")
+    def pack(key: str, request: RevisionRequest):
+        from .project_pack import export_pack
+
+        return export_pack(service, key, request.revision)
 
     @api.get("/projects/{key}")
     def get(key: str):
@@ -996,6 +1215,22 @@ def router(studio, manager):
     def process_clip(key: str, request: ProcessClip):
         return service.process_clip(key, request)
 
+    @api.post("/projects/{key}/fit-preview")
+    def fit_preview(key: str, request: FitPreview):
+        return service.fit_preview(key, request)
+
+    @api.post("/projects/{key}/comparisons")
+    def comparison(key: str, request: Compare):
+        from .audition import prepare
+
+        return prepare(service, creation, key, request)
+
+    @api.get("/projects/{key}/comparisons/{identity}/{side}")
+    def comparison_audio(key: str, identity: str, side: str):
+        from .audition import audio as comparison_path
+
+        return FileResponse(comparison_path(service, key, identity, side), media_type="audio/wav")
+
     @api.get("/projects/{key}/processing")
     def processing(key: str):
         return service.processing(key)
@@ -1003,6 +1238,10 @@ def router(studio, manager):
     @api.post("/projects/{key}/processing/{task}/adopt-stems")
     def adopt_stems(key: str, task: str, request: RevisionRequest):
         return service.adopt_stems(key, task, request.revision)
+
+    @api.post("/projects/{key}/processing/{task}/adopt-melody")
+    def adopt_melody(key: str, task: str, request: RevisionRequest):
+        return service.adopt_melody(key, task, request.revision)
 
     @api.post("/projects/{key}/patterns")
     def add_pattern(key: str, request: PatternRequest):
@@ -1034,7 +1273,7 @@ def router(studio, manager):
 
     @api.get("/exports/{filename}")
     def download(filename: str):
-        if not re.fullmatch(r"[a-f0-9]{16}\.(wav|mid)", filename):
+        if not re.fullmatch(r"[a-f0-9]{16}\.(wav|mid|mwb)", filename):
             raise HTTPException(404)
         path = studio.safe_file(studio.root, ".arrangement-exports/" + filename)
         return FileResponse(path, filename="music-studio-" + filename)

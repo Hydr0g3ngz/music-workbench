@@ -134,6 +134,8 @@ test("generation and stem polling preserve audition sources, time and playing st
   const context = vm.createContext({
     s: state,
     generationAudio: audio,
+    fitPanel: { stop() {} },
+    auditionPanel: { stop() {} },
     previewEngine: { pause() {} },
     pause() {},
     renderGrooves() {},

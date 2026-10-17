@@ -1,0 +1,28 @@
+Music Workbench · 本地音乐创作工作台
+
+安装后可直接使用：可编辑示例、乐器与 MIDI、录音、音频剪辑、多轨编排、混音和导出。
+无需单独安装 Python，无需命令行，直接从桌面或开始菜单打开。
+
+作品独立保存在当前用户的 MusicWorkbench/Projects 数据目录。
+升级和卸载程序不删除该目录中的作品或模型。
+
+本安装器包含基础创作引擎与桌面显示组件。
+首次使用音乐生成时，在软件的“AI 自动配置”中下载模型和独立运行环境。
+首批自动配置支持 ACE-Step，需 NVIDIA 8 GB 显存，联网下载约 8–12 GB，预留 35 GB 空间。
+基础功能无需模型；其他 AI 模型环境仍需按对应文档配置。
+当前为开发预览版本。
+
+Music Workbench · Local music creation
+
+Ready after installation: editable examples, instruments/MIDI, recording, audio editing,
+multitrack arrangement, mixing and export. No separate Python installation or terminal.
+Open it from your desktop or Start menu.
+
+Projects live in your user data directory, separate from program files.
+Upgrading or uninstalling does not remove your project/model data.
+
+This installer includes the basic creation engine and desktop display component.
+Use AI setup inside the app to download ACE-Step and its separate inference environment.
+This profile needs an NVIDIA 8 GB GPU, about 8–12 GB of downloads and 35 GB free space.
+Basic creation needs no models. Other model environments still use their own setup guides.
+This is a development preview.

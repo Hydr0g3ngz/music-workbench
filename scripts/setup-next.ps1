@@ -1,4 +1,4 @@
-param([string]$Python = "")
+﻿param([string]$Python = "")
 $ErrorActionPreference = "Stop"
 $nextRepo = Split-Path $PSScriptRoot -Parent
 $nextEnvironment = Join-Path $nextRepo ".venv-next"
@@ -20,6 +20,6 @@ if (-not (Test-Path -LiteralPath $nextPython)) {
 }
 & $nextPython -X utf8 -c "import sys; assert (3,11) <= sys.version_info[:2] < (3,13), 'Python 3.11 / 3.12 is required'"
 if ($LASTEXITCODE -ne 0) { throw "The Next environment needs Python 3.11 / 3.12." }
-& $nextPython -m pip install -e ($nextRepo + "[ui,audio,agent]")
+& $nextPython -m pip install -e ($nextRepo + "[workstation]")
 if ($LASTEXITCODE -ne 0) { throw "Next dependency installation failed." }
 Write-Host "Next is ready. Run Start-Music-Studio-Next.cmd. Neural models are installed separately."

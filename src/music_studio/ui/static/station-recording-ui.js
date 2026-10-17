@@ -277,5 +277,5 @@ StationRecording.mount = function ({
     }
   });
   window.addEventListener("pagehide", () => recorder.cancel());
-  return { render, busy: () => active() || saving };
+  return { render, busy: () => active() || saving, hasUnsavedTake: hasTake };
 };

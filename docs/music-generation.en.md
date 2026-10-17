@@ -20,7 +20,7 @@ Run explicitly from the repository root:
 
 ```powershell
 py -3.12 scripts/setup_ace.py
-.\Start-Music-Studio-Create.cmd
+.\Start-Music-Workbench.cmd
 ```
 
 On Linux use `python3.12 scripts/setup_ace.py`; the Linux path has not received real inference
@@ -32,9 +32,15 @@ Once cached, the worker enforces offline inference.
 
 The profile uses Turbo, INT8 linear weights, BF16, SDPA, CPU offload, eight steps and one
 candidate. It does not load the 5Hz language model, compile the model or use Flash Attention.
-Start with a 12–20 second instrumental. Requests allow 10–60 seconds, but 30/60-second and
-vocal/lyric quality were not verified in this acceptance run. BPM is a conditioning target;
+Start with a 12–20 second instrumental. Requests allow 10–60 seconds; actual 12/20/32-second
+instrumentals ran successfully. Sixty-second and vocal/lyric quality remain unverified. BPM is a target;
 generated audio may not align precisely and is not automatically stretched.
+
+For reference variation, select a 10–60 second audio clip and choose reference mode.
+The worker receives an immutable copy of the actual crop, with reference/source hashes and parameters.
+Project key and loop length can supply context; conditioning is not verified musical compliance.
+See the [32-second creation walkthrough](creations/radio-through-the-clouds.md) and
+[workflow guide](ai-production-workflow.md) for real inference and adoption.
 
 ## Pinned sources
 
@@ -90,6 +96,11 @@ piano MIDI intro were also arranged before the draft and exported as a 24.444s, 
 24-bit three-track mix. These are integration checks, not full mixing or listening acceptance.
 
 ## Diagnostics and recovery
+
+Enable **Use saved blueprint & section intentions** to include the creative brief, palette,
+motif, harmony and section purpose. Tempo/key follow the saved project. Preview the actual
+prompt before queuing. Rules assemble it; local ACE-Step generates the audio. This adds no
+language model and does not guarantee compliance. [Methods and workflow](arranging-methods.md).
 
 **Details** shows errors and resource counters. Full logs live in the workspace under
 `.creation-tasks/<id>/worker.log`; stage measurements are in `output/resources.jsonl`.

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Music Workbench · 入门 / Get started</title>
+    <link rel="stylesheet" href="/welcome.css" />
+    <link rel="stylesheet" href="/learn.css" />
+    <script defer src="/learn.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="wordmark" href="/welcome.html">◒ music workbench</a
+        ><button id="learn-language">English</button>
+      </header>
+      <section class="learn-hero">
+        <p class="eyebrow">FIRST IDEA → FIRST EXPORT</p>
+        <h1 data-zh="不用先成为音乐家。" data-en="Start before you feel ready.">
+          不用先成为音乐家。
+        </h1>
+        <p
+          data-zh="从一段可以拆开、修改的音乐开始。约 5–10 分钟；无需登录、模型或专业显卡。"
+          data-en="Start with music you can take apart and change. Allow 5–10 minutes. No login, models or dedicated GPU required."
+        >
+          从一段可以拆开、修改的音乐开始。约 5–10
+          分钟；无需登录、模型或专业显卡。
+        </p>
+        <button
+          class="learn-start"
+          id="learn-start"
+          data-zh="新建示例，开始跟练 →"
+          data-en="Create an example and follow along →"
+        >
+          新建示例，开始跟练 →
+        </button>
+        <small
+          data-zh="每次新建独立示例，不覆盖已有作品。"
+          data-en="Each click creates a separate example and keeps your existing work."
+          >每次新建独立示例，不覆盖已有作品。</small
+        >
+        <p id="learn-error" role="alert"></p>
+      </section>
+      <div class="learn-grid">
+        <section>
+          <span class="card-number">01 / LISTEN</span>
+          <h2
+            data-zh="先听整体，再听声部"
+            data-en="Listen to the whole, then the parts"
+          >
+            先听整体，再听声部
+          </h2>
+          <p
+            data-zh="点播放。四行音轨分别是鼓、键盘、贝斯、氛围铺底。鼓让你想跟着打拍子，贝斯连接节奏与和声，键盘提供和弦，铺底提供空间感。"
+            data-en="Press Play. The four tracks are drums, keys, bass and pad. Drums give the pulse, bass connects rhythm and harmony, keys supply chords and pad adds space."
+          >
+            点播放。四行音轨分别是鼓、键盘、贝斯、氛围铺底。鼓让你想跟着打拍子，贝斯连接节奏与和声，键盘提供和弦，铺底提供空间感。
+          </p>
+          <p
+            data-zh="M = 静音，S = 独奏。切换后再还原，听听少了一层会怎样。多个 S 会一起独奏；导出也遵循这些开关。"
+            data-en="M mutes and S solos a track. Toggle and restore them to hear what each layer adds. Multiple solos play together; exports also respect these switches."
+          >
+            M = 静音，S = 独奏。切换后再还原，听听少了一层会怎样。多个 S
+            会一起独奏；导出也遵循这些开关。
+          </p>
+        </section>
+        <section>
+          <span class="card-number">02 / MAKE IT YOURS</span>
+          <h2
+            data-zh="只改一个音，也是在创作"
+            data-en="One changed note is a beginning"
+          >
+            只改一个音，也是在创作
+          </h2>
+          <p
+            data-zh="双击 Velvet keys 片段，打开下方钢琴卷帘。横向是时间，纵向是音高。点一个音符，用 ↑ / ↓ 改音高，拖动改变时机，拖右边缘改变长短。"
+            data-en="Double-click Velvet keys to open the piano roll. Time runs horizontally and pitch vertically. Select a note and use ↑ / ↓ to change pitch, drag to move it, or drag its right edge to change its length."
+          >
+            双击 Velvet keys
+            片段，打开下方钢琴卷帘。横向是时间，纵向是音高。点一个音符，用 ↑ / ↓
+            改音高，拖动改变时机，拖右边缘改变长短。
+          </p>
+          <p
+            data-zh="先保留大部分原样，只改变结尾的一两个音。点 ↶ 撤销即可比较；你也可以从右侧切换乐器音色。"
+            data-en="Keep most of the sketch and change one or two ending notes. Use ↶ Undo to compare. You can also choose a different instrument in the inspector."
+          >
+            先保留大部分原样，只改变结尾的一两个音。点 ↶
+            撤销即可比较；你也可以从右侧切换乐器音色。
+          </p>
+        </section>
+        <section>
+          <span class="card-number">03 / BALANCE</span>
+          <h2
+            data-zh="混音：让主角被听见"
+            data-en="Mix: let the main idea be heard"
+          >
+            混音：让主角被听见
+          </h2>
+          <p
+            data-zh="点下方混音台。推子控制响度，声像把声音放到左右。先把贝斯降低 2–3 dB，再播放比较。一次只动一个参数，才知道变化从哪里来。"
+            data-en="Open the Mixer tab. Faders control level and pan places sounds left or right. Lower bass by 2–3 dB and play again. Change one parameter at a time so you can hear its effect."
+          >
+            点下方混音台。推子控制响度，声像把声音放到左右。先把贝斯降低 2–3
+            dB，再播放比较。一次只动一个参数，才知道变化从哪里来。
+          </p>
+          <p
+            data-zh="如果导出提示超出 0 dBFS，先降低主音量；不要把所有推子推到最大。FX 可以加入均衡、压缩和混响，第一遍先不用也可以。"
+            data-en="If export reports a peak above 0 dBFS, lower the master. Avoid turning every fader up. FX adds EQ, compression and reverb; it is fine to leave them for later."
+          >
+            如果导出提示超出 0 dBFS，先降低主音量；不要把所有推子推到最大。FX
+            可以加入均衡、压缩和混响，第一遍先不用也可以。
+          </p>
+        </section>
+        <section>
+          <span class="card-number">04 / KEEP & SHARE</span>
+          <h2
+            data-zh="保存工程，导出可播放的作品"
+            data-en="Keep the project, export the music"
+          >
+            保存工程，导出可播放的作品
+          </h2>
+          <p
+            data-zh="右上角导出作品 → WAV：得到可播放的立体声音频。MIDI 只保留乐器音符；MWB 保存音频和编排，方便备份、转移和继续编辑。WAV 与 MWB 建议各留一份。"
+            data-en="Export → WAV gives you a playable stereo file. MIDI keeps instrument notes; MWB keeps audio and arrangement for backup, transfer and editing. Keep both WAV and MWB."
+          >
+            右上角导出作品 → WAV：得到可播放的立体声音频。MIDI
+            只保留乐器音符；MWB 保存音频和编排，方便备份、转移和继续编辑。WAV 与
+            MWB 建议各留一份。
+          </p>
+          <p
+            data-zh="左上方显示“已保存到本机”后，工程可从首页重新打开。教程进度在本机单独记录；收起、关闭或重新跟练都不会删除作品。"
+            data-en="Once the top bar says Saved locally, reopen the project from Home. Lesson progress is stored separately on this computer. Collapsing, closing or repeating the lesson keeps your music."
+          >
+            左上方显示“已保存到本机”后，工程可从首页重新打开。教程进度在本机单独记录；收起、关闭或重新跟练都不会删除作品。
+          </p>
+        </section>
+        <section class="learn-wide">
+          <span class="card-number">05 / CO-CREATE, LOCALLY</span>
+          <h2
+            data-zh="下一段素材，让 AI 帮忙"
+            data-en="Let AI help with your next material"
+          >
+            下一段素材，让 AI 帮忙
+          </h2>
+          <p
+            data-zh="基础跟练结束后，再从首页进入本地 AI。先检查电脑并完成 ACE-Step 自动配置；它需要兼容的 NVIDIA 8 GB 显卡、35 GB 空间和约 8–12 GB 首次下载。基础教程完全不依赖它。"
+            data-en="After the basic lesson, try local AI from Home. Complete ACE-Step setup first: it needs a compatible NVIDIA GPU with 8 GB VRAM, 35 GB free space and about 8–12 GB of initial downloads. The basic lesson needs none of this."
+          >
+            基础跟练结束后，再从首页进入本地 AI。先检查电脑并完成 ACE-Step
+            自动配置；它需要兼容的 NVIDIA 8 GB 显卡、35 GB 空间和约 8–12 GB
+            首次下载。基础教程完全不依赖它。
+          </p>
+          <p
+            data-zh="先生成 12 秒器乐草稿。示例提示词：温暖的 lo-fi 键盘、圆润贝斯、轻鼓点，夜晚散步，没有人声。试听后再采用到轨道，结合素材对拍、裁切与淡化融入作品。生成速度与质量因硬件和提示词而异；其他模型需分别配置。"
+            data-en="Start with a 12-second instrumental draft: warm lo-fi keys, round bass, light drums, a night walk, no vocals. Audition before adopting a track, then fit timing, trim and fade it into the piece. Speed and quality vary by hardware and prompt; other models require separate setup."
+          >
+            先生成 12 秒器乐草稿。示例提示词：温暖的 lo-fi
+            键盘、圆润贝斯、轻鼓点，夜晚散步，没有人声。试听后再采用到轨道，结合素材对拍、裁切与淡化融入作品。生成速度与质量因硬件和提示词而异；其他模型需分别配置。
+          </p>
+          <a
+            href="/ai-setup.html"
+            data-zh="查看本地 AI 配置 →"
+            data-en="Open local AI setup →"
+            >查看本地 AI 配置 →</a
+          >
+        </section>
+      </div>
+      <footer>
+        <a
+          href="/welcome.html"
+          data-zh="← 回到创作首页"
+          data-en="← Back to Home"
+          >← 回到创作首页</a
+        ><a
+          href="https://github.com/Hydr0g3ngz/music-workbench"
+          target="_blank"
+          rel="noreferrer"
+          >GitHub ↗</a
+        >
+      </footer>
+    </main>
+  </body>
+</html>

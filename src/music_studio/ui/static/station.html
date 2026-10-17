@@ -10,12 +10,28 @@
     <link rel="stylesheet" href="/station-effects.css" />
     <link rel="stylesheet" href="/station-recording.css" />
     <link rel="stylesheet" href="/station-timing.css" />
+    <link rel="stylesheet" href="/station-workflow.css" />
+    <link rel="stylesheet" href="/station-composition.css" />
+    <link rel="stylesheet" href="/station-envelope.css" />
+    <link rel="stylesheet" href="/station-material.css" />
+    <link rel="stylesheet" href="/station-tutorial.css" />
     <script src="/effects-dsp.js" defer></script>
     <script src="/station-timing.js" defer></script>
+    <script src="/station-envelope.js" defer></script>
     <script src="/station-engine.js" defer></script>
     <script src="/station-recorder.js" defer></script>
     <script src="/station-recording-ui.js" defer></script>
     <script src="/station-timing-ui.js" defer></script>
+    <script src="/station-edit.js" defer></script>
+    <script src="/station-workflow.js" defer></script>
+    <script src="/station-composition.js" defer></script>
+    <script src="/station-composition-ui.js" defer></script>
+    <script src="/station-envelope-ui.js" defer></script>
+    <script src="/comparison.js" defer></script>
+    <script src="/station-fit.js" defer></script>
+    <script src="/station-fit-ui.js" defer></script>
+    <script src="/station-audition-ui.js" defer></script>
+    <script src="/station-tutorial.js" defer></script>
     <script src="/station.js" defer></script>
   </head>
   <body>
@@ -71,7 +87,7 @@
       </defs>
     </svg>
     <header class="topbar">
-      <a class="brand" href="/station.html"
+      <a class="brand" href="/welcome.html"
         ><span class="brand-mark"
           ><svg><use href="#i-wave" /></svg></span
         ><span
@@ -88,6 +104,7 @@
         maxlength="150"
       /><span id="save-state" class="save-state"></span>
       <div class="top-actions">
+        <button id="open-tutorial" class="quiet" aria-expanded="false">入门</button>
         <button id="open-projects" class="quiet" data-t="projects">工程</button
         ><button id="new-project" class="quiet" data-t="new">新建</button
         ><a href="/next.html" class="previous" data-t="previous">原工作台 ↗</a
@@ -121,7 +138,7 @@
         <svg><use href="#i-mixer" /></svg></button
       ><span class="rail-spacer"></span
       ><a
-        href="https://github.com/Hydr0g3ngz/music-studio"
+        href="https://github.com/Hydr0g3ngz/music-workbench"
         target="_blank"
         rel="noreferrer"
         class="rail-footer"
@@ -212,6 +229,7 @@
         >
       </section>
       <section id="models-view" class="browser-view" hidden>
+        <a href="/ai-setup.html" class="ai-setup-link">AI 自动配置 / AI setup →</a>
         <button id="open-generation" class="generation-launch">
           <span class="generation-launch-icon">✦</span
           ><strong data-t="generationSubmit">生成音乐草稿</strong
@@ -455,6 +473,12 @@
       <p class="panel-copy" data-t="exportCopy">
         导出当前编排，包含轨道效果、音量、声像、片段淡化与主输出限制。
       </p>
+      <p
+        id="export-feedback"
+        class="panel-copy"
+        role="status"
+        aria-live="polite"
+      ></p>
       <button id="export-wav" class="export-choice">
         <svg><use href="#i-wave" /></svg
         ><span
@@ -470,9 +494,9 @@
       ><button id="export-project" class="export-choice">
         <svg><use href="#i-folder" /></svg
         ><span
-          ><strong data-t="projectFile">工程快照</strong
+          ><strong data-t="projectFile">便携工程 · MWB</strong
           ><small data-t="projectExport"
-            >JSON 编排数据；音频素材保留在本机</small
+            >编排、音频与署名；可在「工程」中恢复</small
           ></span
         ><span>↗</span>
       </button>
@@ -492,109 +516,174 @@
         <button class="icon-button close-dialog">×</button>
       </div>
       <form id="generation-form" class="generation-card">
-        <div class="generation-heading">
-          <span>✦</span><strong>ACE-Step 1.5</strong
-          ><small>TURBO · LOCAL</small>
-        </div>
-        <p class="library-caption" data-t="generationCopy">
-          把声音想法变成可试听的音乐草稿，再加入编排。
-        </p>
-        <label for="generation-prompt" data-t="generationPrompt"
-          >描述你想要的音乐</label
-        >
-        <textarea
-          id="generation-prompt"
-          rows="4"
-          maxlength="1200"
-          minlength="3"
-          required
-          placeholder="例如：温暖的爵士钢琴、轻鼓点和木贝斯，适合夜晚写作"
-        ></textarea>
-        <div class="generation-presets">
-          <button type="button" data-generation-preset="jazz">Jazz</button
-          ><button type="button" data-generation-preset="electronic">
-            Electronic</button
-          ><button type="button" data-generation-preset="cinematic">
-            Cinematic
-          </button>
-        </div>
-        <label class="tempo-option"
-          ><input id="generation-instrumental" type="checkbox" checked /><span
-            data-t="instrumental"
-            >纯音乐</span
-          ></label
-        >
-        <div id="generation-vocal" hidden>
-          <label for="generation-lyrics" data-t="generationLyrics">歌词</label
-          ><textarea
-            id="generation-lyrics"
+        <div class="generation-scroll">
+          <div class="generation-heading">
+            <span>✦</span><strong>ACE-Step 1.5</strong
+            ><small>TURBO · LOCAL</small>
+          </div>
+          <p class="library-caption" data-t="generationCopy">
+            把声音想法变成可试听的音乐草稿，再加入编排。
+          </p>
+          <label for="generation-prompt" data-t="generationPrompt"
+            >描述你想要的音乐</label
+          >
+          <textarea
+            id="generation-prompt"
             rows="4"
-            maxlength="4000"
+            maxlength="1200"
+            minlength="3"
+            required
+            placeholder="例如：温暖的爵士钢琴、轻鼓点和木贝斯，适合夜晚写作"
           ></textarea>
-          <label for="generation-language" data-t="generationLanguage"
-            >演唱语言</label
-          ><select id="generation-language">
-            <option value="zh">中文</option>
-            <option value="en">English</option>
-            <option value="ja">日本語</option>
-            <option value="ko">한국어</option>
-            <option value="unknown">Auto</option>
-          </select>
+          <div class="generation-presets">
+            <button type="button" data-generation-preset="jazz">Jazz</button
+            ><button type="button" data-generation-preset="electronic">
+              Electronic</button
+            ><button type="button" data-generation-preset="cinematic">
+              Cinematic
+            </button>
+          </div>
+          <label class="tempo-option"
+            ><input id="generation-instrumental" type="checkbox" checked /><span
+              data-t="instrumental"
+              >纯音乐</span
+            ></label
+          >
+          <div id="generation-vocal" hidden>
+            <label for="generation-lyrics" data-t="generationLyrics">歌词</label
+            ><textarea
+              id="generation-lyrics"
+              rows="4"
+              maxlength="4000"
+            ></textarea>
+            <label for="generation-language" data-t="generationLanguage"
+              >演唱语言</label
+            ><select id="generation-language">
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+              <option value="ko">한국어</option>
+              <option value="unknown">Auto</option>
+            </select>
+          </div>
+          <div class="generation-options">
+            <label
+              ><span data-t="generationMode">生成方式</span
+              ><select id="generation-mode">
+                <option value="text2music">文字生成 / Text</option>
+                <option value="cover">
+                  所选音频变奏 / Audio variation · EXP
+                </option>
+                <option value="repaint">局部重绘 / Region repaint · EXP</option>
+              </select></label
+            >
+            <label
+              ><span data-t="generationKey">调性</span
+              ><select id="generation-key">
+                <option value="">Auto</option>
+              </select></label
+            >
+            <label
+              ><span data-t="generationDuration">时长</span
+              ><select id="generation-duration">
+                <option value="12">12 s</option>
+                <option value="20" selected>20 s</option>
+                <option value="30">30 s</option>
+                <option value="60">60 s · EXP</option>
+              </select></label
+            ><span id="generation-bpm"></span>
+          </div>
+          <button
+            type="button"
+            id="generation-use-region"
+            class="quiet"
+            data-t="generationRegion"
+          >
+            按循环范围设置时长
+          </button>
+          <p id="generation-context" class="library-caption"></p>
+          <div id="repaint-options" class="generation-options" hidden>
+            <label
+              >重绘起点 / Start · s<input
+                id="repaint-start"
+                type="number"
+                min="0"
+                max="59.5"
+                step="any"
+                value="4" /></label
+            ><label
+              >重绘终点 / End · s<input
+                id="repaint-end"
+                type="number"
+                min=".5"
+                max="60"
+                step="any"
+                value="8"
+            /></label>
+            <p>
+              时间相对所选片段，至少 0.5
+              秒。选区外保留原始音频；先试听候选再采用。<br />Times are relative
+              to the selected clip. Outside audio is preserved; audition before
+              applying.
+            </p>
+          </div>
+          <details class="generation-advanced">
+            <summary data-t="generationAdvanced">更多参数</summary>
+            <label
+              ><span data-t="generationStrength">参考保留强度</span
+              ><input
+                id="generation-strength"
+                type="number"
+                min="0"
+                max="1"
+                step=".05"
+                value=".65"
+                required
+            /></label>
+            <label
+              ><span data-t="generationSeed">随机种子</span
+              ><input
+                id="generation-seed"
+                type="number"
+                min="0"
+                max="2147483647"
+                value="42"
+                required /></label
+            ><label
+              ><span data-t="generationSteps">推理步数</span
+              ><input
+                id="generation-steps"
+                type="number"
+                min="1"
+                max="16"
+                value="8"
+                required
+            /></label>
+          </details>
         </div>
-        <div class="generation-options">
-          <label
-            ><span data-t="generationDuration">时长</span
-            ><select id="generation-duration">
-              <option value="12">12 s</option>
-              <option value="20" selected>20 s</option>
-              <option value="30">30 s</option>
-              <option value="60">60 s · EXP</option>
-            </select></label
-          ><span id="generation-bpm"></span>
+        <div class="generation-footer">
+          <button
+            id="generation-submit"
+            class="primary"
+            type="submit"
+            disabled
+            data-t="generationSubmit"
+          >
+            生成音乐草稿
+          </button>
+          <p id="generation-health" class="library-caption" role="status"></p>
+          <p class="generation-footnote" data-t="generationProfile">
+            实验功能 · CUDA + INT8 权重 + CPU 卸载 · 不加载语言模型。先试 12–20
+            秒；生成节奏可能偏离目标 BPM。
+          </p>
+          <a
+            href="https://github.com/ACE-Step/ACE-Step-1.5"
+            target="_blank"
+            rel="noreferrer"
+            class="library-credits"
+            >ACE-Step · MIT ↗</a
+          >
         </div>
-        <details class="generation-advanced">
-          <summary data-t="generationAdvanced">更多参数</summary>
-          <label
-            ><span data-t="generationSeed">随机种子</span
-            ><input
-              id="generation-seed"
-              type="number"
-              min="0"
-              max="2147483647"
-              value="42"
-              required /></label
-          ><label
-            ><span data-t="generationSteps">推理步数</span
-            ><input
-              id="generation-steps"
-              type="number"
-              min="1"
-              max="16"
-              value="8"
-              required
-          /></label>
-        </details>
-        <button
-          id="generation-submit"
-          class="primary"
-          type="submit"
-          disabled
-          data-t="generationSubmit"
-        >
-          生成音乐草稿
-        </button>
-        <p id="generation-health" class="library-caption" role="status"></p>
-        <p class="generation-footnote" data-t="generationProfile">
-          实验功能 · CUDA + INT8 权重 + CPU 卸载 · 不加载语言模型。先试 12–20
-          秒；生成节奏可能偏离目标 BPM。
-        </p>
-        <a
-          href="https://github.com/ACE-Step/ACE-Step-1.5"
-          target="_blank"
-          rel="noreferrer"
-          class="library-credits"
-          >ACE-Step · MIT ↗</a
-        >
       </form>
     </dialog>
     <dialog id="task-info-dialog">

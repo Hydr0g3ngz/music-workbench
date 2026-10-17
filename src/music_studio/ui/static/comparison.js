@@ -40,12 +40,16 @@
     }
     async play() {
       if (this.disposed) return;
-      if (this.current.currentTime >= this.duration) this.seek(0);
+      if (this.current.currentTime >= this.duration - 0.02) this.seek(0);
       this.desiredPlaying = true;
       const media = this.current;
       try {
         await media.play();
       } catch (error) {
+        if (!this.disposed && media === this.current) {
+          this.desiredPlaying = false;
+          this.onChange(this);
+        }
         if (
           error.name !== "AbortError" ||
           (!this.disposed && this.desiredPlaying && media === this.current)

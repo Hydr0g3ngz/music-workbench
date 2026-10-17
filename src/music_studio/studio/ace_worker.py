@@ -188,6 +188,13 @@ def execute(request):
         raise RuntimeError("Required quantization was disabled; repair the ACE-Step environment")
     options = request["parameters"]
     params = GenerationParams(
+        task_type=options.get("mode", "text2music"),
+        src_audio=request.get("reference_audio"),
+        audio_cover_strength=options.get("reference_strength", 0.65),
+        repainting_start=options.get("repaint_start", 0),
+        repainting_end=options.get("repaint_end", -1),
+        chunk_mask_mode="explicit" if options.get("mode") == "repaint" else "auto",
+        enable_normalization=options.get("mode") != "repaint",
         caption=options["prompt"],
         lyrics="[Instrumental]" if options["instrumental"] else options["lyrics"],
         instrumental=options["instrumental"],
