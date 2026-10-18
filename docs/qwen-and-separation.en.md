@@ -30,8 +30,8 @@ Unsupported languages or wholly invalid spans retain original timing. Partial al
 
 Explicitly configured interpreters and separation configurations retain priority. Automatic timing in a manual Qwen environment preserves its previous coarse behavior; explicitly selecting word timing requires installed ForcedAligner weights as well.
 
-## Validation scope
+## Result checks and limits
 
 Setup checks actual device execution, output structure, waveform alignment and valid word times. Importing dependencies alone does not enable the Qwen pack. These checks do not establish better transcription or singing alignment accuracy; that requires separate labeled evaluation.
 
-See [hardware and workflow evidence](model-hardware.en.md) and [tool validation](model-tools-validation.md).
+See [hardware and workflow evidence](model-hardware.en.md) and .

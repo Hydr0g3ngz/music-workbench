@@ -1,6 +1,6 @@
-# Public annotated regression suite
+# Model evaluation datasets and commands
 
-Next speech cleanup has a separate **32-pair** VoiceBank-DEMAND regression protocol,
+Speech cleanup has a separate **32-pair** VoiceBank-DEMAND regression protocol,
 with disjoint 16-pair pilot/follow-up files from the same two test speakers. It is not added
 to the older song/lyric case count. See [methods, per-case regressions and reproduction](../docs/speech-cleanup.en.md)
 ([中文](../docs/speech-cleanup.md)), [pilot](speech-cleanup-v1.json) and
@@ -9,11 +9,11 @@ full audio and model weights remain local.
 
 This suite reuses published audio and annotations. No new manual labels are required. The frozen selection lives in [suite-v1.json](suite-v1.json); audio and reference text are downloaded into the ignored `.artifacts/benchmark/data/` directory.
 
-The [v4 extension](suite-v2-mir1k.json) adds 17 Mandarin karaoke recordings with human character boundaries, bringing the inventory to **43 cases**. Its 8-development / 9-confirmation split was frozen before new inference. See [v4 results and limitations](../docs/lyrics-v4.md); the original 26-case suite remains unchanged.
+The [v4 extension](suite-v2-mir1k.json) adds 17 Mandarin karaoke recordings with human character boundaries, bringing the inventory to **43 cases**. Its 8-development / 9-confirmation split was frozen before new inference. See v4 results and limitations; the original 26-case suite remains unchanged.
 
-The suite is an engineering regression set, not an official benchmark split or an unbiased model leaderboard. It keeps four different evaluation domains separate:
+The suite evaluates individual analysis components used by the audio tools. It does not measure the usability or musical quality of a complete Workbench project. This is an engineering regression set, not an official benchmark split or an unbiased model leaderboard. It keeps four different evaluation domains separate:
 
-The [original ten-case pilot](../docs/benchmark-baseline.md) is retained. Complete **26/26** baselines and paired improvements are in [results](results/), with a [fixed protocol](protocol-v1.json), [v2 decisions](../docs/benchmark-v2.md) and [lyrics v3 results](../docs/lyrics-v3.md). Basic installation retains small ASR; the optional Qwen configuration prioritizes text accuracy and marks missing word times explicitly.
+The original ten-case pilot is retained. Complete **26/26** baselines and paired improvements are in [results](results/), with a [fixed protocol](protocol-v1.json), v2 decisions and lyrics v3 results. Basic installation retains small ASR; the optional Qwen configuration prioritizes text accuracy and marks missing word times explicitly.
 
 | Source | Cases | What it tests | Reference |
 | --- | ---: | --- | --- |
@@ -151,4 +151,4 @@ $env:PYTHONPATH='src'
 .artifacts/lyrics-env/Scripts/python.exe scripts/audit_lyric_aligner.py --offline
 ```
 
-It is a malformed-span diagnostic, not another accuracy benchmark. Public reports contain numerical summaries, input hashes and model/driver identity. See [v4 decisions](../docs/lyrics-v4.md) and [results](results/).
+It is a malformed-span diagnostic, not another accuracy benchmark. Public reports contain numerical summaries, input hashes and model/driver identity. See v4 decisions and [results](results/).

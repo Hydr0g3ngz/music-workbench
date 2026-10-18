@@ -53,7 +53,6 @@ without changing the downloaded snapshot. Workers check manifest/file SHA256 aga
 Tasks record revisions, worker hash, profile, seed, prompt, duration, BPM, steps, audio hashes
 and resource measurements. Model licensing does not guarantee rights to any particular output.
 
-[技术验证 / Technical verification](feature-validation.md)。
 
 ## Diagnostics and recovery
 

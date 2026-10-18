@@ -24,9 +24,9 @@ Requested key, rhythm or motifs are not verified compliance. Use [matched candid
 
 ## 3. 拆解成可编辑声部 / Separate editable parts
 
-选择音频 →「素材适配 / AI」，可用 Demucs 四声部或 RoFormer 人声/伴奏分离。需要旋律音符时对合适的单旋律声部运行 CREPE，再换音色或编辑音符。采用保留时间关系与来源，支持撤销。[分轨](separation.md)
+选择音频 →「素材适配 / AI」，可用 Demucs 四声部或 RoFormer 人声/伴奏分离。需要旋律音符时对合适的单旋律声部运行 CREPE，再换音色或编辑音符。钢琴可选择 Transkun，其他独奏乐器可用 Basic Pitch 提取多音音符。采用保留时间关系与来源，支持撤销。[分轨](separation.md)
 
-Select audio → **Make this material fit** for Demucs four-part or RoFormer vocal/backing separation. Apply CREPE to a suitable monophonic source, then edit notes or change instruments. Adopted parts retain timing/provenance and support undo. [Separation](separation.en.md)
+Select audio → **Make this material fit** for Demucs four-part or RoFormer vocal/backing separation. Apply CREPE to a suitable monophonic source, then edit notes or change instruments. Use Transkun for piano and Basic Pitch for other solo-instrument polyphony. Adopted parts retain timing/provenance and support undo. [Separation](separation.en.md)
 
 分轨可能串音，CREPE 不能完整转录复音和声；导出 MIDI 也不会自动为音频轨生成乐谱。
 
@@ -52,6 +52,6 @@ MWB excludes weights, runtimes and the full task database. Generation/processing
 
 ## 案例与扩展 / Case study and future work
 
-[《云隙电台》](creations/radio-through-the-clouds.md) 组合 ACE-Step、Demucs 与 CREPE 完成九轨编排。测量记录展示功能连接与资源需求；音乐质量仍需实际试听。多音转谱、更多模型和完整工作台 Agent 控制见 [路线图](workbench-roadmap.md)。
+可以打开 [《雨后的街灯》](creations/after-the-rain.md) 跟着编辑，或按 [《云隙电台》](creations/radio-through-the-clouds.md) 的配方组合生成、分轨与 MIDI。后续计划见 [路线图](workbench-roadmap.md)。
 
-[Radio Through the Clouds](creations/radio-through-the-clouds.md) combines ACE-Step, Demucs and CREPE into nine tracks. Its measurements describe integration/resources; listen to assess musical results. See the [roadmap](workbench-roadmap.md) for polyphonic transcription, more models and full workstation Agent control.
+Open [After the Rain](creations/after-the-rain.md) to edit a ready-made project, or remake [Radio Through the Clouds](creations/radio-through-the-clouds.md) with generation, stems and MIDI. See the [roadmap](workbench-roadmap.md) for planned features.

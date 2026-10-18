@@ -30,4 +30,4 @@ A 16-second AI piano clip took **6.63 s** in task inference and **11.59 s** for 
 
 Source and ONNX weights are extracted from a hash-verified official wheel without its TensorFlow-dependent distribution metadata. The isolated environment is checked with actual offline inference. Use AI tools' check/repair actions for missing or corrupt files.
 
-[Spotify Basic Pitch](https://github.com/spotify/basic-pitch) source/weights use Apache-2.0; ONNX Runtime uses MIT. Versions, hashes and the benchmark script are in the repository. Weights download separately from the installer. Transkun remains an unintegrated research candidate.
+[Spotify Basic Pitch](https://github.com/spotify/basic-pitch) source/weights use Apache-2.0; ONNX Runtime uses MIT. Versions, hashes and the benchmark script are in the repository. Weights download separately from the installer. For piano, you can also use [Transkun](piano-notes.en.md).

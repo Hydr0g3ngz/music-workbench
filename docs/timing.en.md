@@ -6,7 +6,6 @@ Focus on a drum groove or melody while listening and editing. No models or GPU n
 
 ![Loop and metronome settings](images/timing-en.png)
 
-[Validation record](timing-validation.md)
 
 1. Open `↻ 1 → 5` in the arrangement toolbar.
 2. Set start/end bars, or use the selected-clip/whole-arrangement shortcuts. The end is exclusive: `1 → 5` repeats bars 1–4.

@@ -1,74 +1,45 @@
-# Local AI: hardware, speed and workflow
+# Choose AI tools for your computer
 
 [中文](model-hardware.md) · [Model setup](models.en.md)
 
-CPU execution is practical for speech cleanup and short transcription. Stems and monophonic transcription benefit substantially from a GPU. The current Windows ACE-Step configuration requires NVIDIA CUDA; CPU generation is not offered.
+Arrangement, instruments, recording, mixing and export need no dedicated GPU. Install AI tools only when needed. CPU processing works for some tasks, with longer waits for long material.
 
-## Measurements
+## Choose by task
 
-Measured on 2026-10-17: Windows x64, Core Ultra 9 185H, RTX 4070 Laptop 8 GB, 32 GB RAM. The private CPU pack uses Python 3.12.10 and Torch 2.5.1 CPU; the separate GPU pack uses Torch 2.10 CUDA 12.8. Both use the same model versions and algorithm parameters, with four CPU inference threads.
-
-Each case starts a new process, matching the workstation queue. Time includes startup, imports, weight loading, inference and artifact writing. OS file caches were not flushed. The 30-second music fixture combines attributed factory instrument samples; speech uses the bundled 23.112-second VoiceBank-DEMAND example. These measure execution speed, not recognition/separation quality or full-song performance. A real-time factor below one means processing finished faster than the input duration.
-
-| Task | Input duration | CPU completion | Sampled peak process RAM |
-| --- | ---: | ---: | ---: |
-| Demucs four stems | 30 s | 49.6 s | 1336 MiB |
-| CREPE monophonic notes | 30 s | 109.0 s | 1191 MiB |
-| Whisper small | 23.112 s | 16.6 s | 855 MiB |
-| DPDFNet2 speech cleanup | 23.112 s | 11.3 s | 160 MiB |
-| GTCRN speech cleanup | 23.112 s | 3.2 s | 112 MiB |
-
-The private CUDA pack completed the identical frozen inputs in **9.1 s** (Demucs), **11.0 s** (CREPE) and **11.7 s** (Whisper). Torch peak allocations were about 553 MiB and 735 MiB for the first two. Whisper uses CTranslate2; a zero Torch allocation is not zero VRAM, so its VRAM is unmeasured. These are single trials, not a statistical ranking.
-
-Installation smoke tests on a few seconds cannot establish practical throughput. Initialization, content, temperature and other applications affect latency. Do not extrapolate short fixtures linearly to complete songs.
-
-## Exact ACE-Step configuration
-
-Pinned ACE-Step 1.5 Turbo: source `ca1e85fe9430179831e6bc6be790c332190a3866`, model `19671f406d603126926c1b7e2adc169acbcade22`. Reading the safetensors headers gives:
-
-| Component | Stored tensor elements (approximate parameters) | Weight file bytes | Storage dtype |
-| --- | ---: | ---: | --- |
-| Turbo generation network | 2,393,872,518 | 4,787,825,604 | BF16 |
-| VAE | 168,695,426 | 337,431,388 | BF16 |
-| Qwen3-Embedding text encoder | 595,776,512 | 1,191,586,416 | BF16 |
-
-The three weight files total 6.32 GB / 5.88 GiB. Python, CUDA libraries, model code and retained downloads increase installation size. Qwen3-Embedding encodes prompts; this configuration has no 5Hz language model or AI arrangement planner.
-
-The low-VRAM profile applies torchao `int8_weight_only` after loading, specifically to **DiT decoder linear weights**. The rest of the network, VAE and text encoder are not all INT8. Downloaded checkpoints remain BF16.
-
-dev16 checks GPU architecture and current free VRAM before loading. Automatic setup uses CUDA 12.8 and requires Windows NVIDIA driver 570 or newer.
-
-| Profile | Free VRAM policy | Execution |
+| 工具 / Tool | 适合的用途 / Use | 安装和硬件 / Setup |
 | --- | --- | --- |
-| Low VRAM | 4–10 GB | Decoder linear weights in INT8; stage-wise CPU offload |
-| Balanced | 10–18 GB | Same INT8; generation network stays on GPU, other modules offload |
-| Original precision | At least 18 GB | BF16, no quantization or CPU offload |
+| Basic Pitch | 独奏乐器转多音 MIDI / Single-instrument polyphonic MIDI | CPU；下载约 150–350 MB，预留 2 GB / CPU, 2 GB disk |
+| 讲话清理 / Speech cleanup | 讲话录音降噪 / Reduce speech noise | CPU；下载约 150–300 MB，预留 1 GB / CPU, 1 GB disk |
+| Demucs、CREPE、Whisper | 分轨、单旋律、转写 / Stems, monophonic MIDI, text | 可选 CPU 或 NVIDIA 工具包 / CPU or NVIDIA pack |
+| Transkun | 钢琴专用多音 MIDI / Piano notes | 自动安装需 Turing 或更新 NVIDIA、4 GB 显存；可显式用 CPU / Managed CUDA pack, optional CPU inference |
+| RoFormer | 人声与伴奏 / Vocals and backing | Turing 或更新 NVIDIA、4 GB 显存 / Turing+ NVIDIA, 4 GB VRAM |
+| Qwen ASR + Aligner | 转写与逐字时间 / Text and word times | Ampere 或更新 NVIDIA、8 GB 总显存；运行前约 6 GB 空闲 / Ampere+, 8 GB total and about 6 GB free |
+| ACE-Step | 文字生成、变奏和重绘 / Generation and variations | Ampere 或更新 NVIDIA、8 GB 总显存，预留 35 GB 磁盘 / Ampere+, 8 GB VRAM, 35 GB disk |
 
-Automatic ACE setup also requires Ampere or newer and at least 8 GB total VRAM. Below 4 GB free, close other GPU applications first. Advanced generation settings can select a profile explicitly; insufficient memory is reported instead of silently changing it. These thresholds are resource policies, not universal compatibility guarantees for every GPU or 60-second task. Actual hardware validation currently covers the 4070 Laptop low-VRAM profile; the other policies have selection regression tests and still require physical-device validation.
+CUDA packs use Torch 2.10 / CUDA 12.8 and a compatible driver. Setup checks actual hardware and free memory. Reserve about 10 GB for Transkun, 12 GB for RoFormer and 24 GB for Qwen, including their separate runtimes. Selecting CPU does not shrink a CUDA pack into a lightweight CPU installation.
 
-One new 12-second, 8-step instrumental generation completed in 94.7 s: 78.7 s initialization/checks and 16.0 s generation/output. Torch peak allocated VRAM was about 3150 MiB, peak resident RAM 11,292 MiB, and peak private commit 17,947 MiB. Installation activity was present, so this is execution evidence rather than a controlled speed comparison. CPU offload needs substantial system RAM; 32 GB is the measured configuration. Workers exit after each task to release models, so each task pays loading costs.
+## Speed reference
 
-## Integration audit
+Single-host measurements: Windows, Core Ultra 9 185H, RTX 4070 Laptop 8 GB, 32 GB RAM. Invocation times include the stated loading overhead; they are not full-song guarantees.
 
-| Model | Purpose and result adoption | Evidence and limits |
+| Task | Input | Full invocation |
 | --- | --- | --- |
-| ACE-Step | Text, reference variation, repaint → audition draft → adopt audio track → undo/export | Real generation; outputs audio rather than separately editable instrumental notes |
-| Demucs | Two/four stems → audition → aligned source replacement or additional tracks | Real CPU/CUDA inference; separation does not compose new performances |
-| Mel-Band RoFormer KJ | Vocals/backing → same aligned adoption workflow | Existing quality comparison; dev17 adds a managed CUDA tool pack |
-| CREPE | Solo singing/humming/monophonic instrument → pitch/MIDI → editable sampled instrument notes | Public annotated-data evaluations; not reliable polyphonic whole-song transcription |
-| Whisper small | Speech/lyrics → transcript → line corrections in detailed asset editor → TXT/LRC/SRT | Real CPU/CUDA execution; singing, backing and overlapping voices remain difficult |
-| Qwen3-ASR-1.7B + ForcedAligner-0.6B | Transcription → acoustic word timing → same correction workflow | Managed setup in dev17; choose coarse timing or alignment. Alignment preserves recognized text and cannot fix wrong words; failed lines retain original timing and review markers |
-| DPDFNet2 | Speech cleanup → original/processed audition → add new track | Measured CPU execution and adjustable strength; may damage music/ambience |
-| GTCRN | Lightweight speech cleanup → same adoption workflow | Measured CPU execution; internal 16 kHz limits high frequencies; experimental alternative |
+| Basic Pitch CPU | 16 s AI piano | About 11.6 s |
+| Transkun GPU FP32 | Same 16 s piano | About 18.3 s |
+| Transkun CPU FP32 | Same 16 s piano | About 30.4 s |
+| Demucs CPU / GPU | 30 s instrumental | About 49.6 / 9.1 s |
+| CREPE CPU / GPU | 30 s instrumental | About 109.0 / 11.0 s |
 
-The main workstation now passes device, transcription language, Qwen timing mode and cleanup strength into real tasks. Processing still covers the **whole source asset**; adoption preserves the clip range. Shortening a timeline clip does not reduce model computation automatically. Transcript correction still opens **Details and editing** in the asset editor rather than an inline multitrack editor.
+New tasks may reload models; first-use imports can be slower. Trim long material and process the selected clip. Audition estimates and choose a backend suited to piano, another solo instrument or a separated stem.
 
-Beats, tempo, key, time/pitch, EQ, compression, reverb and volume curves use DSP. Blueprint and section-prompt compilation use rules. No hidden AI model performs those functions. CREPE stable/rest are decoder variants of one neural network.
+## ACE-Step configuration
 
-Quality evidence: [melody evaluation](melody-next.en.md), [separation](separation.en.md), [speech cleanup](speech-cleanup.en.md). Successful installation/inference does not establish accuracy gains.
+ACE-Step 1.5 Turbo uses about 2.39B main-network, 169M VAE and 596M text-encoder tensor elements. The downloaded BF16 checkpoints total about 6.32 GB, before runtime dependencies.
 
-## Reproduce and extend
+Low-VRAM and balanced modes quantize DiT decoder linear weights to INT8; other components remain BF16. This is partial quantization, not a fully INT8 model. Low-VRAM mode moves modules between RAM and GPU, so system RAM matters too.
 
-Run `scripts/benchmark_local_models.py` with an isolated interpreter, model directory, device and output directory; the development environment needs psutil. Use `--input-dir` to reuse identical WAV bytes in paired CPU/GPU runs. Machine-readable results: `benchmarks/results/local-hardware-2026-10-17.json`. Record driver/runtime versions, input hashes and actual devices. Developer GPU environments must not stand in for installer CPU results.
+Automatic selection uses free VRAM: low-VRAM at 4–10 GB, balanced at 10–18 GB, original precision at 18 GB or more. Setup still requires at least 8 GB total VRAM. Close other GPU applications if less than about 4 GB is free. Hardware coverage beyond the measured configuration remains limited.
 
-See the [dev17 guide](qwen-and-separation.en.md) for managed RoFormer/Qwen setup and word alignment. The dev16 measurements above retain their original conditions and are not speed guarantees for the new packs. Next priorities: processing selected clips only; releasable resident workers to reduce waits; and a complete humming → corrected MIDI → editable accompaniment → arrangement/export workflow. AI mixing, polyphonic transcription, controllable singing and deep Agent integration remain future work.
+A measured 20 s piano generation took about 65.5 s including loading. Results and resources vary with prompts, length and settings. Managed setup does not offer CPU music generation.
+
+[Piano comparison](piano-benchmark.md) · [Polyphony settings](polyphony-benchmark.md) · [Hardware measurements](../benchmarks/results/local-hardware-2026-10-17.json)

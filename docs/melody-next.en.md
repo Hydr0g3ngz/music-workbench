@@ -1,5 +1,7 @@
 # Melody and MIDI: candidate comparison
 
+This is a historical fixed-data comparison with its original environments and settings. Basic Pitch and Transkun are now installable tools; use [polyphonic notes](polyphonic-notes.en.md) and [piano transcription](piano-notes.en.md) for current setup.
+
 [中文](melody-next.md) · 2026-10-16 · [Per-case JSON](../benchmarks/results/melody-next-2026-10-16.json)
 
 **Keep the current default for now.** ROSVOT improves the existing GTSinger regression but

@@ -12,11 +12,11 @@ Create, arrange, record, edit, mix and export locally. Templates, presets, lesso
 
 | Area | Existing foundation | Extension |
 | --- | --- | --- |
-| Arrangement | Audio/MIDI tracks, source ranges and positions, split/copy, loops and sections | Group moves, local timing correction, longer projects |
+| Arrangement | Audio/MIDI tracks, source ranges and positions, split/copy, groups, loops and sections | Local timing correction, longer projects |
 | Instruments and MIDI | Samples/synths, grooves, import, piano roll and batch edits | More samples, controller events, third-party instruments |
 | Recording | Mono capture, device/meter and audition before adoption | Overdub, monitoring, count-in and latency compensation |
-| Mixing | Levels/pan, fixed EQ/compressor/reverb, volume curves and crossfades | Buses, sends, effect automation and plugin hosting |
-| AI material | ACE-Step, stems, monophonic MIDI, source/task records | Polyphony, singing, timbre, effects, retrieval and restoration |
+| Mixing | Levels/pan, fixed EQ/compressor/reverb, volume curves, crossfades, buses and sends | Effect automation and plugin hosting |
+| AI material | ACE-Step, stems, monophonic/polyphonic MIDI, source/task records | Broader multi-instrument transcription, singing, timbre, effects, retrieval and restoration |
 | Delivery | WAV/MIDI, credits and portable MWB projects | Portable task recipes, dependency diagnostics and batch delivery |
 | Onboarding | Windows installer/window, ACE-Step setup and bilingual lesson | Broader hardware coverage and observed usability trials |
 

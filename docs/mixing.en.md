@@ -48,6 +48,5 @@ The 32-track project limit is not a guarantee of real-time full-effects performa
 With limiting disabled, the existing export overload guard still rejects WAV clipping and requests a lower master fader.
 The master card displays actual sample peaks and overload warnings. Reduction readings represent recent audio blocks, not long-term maxima.
 
-[技术验证 / Technical verification](feature-validation.md)。
 
 Algorithm reference: RBJ formulas in the [W3C Audio EQ Cookbook](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html), and the classic Schroeder reverb structure. Implementations: `studio/effects.py` and `ui/static/effects-dsp.js`; cross-language regression: `tests/test_mix_effects.py`.

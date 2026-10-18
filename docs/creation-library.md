@@ -58,5 +58,3 @@
 完整记录见 `src/music_studio/data/creation/NOTICE.md` 和 `manifest.json`；
 每个源文件与派生采样都有哈希。需要重建时运行 `python scripts/build_creation_library.py`，
 这是主动联网操作，应用启动不会运行它。
-
-[技术验证 / Technical verification](feature-validation.md)。

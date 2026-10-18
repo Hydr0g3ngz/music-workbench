@@ -2,7 +2,7 @@
 
 [中文](local-model-candidates.md) · [Platform plan](workbench-plan.en.md) · Researched 2026-10-16
 
-See [audio resources research](audio-resources.en.md) for updated priorities, open assets,
+[Supported models](models.en.md) · [Roadmap](workbench-roadmap.md)
 evaluation datasets and storage choices.
 
 This research index uses upstream repositories and official model cards. It is not an installed
@@ -56,19 +56,5 @@ The application is currently MIT. Establish an appropriate integration/distribut
 plan before adopting GPL components; a separate process does not automatically remove obligations.
 Do not advertise researched GPL libraries as existing MIT built-ins.
 
-## Promotion from research to supported provider
 
-1. Register task scope, primary sources, code/weight/voicebank terms, maintenance, OS and runtime.
-2. Freeze checkpoints, code revisions, configuration, dependencies and hashes; record download/disk sizes.
-3. Run fixed short examples in isolation; retain failures/diagnostics and reproduce offline.
-4. Measure quality, time, peak memory, long input, cancellation/recovery and regressions; separate upstream figures from local measurements.
-5. Insert typed outputs into the project with timing/provenance; support audition, placement, undo and export.
-6. Choose task-specific recommended, lightweight, quality and experimental profiles; upgrades preserve existing results.
-
-Measure CPU, 8GB, 12–16GB and 24GB+ profiles with hardware, precision, offload and input lengths.
-ACE-Step's upstream near-8GB configuration and YuE2's official 24GB setup do not establish local
-verification. Label restricted open weights separately from permissively licensed open-source models.
-
-Community adapters can add models, parameters and hardware optimizations. Keep the base install
-useful and install/switch models on demand. Allow configured local model services to avoid
-duplicating weights. See the [roadmap](workbench-plan.en.md) for the first implementation order.
+Use [supported models](models.en.md) for tools available in the app. Candidates need separate integration and have their own code, weight and asset licenses. See [Contributing](../CONTRIBUTING.md) to help add a backend.

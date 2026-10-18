@@ -18,7 +18,7 @@ py -3.12 scripts/setup_ace.py
 .\Start-Music-Workbench.cmd
 ```
 
-Linux 使用 `python3.12 scripts/setup_ace.py`。Linux 路径已实现但尚未完成实机推理验收。
+Linux 使用 `python3.12 scripts/setup_ace.py`。Linux 安装路径仍为实验支持。
 安装器从官方 PyTorch、PyPI、GitHub 和 Hugging Face 下载，建立独立环境，
 不升级 UI、经典版或其他模型的 Torch。应用启动不会自动下载权重。
 默认配置是项目根目录 `.artifacts/acestep-runtime.json`；高级用户可用
@@ -26,7 +26,7 @@ Linux 使用 `python3.12 scripts/setup_ace.py`。Linux 路径已实现但尚未�
 
 默认使用 Turbo、INT8 线性层权重、BF16、SDPA、CPU offload、8 步、单候选，
 不加载 5Hz 语言模型，不编译，也不使用 Flash Attention。先尝试 12–20 秒器乐。
-界面提供 10–60 秒请求范围；已实际运行 12/20/32 秒器乐，60 秒和人声歌词质量尚未验收。
+界面可请求 10–60 秒；建议先用 12–20 秒器乐试听，长片段和人声歌词的质量不保证稳定。
 工程 BPM 作为生成条件传入，输出不保证准确对拍，也不会自动拉伸。
 
 新增参考变奏：先选中 10–60 秒音频片段，在生成面板选择「参考变奏」。
@@ -49,7 +49,6 @@ worker 再检查 manifest 与文件 SHA256，首次任务的加载时间包含�
 任务保留源码/权重修订、worker 哈希、profile、seed、描述、时长、BPM、步数、文件哈希和资源记录。
 生成音频不是训练素材许可或生成内容使用权的保证；发布作品前仍需判断具体内容。
 
-[技术验证 / Technical verification](feature-validation.md)。
 
 ## 故障与数据
 

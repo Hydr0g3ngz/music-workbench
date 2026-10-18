@@ -1,5 +1,7 @@
 # 旋律与 MIDI：候选模型实测
 
+这是早期旋律后端的固定数据对照，保留原环境和参数。当前 Basic Pitch 与 Transkun 已可在工具管理中安装；操作与要求见 [多音音符](polyphonic-notes.md) 和 [钢琴转录](piano-notes.md)。
+
 [English](melody-next.en.md) · 2026-10-16 · [逐例 JSON](../benchmarks/results/melody-next-2026-10-16.json)
 
 **结论：暂不替换默认模型。** ROSVOT 在既有 GTSinger 回归上明显更好，

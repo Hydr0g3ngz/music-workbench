@@ -48,6 +48,5 @@ AudioWorklet 需要现代浏览器与 localhost/HTTPS；效果器加载失败会
 关闭限制器后仍沿用削波导出保护：超出 0 dBFS 时拒绝 WAV，并提示降低主推子。
 播放中的主输出卡片显示实际采样峰值和过载提示；增益衰减读数是近期音频块读数，不是长时最大值。
 
-[技术验证 / Technical verification](feature-validation.md)。
 
 算法参考：[W3C Audio EQ Cookbook](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html) 中的 RBJ 系数公式；混响采用经典 Schroeder 结构。实现位于 `studio/effects.py` 和 `ui/static/effects-dsp.js`，跨语言回归位于 `tests/test_mix_effects.py`。

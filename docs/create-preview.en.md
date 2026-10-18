@@ -43,16 +43,16 @@ MWB excludes model weights, runtimes and the complete task database. Restore wit
 
 ## Add local AI
 
-Generate a draft from an empty project, or select audio for stems, monophonic MIDI or fitting. Audition candidates before adding at the playhead or replacing an aligned clip. Adoption supports undo. [Models and setup](models.en.md) · [AI workflow](ai-production-workflow.md)
+Generate a draft from an empty project, or select audio for stems, monophonic/polyphonic MIDI or fitting. Audition candidates before adding at the playhead or replacing an aligned clip. Adoption supports undo. [Models and setup](models.en.md) · [AI workflow](ai-production-workflow.md)
 
 ## Current limits
 
 - Fixed 4/4 and 44.1 kHz stereo; up to 32 tracks and ten-minute projects. Maximum upload: 256 MiB; decoded/synthesized audition budget: 256 MiB.
 - BPM changes affect MIDI and the grid. Audio needs a separate [beat-fit candidate](material-fitting.md) for time stretching.
-- Built-in sampled/synth sounds and fixed-order effects; no general SFZ/SoundFont, VST or buses/sends yet.
+- Built-in sampled/synth sounds and fixed-order effects; buses and sends are available. General SFZ/SoundFont and VST hosting are not yet provided.
 - Clip volume curves vary over time. Live effect tweaks are not recorded as automation.
 - Recording pauses arrangement playback; synchronized overdubbing, input monitoring and latency compensation are unavailable.
 - Seek and pause/resume rebuild effects; loops preserve effect tails. Discontinuous source boundaries can click.
-- Task input ranges differ: separation uses the complete source asset; reference generation/repaint use the ranges specified in their panels.
+- Task input ranges differ: workstation processing uses the selected source crop; reference generation/repaint use the ranges specified in their panels.
 
 See the [roadmap](workbench-roadmap.md) for future work and [technical reference](technical-reference.md) for version-specific checks and evaluations.

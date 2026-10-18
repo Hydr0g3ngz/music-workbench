@@ -1,47 +1,47 @@
-# Music Workbench documentation
+# Music Workbench user guide
 
 [中文](README.md) · [Project home](../README.en.md)
 
-- [Piano transcription](piano-notes.en.md) · [Note simplification and batch fades](note-editing.en.md) · [dev21 validation](dev21-validation.md)
+## First steps
 
-## Get started
+1. [Install the Windows app](windows-install.md) and open it from the desktop or Start menu.
+2. Choose **Make your first musical sketch** on Home. Follow the [five-step lesson](first-sketch.md) to listen, edit, mix and export.
+3. Use the [workstation guide](create-preview.en.md) to explore the controls, or open an [optional example project](examples.md).
 
-- [Install and upgrade](windows-install.md): Windows installer, requirements and project locations.
-- [Five-step lesson](first-sketch.md): listen, edit a note, balance and export.
-- [Workstation guide](create-preview.en.md): layout, tracks, clips, saving and export.
-- [Run from source](../QUICKSTART.md): Python environment and launch commands.
-- [Product and data boundaries](product-boundaries.md): Workbench, Studio, older bookmarks and the asset editor.
+Basic creation needs no AI models. Install a tool only when you need it; see [models and requirements](models.en.md).
 
 ## Make music
 
 | Task | Guide |
 | --- | --- |
-| Instruments, grooves and MIDI import | [Sampled instruments and MIDI](creation-library.en.md) |
-| Practice with a beat | [Loop and metronome](timing.en.md) |
-| Capture a microphone or audio input | [Recording](recording.en.md) |
-| Develop motifs and sections | [Creative blueprint and arranging methods](arranging-methods.md) |
-| Copy related parts and share effects | [Clip groups, buses and sends](groups-and-routing.en.md) |
-| Fit audio to the project | [Beat fitting and candidate comparison](material-fitting.md) |
-| Shape effects and levels | [Mixing](mixing.en.md) |
-| Fades, crossfades and region repaint | [Volume and transitions](volume-and-repaint.md) |
+| Write notes, change instruments, import MIDI | [Instruments and MIDI](creation-library.en.md) |
+| Record a microphone or audio input | [Recording](recording.en.md) |
+| Loop and practice with a beat | [Loop and metronome](timing.en.md) |
+| Develop motifs and sections | [Blueprint and arranging](arranging-methods.md) |
+| Move related clips and share effects | [Groups, buses and sends](groups-and-routing.en.md) |
+| Fit beats, change timing and compare candidates | [Material fitting](material-fitting.md) |
+| Balance levels, pan and effects | [Mixing](mixing.en.md) |
+| Add fades, crossfades and region repaint | [Volume and transitions](volume-and-repaint.md) |
 
 ## Use local AI
 
-- [Supported models and setup](models.en.md): automatic setup, manual installation and research candidates.
-- [Single-instrument polyphonic MIDI](polyphonic-notes.en.md): transcribe, audition, adopt and edit notes.
-- [Windowlight case study](creations/windowlight.md): an empty project to 32 bars and portable recovery.
-- [Hardware and measured speed](model-hardware.en.md)
-- [Automatic RoFormer and Qwen setup](qwen-and-separation.en.md): vocals/backing, transcription and word timing.
-- [ACE-Step generation](music-generation.en.md): text, reference variations, settings and troubleshooting.
-- [Vocal/backing separation](separation.en.md): audition and aligned adoption with originals retained.
-- [AI production workflow](ai-production-workflow.md): from brief to portable delivery.
-- [Radio Through the Clouds](creations/radio-through-the-clouds.md): a case study using generation, stems and editable MIDI.
+- [Choose and install models](models.en.md) · [Hardware and speed](model-hardware.en.md)
+- [Generation and variations](music-generation.en.md) · [AI production workflow](ai-production-workflow.md)
+- [Separate vocals and backing](separation.en.md) · [Transcription and word timing](qwen-and-separation.en.md)
+- [Instrument audio to MIDI](polyphonic-notes.en.md) · [Piano transcription](piano-notes.en.md)
+- [Simplify dense notes](note-editing.en.md) · [Speech cleanup](speech-cleanup.en.md)
 
-## Contribute and investigate
+## Learn from a piece
 
-- [Contributing](../CONTRIBUTING.md) · [Current roadmap](workbench-roadmap.md) · [Platform design](workbench-plan.en.md)
-- [Model research](local-model-candidates.en.md) · [Open assets and storage](audio-resources.en.md)
-- [Technical and historical reference](technical-reference.md): frozen datasets, reproduction, version checks and the compatibility editor.
-- [Media kit](launch-kit.md) · [Changelog](../CHANGELOG.md) · [Third-party notices](../THIRD_PARTY_NOTICES.md)
+- [After the Rain](creations/after-the-rain.md): piano, marimba echoes, a reference variation and bus mixing.
+- [Windowlight](creations/windowlight.md): develop a quiet sketch through space and timbre.
+- [Radio Through the Clouds](creations/radio-through-the-clouds.md): separate generated audio and rebuild it into six sections.
 
-Full-song lyric, melody, chord and beat analysis is maintained separately in [Music Studio](https://github.com/Hydr0g3ngz/music-studio). Compatibility pages and pre-split documents remain for maintenance and reproducibility. Some technical guides combine Chinese and English on one page.
+## Help and advanced use
+
+- [Installation, updates and troubleshooting](windows-install.md) · [Project locations and products](product-boundaries.md)
+- [Report a problem](https://github.com/Hydr0g3ngz/music-workbench/issues) · [Changelog](../CHANGELOG.md) · [Planned features](workbench-roadmap.md)
+- [Run from source](../QUICKSTART.md) · [Contribute](../CONTRIBUTING.md)
+- [Model evaluations and technical reference](technical-reference.md) · [Licenses](../THIRD_PARTY_NOTICES.md)
+
+Some advanced guides share a bilingual page.

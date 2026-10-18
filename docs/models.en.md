@@ -35,7 +35,7 @@ After installation, click **Use in workstation**, import a recording, select an 
 
 Use **Check environment** to find missing dependencies or corrupt weights, or **Repair setup** to prepare the pack again. Explicitly configured inference environments retain priority; existing models do not need moving.
 
-[Installation and workstation validation](model-tools-validation.md) · [Actual speed, quantization and integration audit](model-hardware.en.md).
+[Hardware requirements and measured speed](model-hardware.en.md)
 
 ## Automatic ACE-Step setup
 

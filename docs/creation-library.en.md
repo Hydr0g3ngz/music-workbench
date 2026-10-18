@@ -68,5 +68,3 @@ Export → Sources and attribution produces credits for templates actually used 
 See `src/music_studio/data/creation/NOTICE.md` and `manifest.json` for licenses, modifications,
 source/derived hashes and exact filenames. `python scripts/build_creation_library.py` explicitly
 rebuilds the pack over the network; normal application startup never invokes it.
-
-[技术验证 / Technical verification](feature-validation.md)。

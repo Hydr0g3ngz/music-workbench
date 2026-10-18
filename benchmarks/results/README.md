@@ -1,6 +1,6 @@
-# Local results · 2026-10-15
+# Analysis-component evaluation results
 
-These are engineering regressions on the pinned 26-case subset. See [the protocol](../protocol-v1.json), [model hashes](../model-provenance.json), [method and decisions](../../docs/benchmark-v2.md).
+These are engineering regressions on the pinned 26-case subset. See [the protocol](../protocol-v1.json), [model hashes](../model-provenance.json), method and decisions.
 
 `baseline.json`, `balanced.json` and `text-priority.json` each account for all 26 cases. The latter two inherit unchanged, measured components; they are not fresh full-run speed tests. The two note decoders use the same hash-verified seed=0 pitch contours. Composition also checks identical source and vocal audio. Per-case metrics and provenance are included; raw audio, reference lyrics and prediction text are excluded.
 
@@ -18,7 +18,7 @@ The three `*-recognition.json` reports preserve the original Qwen vocal (cold pr
 
 `lyrics-v3-global-anchors.json` and `lyrics-v3-window-anchors.json` preserve earlier matching algorithms. The two forced-alignment reports preserve independent Qwen/Whisper experiments; their recognition text equals the Qwen candidate. The legacy-turbo Qwen alignment report uses unchanged v2 text; the unseeded turbo diagnostic predates the explicit CTranslate2 seed and is not the v3 control. `lyrics-v3-rejected-28s.json` has only an interrupted first attempt, no complete accuracy result. Nothing is silently removed from the comparison because it failed or regressed.
 
-See [lyrics v3 decisions](../../docs/lyrics-v3.md) and [protocol](../lyrics-v3-protocol.json). Qwen/Heart training membership is unverified. This is a small, previously used engineering suite, including only 64 Chinese characters; it is not an unseen-test leaderboard.
+See lyrics v3 decisions and [protocol](../lyrics-v3-protocol.json). Qwen/Heart training membership is unverified. This is a small, previously used engineering suite, including only 64 Chinese characters; it is not an unseen-test leaderboard.
 
 ## Lyrics v4
 
@@ -28,4 +28,4 @@ See [lyrics v3 decisions](../../docs/lyrics-v3.md) and [protocol](../lyrics-v3-p
 
 `lyrics-v4-aligner-audit.json` is a three-case diagnostic of official raw-text versus tokenized Qwen aligner input, with no reference text supplied. It reports invalid spans, not alignment accuracy. Detailed token outputs remain local.
 
-See [v4 report](../../docs/lyrics-v4.md) for scope, Mandarin P90 regressions and product validation. Data and prediction text remain excluded; upstream data/model terms are not replaced by this repository's MIT license.
+See v4 report for scope, Mandarin P90 regressions and product validation. Data and prediction text remain excluded; upstream data/model terms are not replaced by this repository's MIT license.

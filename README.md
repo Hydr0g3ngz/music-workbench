@@ -4,9 +4,7 @@
 
 本地运行的开源音乐创作工作台。用采样乐器、MIDI、多轨编排、录音和混音制作音乐，也可以把本地 AI 生成、分离和转录的素材加入作品。
 
-整曲分析是独立产品 [Music Studio](https://github.com/Hydr0g3ngz/music-studio)。两个产品分别安装、保存和发布，详见[产品与数据边界](docs/product-boundaries.md)。
-
-[**下载 Windows 安装器**](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-0.2.0.dev21-Setup-x64.exe) · [入门宣传片](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-dev21-Promo-1080p.mp4) · [入门教程](docs/first-sketch.md) · [文档目录](docs/README.md)
+[**下载 Windows 安装器**](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-0.2.0.dev21-Setup-x64.exe) · [入门教程](docs/first-sketch.md) · [文档目录](docs/README.md)
 
 Windows 10 22H2 / 11 x64 · 中文 / English · 开发预览版，安装器未签名
 
@@ -23,9 +21,8 @@ Windows 10 22H2 / 11 x64 · 中文 / English · 开发预览版，安装器未�
 
 跟练约需 5–10 分钟，无需账号、AI 模型或专业显卡。关闭后可从顶部 **入门** 继续；软件内提供完整离线手册。
 
-[安装与升级](docs/windows-install.md) · [教程详细步骤](docs/first-sketch.md) · [下载可编辑示例](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/First-Sketch-Example.mwb)
+[安装与升级](docs/windows-install.md) · [教程详细步骤](docs/first-sketch.md) · [可选示例工程](docs/examples.md)
 
-宣传片使用实际操作录屏、作品导出声音和合成旁白。入门示例使用内置乐器，不需要 AI 生成。
 
 ## 可以做什么
 
@@ -47,7 +44,7 @@ AI 工具管理还提供七个独立处理工具包，按需安装并执行真�
 
 ## 版本范围
 
-当前源码支持固定 4/4 拍、最多 32 轨、8 条总线和 10 分钟工程。VST、效果参数自动化、同步叠录、延迟补偿和工作台全流程 Agent 操作尚未提供。安装器没有自动更新器；更新前请保存工程并关闭软件。[dev21 发布说明与校验](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev21)
+当前版本支持固定 4/4 拍、最多 32 轨、8 条总线和 10 分钟工程。VST、效果参数自动化、同步叠录、延迟补偿和工作台全流程 Agent 操作尚未提供。安装器没有自动更新器；更新前请保存工程并关闭软件。[dev21 发布说明与校验](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev21)
 
 ## 从源码运行与参与贡献
 

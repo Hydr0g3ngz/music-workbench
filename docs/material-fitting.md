@@ -1,6 +1,6 @@
 # 素材对拍与候选比较 / Beat fitting and candidate comparison
 
-[文档 / Documentation](README.md) · 适用于 / Applies to dev14
+[文档 / Documentation](README.md) · 适用于 / Applies to dev21
 
 让生成或导入的音频能够进入同一首作品：**分析 → 人工确认参考拍 → 制作适配候选 → 等响度试听 → 采用 / 撤销**。
 Tempo analysis and stretching use DSP; this workflow needs no additional neural model.
@@ -49,42 +49,6 @@ from an uncertain key estimate. Phase-vocoder transients may smear.
 - 预览音频按内容哈希缓存；准备和下载均检查归属及输入/输出哈希。后续编辑工程时必须按新版本重新准备。
   Previews use immutable content-keyed caching with ownership and integrity checks. Project edits require preparing with the new revision.
 
-## 实测 / Verification
-
-dev10 独立节拍测试样本：通过浏览器导入自制节拍音，
-运行分析、两拍校准、120 BPM 对拍任务、试听、采用、撤销与重做；还比较了 ACE-Step 的 16 秒主题和参考变奏测试样本。
-这些是工作流验收样本，不是新完成作品或模型音质排名。
-
-The independent fixture used browser import, actual DSP tasks, calibration, A/B, adoption and history.
-It also compared the earlier real ACE-Step theme and variation. These are workflow fixtures, not music-quality rankings.
-
-| 项目 / Check | 结果 / Result |
-| --- | --- |
-| 源音频真值 / Source truth | 100 BPM，首拍 0.37 s，12 s stereo / 44.1 kHz；带弱起。 |
-| 对拍参数 / Alignment | 120 BPM，速度比 1.2；参考拍落到第 3 小节 / 4 s，片段从 3.691667 s 开始、时长 10 s。 |
-| 实际音频 / Rendered timing | 最近脉冲峰值最大误差 22.03 ms；首尾漂移 9.48 ms。峰值位置包含声码器瞬态变化。 |
-| 等响度复测 / Remeasured matching | 衰减后的文件 −37.769 / −37.787 LUFS，差约 0.018 LU；仅此固定样本。 |
-| 实际浏览器 / Browser | 两个音源各一次加载；中途切换、匹配开关、完整播放；没有任务刷新触发重载。 |
-| AI 音乐 / AI material | 既有主题 / 变奏窗口约 −15.93 / −14.84 LUFS；均完成匹配试听，无艺术质量评级。 |
-
-时间基准可复跑（需安装 librosa 推理依赖）：
-
-```sh
-python scripts/benchmark_material_fit.py --output outputs/benchmark/material-fit
-```
-
-阈值：本固定脉冲样本最大峰值误差 <40 ms，首尾漂移 <20 ms；不是全部风格的保证。
-自动测试还覆盖无效边界、静音、峰值余量、跨工程访问拒绝、候选损坏、版本冲突、
-参考变奏/处理结果的比较、对拍采用时 BPM 变化、撤销与原素材保持。
-
-The reproducible pulse regression checks <40 ms peak error and <20 ms endpoint drift on this fixture only.
-Tests also cover bounds, silence, headroom, ownership, corruption, revisions, candidate types and undo.
-
-167 项 Python 测试、64 项前端测试通过；安装后的 wheel 验证覆盖对拍预览与候选比较。
-检查工程保存、音频引用与撤销历史保留。
-167 Python and 64 frontend tests passed. Installed-wheel checks cover fit preview and candidate A/B;
-project persistence, audio references and undo history were checked.
-[固定时间基准结果 / Fixed timing result](../benchmarks/results/material-fit-dev10.json)
 
 ## 继续编辑 / Continue editing
 

@@ -59,6 +59,10 @@ Preserve timing units, immutable sources and optimistic revisions. Incompatible 
 
 ## Releases and documentation
 
-Write documentation for users or contributors who have not seen development discussions. Put current instructions in guides, future work in the roadmap, versioned measurements in technical reports and user-visible changes in release notes. Keep Chinese and English guides consistent.
+Write guides for users who have not read development conversations. Keep current instructions and limits in the guides, future work in the roadmap, and release notes focused on user-visible changes. Keep Chinese and English consistent. Internal QA logs, owner handoffs and promotional production instructions stay outside the public documentation.
 
-Update the package version, changelog and `docs/releases/vX.Y.Z.md`. Validate the wheel and intended desktop/installer package, including a clean installation and project retention, before tagging. The [release workflow](.github/workflows/release.yml) validates tags and builds ZIP/wheel/sdist/checksums. It creates a prerelease **draft** when no release exists and preserves existing reviewed assets. Desktop installers and media require their separate packaging steps; review the final draft and checksums before publishing.
+Run `python scripts/check_public_docs.py` before submitting documentation. Check links when moving a guide or removing an attachment.
+
+The download page has one primary Windows installer link. Publish only the installer, an optional example-project ZIP and matching checksums. Keep wheel/sdist/source build outputs in CI artifacts; GitHub supplies source archives automatically. Do not attach individual demo exports, QA reports, videos, subtitles, covers or publishing kits to software releases.
+
+The release workflow validates tags and keeps build outputs in Actions. A new tag creates a draft without uploading `dist/*`. Add reviewed user downloads and verify checksums before publishing. Existing release assets remain unchanged unless explicitly reviewed.

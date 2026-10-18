@@ -27,5 +27,3 @@ Before adoption, audio stays in browser memory. A stopped take survives closing/
 On device failure, delivered PCM remains recoverable; an undelivered audio-thread tail block can be lost, up to roughly 85 ms at 48 kHz.
 
 Synchronized overdubbing, input monitoring, count-in, latency calibration and multichannel recording are not implemented. The timeline position does not compensate for input hardware/browser latency.
-
-[技术验证 / Technical verification](feature-validation.md)。

@@ -4,9 +4,7 @@
 
 An open-source music workstation that runs locally. Create with sampled instruments, MIDI, multitrack arrangement, recording and mixing, and bring material from local AI generation, separation and transcription into your project.
 
-Full-song analysis is a separate product, [Music Studio](https://github.com/Hydr0g3ngz/music-studio), with its own installation, data and releases. See [product and data boundaries](docs/product-boundaries.md).
-
-[**Download Windows installer**](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-0.2.0.dev21-Setup-x64.exe) · [Introductory film](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-dev21-Promo-1080p.mp4) · [Beginner lesson](docs/first-sketch.md) · [Documentation](docs/README.en.md)
+[**Download Windows installer**](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-0.2.0.dev21-Setup-x64.exe) · [Beginner lesson](docs/first-sketch.md) · [Documentation](docs/README.en.md)
 
 Windows 10 22H2 / 11 x64 · English / 中文 · Development preview; unsigned installer
 
@@ -23,9 +21,8 @@ Windows 10 22H2 / 11 x64 · English / 中文 · Development preview; unsigned in
 
 Allow 5–10 minutes. No account, AI models or dedicated GPU are required. Resume from **Learn** in the header; a full offline handbook is included.
 
-[Installation and upgrades](docs/windows-install.md) · [Lesson steps](docs/first-sketch.md) · [Editable example](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/First-Sketch-Example.mwb)
+[Installation and upgrades](docs/windows-install.md) · [Lesson steps](docs/first-sketch.md) · [Optional example projects](docs/examples.md)
 
-The film uses real UI recordings, exported example music and synthetic narration. The beginner lesson uses built-in instruments and needs no AI generation.
 
 ## What you can do
 
@@ -47,7 +44,7 @@ AI tools also offers seven isolated processing packs, downloaded on demand and c
 
 ## Preview scope
 
-Current source supports fixed 4/4 time, up to 32 tracks, eight buses and ten-minute projects. VST, effect-parameter automation, synchronized overdubbing, latency compensation and full workstation Agent control are not available yet. There is no automatic updater; save your work and close the app before updating. [dev21 release notes and checksums](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev21)
+The current version supports fixed 4/4 time, up to 32 tracks, eight buses and ten-minute projects. VST, effect-parameter automation, synchronized overdubbing, latency compensation and full workstation Agent control are not available yet. There is no automatic updater; save your work and close the app before updating. [dev21 release notes and checksums](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev21)
 
 ## Run from source and contribute
 

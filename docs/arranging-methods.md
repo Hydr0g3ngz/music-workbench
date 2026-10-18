@@ -1,6 +1,6 @@
 # 从编曲方法到可操作流程 / Arrangement methods in the workflow
 
-[文档 / Documentation](README.md) · 适用于 / Applies to dev14
+[文档 / Documentation](README.md) · 适用于 / Applies to dev21
 
 主线：**创作意图 → 动机与音色 → 发展变化 → 段落组织 → 对比与打磨**。
 这些方法是可修改的创作起点，不是通用规范或自动评分标准。
@@ -8,7 +8,6 @@
 The workflow is **intention → motif and palette → development → arrangement → comparison and refinement**.
 Methods provide editable starting points, not universal rules or an automatic music score.
 
-[真实操作与模型测量 / Real workflow verification](arranging-validation.md)
 
 ## 依据与产品实现 / Sources and implementation
 

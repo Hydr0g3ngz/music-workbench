@@ -88,7 +88,7 @@ Next 自动发现本仓库 `.artifacts/lyrics-env`。也可通过 `launch-next.p
 
 ## Agent 工具与限制
 
-原有 8 个编辑工具保留，新增 `audio_list_models`、`audio_check_model`、`audio_run_task`、
+提供 8 个基本编辑工具，以及 `audio_list_models`、`audio_check_model`、`audio_run_task`、
 `audio_get_tasks`、`audio_cancel_task`、`audio_read_artifact`、`audio_correct_transcript` 与
 `audio_prepare_comparison`，共 16 个。A/B 工具只准备界面对比，不自动播放或采用。
 例如让 Codex “先分离当前音频的人声，再读取转写结果”。工具参数只接受固定模型 ID 和项目素材 ID，

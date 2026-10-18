@@ -2,7 +2,7 @@
 
 [English](polyphonic-notes.en.md) · [模型目录](models.md)
 
-dev20 新增 **Basic Pitch 0.4.0 ONNX**：从单件乐器录音估计重叠音符，生成 MIDI，再用乐器音色演奏和修改。它是轻量基线，不是复杂混音的自动完整配器或保证准确的扒谱工具。
+**Basic Pitch 0.4.0 ONNX**：从单件乐器录音估计重叠音符，生成 MIDI，再用乐器音色演奏和修改。它是轻量基线，不是复杂混音的自动完整配器或保证准确的扒谱工具。
 
 ## 安装与使用
 
@@ -30,4 +30,4 @@ dev20 新增 **Basic Pitch 0.4.0 ONNX**：从单件乐器录音估计重叠音�
 
 官方 Basic Pitch wheel 的源码与 ONNX 权重单独提取，校验固定 SHA-256；不安装会引入 TensorFlow 依赖的发行元数据。环境与其他模型隔离，安装验证运行真实离线推理。损坏时在 AI 工具管理选择检查/修复。
 
-代码与权重 Apache-2.0：[Spotify Basic Pitch](https://github.com/spotify/basic-pitch)。ONNX Runtime 使用 MIT 许可。版本、哈希及评测脚本随仓库保存；权重按需下载，不随安装器内置。Transkun 仍是未接入候选。
+代码与权重 Apache-2.0：[Spotify Basic Pitch](https://github.com/spotify/basic-pitch)。ONNX Runtime 使用 MIT 许可。版本、哈希及评测脚本随仓库保存；权重按需下载，不随安装器内置。钢琴素材也可选择 [Transkun](piano-notes.md)。

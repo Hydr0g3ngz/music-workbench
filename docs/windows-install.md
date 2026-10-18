@@ -1,45 +1,45 @@
-# Windows 安装版 / Windows installer
+# Windows 安装与更新 / Install and update
 
-当前下载为 **dev21 开发预览版**。直接运行安装器并核对发布页的 SHA-256，无需先安装旧版本。[本版新增功能](releases/v0.2.0.dev21.md)。
+[**下载安装器 / Download installer**](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-0.2.0.dev21-Setup-x64.exe)
 
-The current download is the **dev21 development preview**. Run Setup and check the release SHA-256. No older installation is required. See the dev21 release notes.
+适用于 Windows 10 22H2 / Windows 11 x64。基础运行环境已包含，无需安装 Python。基础乐器、MIDI、录音、编排、混音和导出无需 AI 模型。
 
-下载 [`Music-Workbench-0.2.0.dev21-Setup-x64.exe`](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-0.2.0.dev21-Setup-x64.exe)，运行安装器，选择语言和安装目录。安装结束后从桌面或开始菜单打开 **Music Workbench**。工作台在自己的桌面窗口内显示，无需 Python、终端、端口或单独的浏览器窗口。
+For Windows 10 22H2 / Windows 11 x64. The basic runtime is included; no Python setup is needed. Instruments, MIDI, recording, arrangement, mixing and export work without AI models.
 
-Download and run the x64 Setup executable, choose language and installation directory, then open Music Workbench from the desktop or Start menu. The workspace opens in its own desktop window, without a separate Python installation, terminal, port selection or browser window.
+## 首次安装 / First installation
 
-第一次打开建议选择 **跟着做出第一段音乐**，按五步完成试听、认识音轨、音符编辑、混音和 WAV 导出。教程可关闭、继续或重新学习；顶部“入门”可再次打开。完整离线手册也在软件内。[教程](first-sketch.md)。
+1. 下载上面的 `Setup-x64.exe`，运行安装器并选择安装位置。安装器目前未签名，Windows 可能显示来源提醒。
+2. 安装后，从桌面或开始菜单打开 **Music Workbench**。
+3. 首页选择 **跟着做出第一段音乐**。五步跟练和离线手册已随软件提供。
+4. 需要生成、分轨或转录时，再打开 **AI 工具管理**。不同模型的下载量和显卡要求见 [模型指南](models.md)。
 
-Choose **Make your first musical sketch** on first launch. Five in-app steps cover listening, track layers, note edits, balance and WAV export. Resume from **Learn** in the header, or read the offline handbook inside the app.
+Run Setup, install and open Music Workbench. Choose the first lesson on Home. The installer is currently unsigned. Install AI tools later when needed; see [model requirements](models.en.md).
 
-支持 Windows 10 22H2 / Windows 11 x64。默认安装到当前用户的 Programs 目录，不要求管理员权限。安装器包含基础创作运行时和微软签名的 WebView2 离线安装器；已安装显示运行时则复用，否则自动安装。安装后基础功能可离线使用。
+## 更新 / Update
 
-Windows 10 22H2 / Windows 11 x64. Installs per user without administrator rights. The package includes the basic creation runtime and Microsoft-signed offline WebView2 installer, used only when needed. Basic creation works offline after installation.
+保存工程并关闭软件，下载新版本安装器，安装到原来的位置。软件菜单中的 **版本与更新** 提供发布入口；目前没有后台自动更新器。建议先导出 `.mwb` 备份。
 
-基础功能包括示例、乐器、MIDI、录音、剪辑、编排、混音和导出。首页 AI 入口提供 ACE-Step 图形化自动配置：检查显卡和磁盘、下载独立环境与固定版本模型、校验、生成 12 秒音乐验证，然后启用文字生成、参考变奏和局部重绘。无需另外安装 Python 或 CUDA Toolkit。需要 Windows x64、NVIDIA 至少 8 GB 显存和兼容驱动、35 GB 可用空间；首次下载约 8–12 GB，网络和硬件决定耗时。失败可重试，已有校验缓存复用；关闭程序会暂停准备。AI 工具管理还提供七个独立处理工具包，包含钢琴、多音音符、分轨、转写与语音清理；模型另外下载。
+Save and close the app, then install the new version in the same location. **Version & updates** opens the release page. Updates are manual; export an `.mwb` backup first.
 
-Examples, instruments, MIDI, recording, editing, arrangement, mixing and export are included. Home offers graphical ACE-Step setup: hardware/disk checks, isolated dependencies, pinned model downloads, checksum verification and a real 12-second generation test. No separate Python or CUDA Toolkit installation is needed. Requires Windows x64, an NVIDIA GPU with at least 8 GB VRAM and a compatible driver, 35 GB free space and about 8–12 GB of initial downloads. Retry reuses verified caches; closing pauses setup. AI tools offers seven isolated processing packs for piano/polyphonic notes, separation, transcription and speech cleanup. Models download separately.
+## 作品放在哪里 / Where files are stored
 
-作品默认保存在 `%LOCALAPPDATA%\MusicWorkbench\Projects`，与安装目录分离。升级后继续使用；卸载只处理程序文件，不删除作品、模型或浏览器用户数据。可通过软件菜单打开作品目录，或用 `.mwb` 转移作品。原源码工程在 `outputs/workbench`，不自动迁移。
+| 内容 / Data | 位置 / Location |
+| --- | --- |
+| 工程 / Projects | `%LOCALAPPDATA%\MusicWorkbench\Projects` |
+| AI 环境和模型 / AI tools and weights | `%LOCALAPPDATA%\MusicWorkbench\AI` |
+| 启动日志 / Startup log | `%LOCALAPPDATA%\MusicWorkbench\Logs\startup.log` |
 
-Projects remain in `%LOCALAPPDATA%\MusicWorkbench\Projects`, separate from program files. Upgrades retain them; uninstall removes program files while preserving project/model/profile data. Source-checkout projects in `outputs/workbench` are not migrated automatically.
+升级和卸载保留这些数据。可以从软件菜单打开作品目录；用 `.mwb` 转移完整作品。源码版默认使用 `outputs/workbench`，不会自动搬到安装版。
 
-AI 文件保存在 `%LOCALAPPDATA%\MusicWorkbench\AI`，也与程序和作品分离。显示支持按显示器 DPI 缩放；若误调了页面大小，可用菜单“显示设置 → 恢复 100% 页面缩放”。诊断入口可查看实际 DPI 与渲染像素比。
+These folders are retained on upgrade and uninstall. Open the project folder from the app menu or transfer projects with MWB. Source projects default to `outputs/workbench` and are not moved automatically.
 
-AI files live separately in `%LOCALAPPDATA%\MusicWorkbench\AI`. The desktop uses per-monitor DPI scaling. Use Display → Reset page zoom to 100% after an accidental zoom change; diagnostics show actual DPI and rendering pixel ratio.
+## 遇到问题 / Troubleshooting
 
-退出时会等待当前工程保存；录音尚未保留时应先加入轨道或下载，再退出。重复打开激活已有窗口。正在运行时需要先关闭软件再升级或卸载。后台由本窗口启动时，退出会一并关闭；连接已有独立服务时保留该服务。
+- 启动失败：从软件菜单打开诊断，或查看上面的启动日志。报告问题时附系统、软件版本和错误信息。
+- 显示过大或模糊：在 **显示设置** 中恢复 100% 页面缩放；诊断页可查看 DPI。
+- AI 工具不可用：在工具管理中选择 **检查当前环境** 或 **修复安装**；先确认空间、显卡和网络满足要求。
+- 退出前，未采用的录音应先加入轨道或下载。重复打开会激活已有窗口。
 
-Closing waits for project saves and protects unadopted recordings. Relaunch activates the existing window. Close the software before upgrading/uninstalling. Closing stops a backend owned by this window, while retaining a reused independent service.
+For startup failures, inspect diagnostics/logs and include the OS, app version and error in your report. Reset page zoom to 100% for display issues. Check or repair missing AI tools. Keep an unadopted recording before closing.
 
-本预览安装器尚未签名，也没有自动更新器。dev21 可在 [发布页](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev21) 核对 SHA-256。遇到启动问题时，从软件菜单打开诊断或查看 `%LOCALAPPDATA%\MusicWorkbench\Logs\startup.log`；反馈时提供系统、软件版本与错误信息。
-
-The preview installer is unsigned. Version & updates in the app opens release links and manual upgrade instructions; there is no background updater. Verify the release checksums. For startup problems, open diagnostics or inspect `%LOCALAPPDATA%\MusicWorkbench\Logs\startup.log`; include the OS, app version and error when reporting a problem. Broader compatibility results are in the technical report below.
-
-## 开发者：构建与验证 / Developers: build and verification
-
-Implementation references: [Microsoft WebView2 distribution](https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution), [Inno Setup per-user installation](https://jrsoftware.org/ishelp/topic_setup_privilegesrequired.htm), [installer command-line options](https://jrsoftware.org/ishelp/topic_setupcmdline.htm).
-
-[实测记录与边界 / Validation and limits](windows-validation.md)。源码构建：先用 `scripts/prepare_installer_tools.py` 获取并校验构建工具，安装 Inno 编译器到 `.artifacts/desktop-build-tools/inno`，再用 `scripts/package_installer.py`。Evergreen 下载链接会更新；哈希不匹配时先复核微软签名和版本，再有意识地更新固定输入，不跳过校验。
-
-Source builds: prepare and verify build inputs with `scripts/prepare_installer_tools.py`, install the Inno compiler into `.artifacts/desktop-build-tools/inno`, then use `scripts/package_installer.py`. The Evergreen URL changes over time: review Microsoft's signature/version before updating the pinned input; do not bypass verification.
+[检查下载文件的 SHA-256 / Checksums](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/SHA256SUMS.txt) · [报告问题 / Report a problem](https://github.com/Hydr0g3ngz/music-workbench/issues) · [从源码运行 / Run from source](../QUICKSTART.md)

@@ -26,8 +26,6 @@ Use **Learn** in the workstation header to resume. The full offline guide opens 
 
 ## 接下来用 AI / Continue with AI
 
-完成后点“探索本地 AI”。已配置 ACE-Step 时进入生成，否则进入图形配置。先尝试 12 秒器乐草稿，试听再采用，结合对拍、裁切和淡化融入作品。自动配置首批覆盖 ACE-Step；需要兼容 NVIDIA 8 GB 显卡、35 GB 空间、首次约 8–12 GB 下载。模型速度与质量因硬件和提示词而异。
+完成后点“探索本地 AI”。已配置 ACE-Step 时进入生成，否则进入图形配置。先尝试 12 秒器乐草稿，试听再采用，结合对拍、裁切和淡化融入作品。ACE-Step 自动配置需要兼容 NVIDIA 8 GB 显卡、35 GB 空间、首次约 8–12 GB 下载。模型速度与质量因硬件和提示词而异。
 
-Explore local AI after the lesson. A configured ACE-Step runtime opens generation; otherwise open setup. Try a 12-second instrumental, audition before adopting, then fit timing, trim and fade. The first automatic profile covers ACE-Step and requires a compatible NVIDIA GPU with 8 GB VRAM, 35 GB free space and roughly 8–12 GB initial downloads. Speed and quality vary.
-
-[技术验证 / Technical verification](feature-validation.md)。
+Explore local AI after the lesson. A configured ACE-Step runtime opens generation; otherwise open setup. Try a 12-second instrumental, audition before adopting, then fit timing, trim and fade. ACE-Step setup requires a compatible NVIDIA GPU with 8 GB VRAM, 35 GB free space and roughly 8–12 GB initial downloads. Speed and quality vary.
