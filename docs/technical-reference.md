@@ -16,6 +16,8 @@ This index is for contributors and experiment reproduction. Versions, devices, d
 
 ## 工作台版本验证 / Workstation verification
 
+- [dev21 UI 创作、钢琴转录、安装升级与恢复 / UI creation, piano, installation and recovery](dev21-validation.md)
+- [钢琴固定评测 / Frozen piano comparison](piano-benchmark.md)
 - [dev20 编排、多音音符、路由与打包 / Arrangement, polyphony, routing and packaging](preagent-validation.md)
 - [多音参数开发评测 / Polyphonic parameter benchmark](polyphony-benchmark.md)
 - [dev19 入口与工程兼容 / Entry and project compatibility](workbench-entry-validation.md)

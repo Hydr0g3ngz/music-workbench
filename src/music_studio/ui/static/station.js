@@ -193,15 +193,16 @@
       : value;
   function toast(message, error = false) {
     const host = document.querySelector("dialog[open]") || document.body;
-    if ($("toast").parentElement !== host) host.append($("toast"));
-    $("toast").textContent = message;
-    $("toast").classList.toggle("error", error);
-    $("toast").hidden = false;
+    const notice = $("toast") || document.createElement("div");
+    notice.id = "toast";
+    notice.className = "toast";
+    notice.setAttribute("role", "status");
+    if (notice.parentElement !== host) host.append(notice);
+    notice.textContent = message;
+    notice.classList.toggle("error", error);
+    notice.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(
-      () => ($("toast").hidden = true),
-      error ? 9000 : 3500,
-    );
+    toastTimer = setTimeout(() => (notice.hidden = true), error ? 9000 : 3500);
   }
   async function request(url, body, method = "POST") {
     const opts =
@@ -239,6 +240,32 @@
         toast(e.message, true);
       }
     };
+  }
+  let sessionUpdating = false;
+  function guardedSessionUpdate(fn) {
+    return guarded(async (event) => {
+      if (
+        !event.target.closest(
+          "[data-adopt-melody], [data-adopt-generation], [data-adopt-section-generation], [data-adopt-stems], [data-attach-task]",
+        )
+      )
+        return fn(event);
+      if (sessionUpdating) return;
+      sessionUpdating = true;
+      const busy = document.createElement("dialog");
+      busy.setAttribute("aria-label", tr("正在更新工程", "Updating project"));
+      busy.textContent = tr("正在加入工程，请稍候…", "Adding to the project…");
+      busy.addEventListener("cancel", (e) => e.preventDefault());
+      document.body.append(busy);
+      busy.showModal();
+      try {
+        return await fn(event);
+      } finally {
+        busy.close();
+        busy.remove();
+        sessionUpdating = false;
+      }
+    });
   }
   function localize() {
     document.documentElement.lang = s.lang === "zh" ? "zh-CN" : "en";
@@ -289,7 +316,10 @@
   }
   async function flush() {
     clearTimeout(saveTimer);
-    if (s.saving) await s.saving;
+    if (s.saving) {
+      await s.saving;
+      return flush();
+    }
     if (!s.dirty) return;
     s.saving = (async () => {
       while (s.dirty) {
@@ -346,6 +376,10 @@
     if (!selectedTrack()) {
       s.track = content().tracks[0]?.id;
       s.clip = content().tracks[0]?.clips[0]?.id;
+    }
+    if (!selectedClip()) {
+      s.clip = selectedTrack()?.clips[0]?.id || null;
+      s.noteClip = null;
     }
     history.replaceState({}, "", `/station.html?session=${session.id}`);
     localStorage.setItem("station-session", session.id);
@@ -638,7 +672,9 @@
         `<section class="inspector-section source-credit"><h3>${tr("素材来源", "SOURCE")}</h3><strong>${esc(c.origin.title)}</strong><p>${esc(c.origin.author)}</p><small>${esc(c.origin.license)}</small></section>`,
       );
     const note =
-      t.kind === "midi" && c?.id === s.noteClip ? c.notes[s.noteIndex] : null;
+      t.kind === "midi" && c && c.id === s.noteClip
+        ? c.notes[s.noteIndex]
+        : null;
     if (note)
       $("inspector-content").insertAdjacentHTML(
         "beforeend",
@@ -1225,7 +1261,7 @@
     $("model-list").innerHTML = s.models
       .map(
         (m) =>
-          `<div class="model-card" data-model-card="${esc(m.id)}"><strong>${esc(m.title[s.lang === "zh" ? 0 : 1])}</strong><small>${esc(m.description[s.lang === "zh" ? 0 : 1])}</small>${StationModelControls.controls(m, modelOptions[m.id], s.lang)}<small>${m.execution_device === "cuda" ? tr("自动模式默认：NVIDIA GPU", "Automatic defaults to NVIDIA GPU") : m.execution_device === "cpu" ? (m.device === "cpu" ? tr("使用 CPU", "Runs on CPU") : tr("自动模式默认：CPU", "Automatic defaults to CPU")) : tr("检查后显示实际运行设备", "Check to see the runtime device")}${m.stage === "melody" && m.id !== "basic-pitch" ? tr(" · 请使用独唱、哼唱或单音乐器，CPU 提取可能较慢。", " · Use solo singing, humming or a monophonic instrument. CPU extraction can be slow.") : ""}</small>${m.setup_url && !m.runnable ? `<a class="model-setup-link" href="${esc(m.setup_url)}">${tr("安装此工具 →", "Set up this tool →")}</a>` : ""}<div class="model-actions"><span>${esc({ verified: tr("已验证", "Verified"), unchecked: tr("待检查", "Not checked"), missing: tr("缺少组件", "Missing components"), failed: tr("检查失败", "Check failed") }[m.health.state] || m.health.state)} · ${m.health.weights ? tr("权重已缓存", "weights cached") : tr("权重待检查", "check weights")}</span><button data-check-model="${m.id}">${tr("检查", "Check")}</button><button data-run-model="${m.id}" ${m.runnable ? "" : "disabled"}>${tr("运行", "Run")}</button></div></div>`,
+          `<div class="model-card" data-model-card="${esc(m.id)}"><strong>${esc(m.title[s.lang === "zh" ? 0 : 1])}</strong><small>${esc(m.description[s.lang === "zh" ? 0 : 1])}</small>${StationModelControls.controls(m, modelOptions[m.id], s.lang)}<small>${m.execution_device === "cuda" ? tr("自动模式默认：NVIDIA GPU", "Automatic defaults to NVIDIA GPU") : m.execution_device === "cpu" ? (m.device === "cpu" ? tr("使用 CPU", "Runs on CPU") : tr("自动模式默认：CPU", "Automatic defaults to CPU")) : tr("检查后显示实际运行设备", "Check to see the runtime device")}${m.stage === "melody" && !["basic-pitch", "transkun-piano"].includes(m.id) ? tr(" · 请使用独唱、哼唱或单音乐器，CPU 提取可能较慢。", " · Use solo singing, humming or a monophonic instrument. CPU extraction can be slow.") : ""}</small>${m.setup_url && !m.runnable ? `<a class="model-setup-link" href="${esc(m.setup_url)}">${tr("安装此工具 →", "Set up this tool →")}</a>` : ""}<div class="model-actions"><span>${esc({ verified: tr("已验证", "Verified"), unchecked: tr("待检查", "Not checked"), missing: tr("缺少组件", "Missing components"), failed: tr("检查失败", "Check failed") }[m.health.state] || m.health.state)} · ${m.health.weights ? tr("权重已缓存", "weights cached") : tr("权重待检查", "check weights")}</span><button data-check-model="${m.id}">${tr("检查", "Check")}</button><button data-run-model="${m.id}" ${m.runnable ? "" : "disabled"}>${tr("运行", "Run")}</button></div></div>`,
       )
       .join("");
   }
@@ -1318,7 +1354,7 @@
     $("task-count").textContent = [...s.tasks, ...s.generations].filter((t) =>
       ["queued", "checking", "running", "cancelling"].includes(t.status),
     ).length;
-    $("tasks").innerHTML =
+    const html =
       renderGenerationTasks() +
         s.tasks
           .map(
@@ -1336,6 +1372,12 @@
           )
           .join("") ||
       `<p class="panel-copy">${tr("暂无任务。在 AI 模型面板生成音乐，或选中音频片段运行处理。", "No tasks yet. Generate music in Models, or select audio to process it.")}</p>`;
+    // Polling must not replace unchanged buttons, their focus or pointer targets.
+    const panel = $("tasks");
+    if (panel.taskHTML !== html) {
+      panel.innerHTML = html;
+      panel.taskHTML = html;
+    }
   }
   async function projectDialog() {
     await flush();
@@ -2038,7 +2080,7 @@
     await pollTasks();
     toast(tr("任务已加入本地队列", "Task queued locally"));
   });
-  $("tasks").onclick = guarded(async (e) => {
+  $("tasks").onclick = guardedSessionUpdate(async (e) => {
     const report = e.target.closest("[data-musical-report]");
     if (report)
       return workflowPanel.showReport(
@@ -2628,41 +2670,53 @@
     }),
   });
   $("open-tutorial").onclick = () => tutorialPanel.show();
+  const opening = document.createElement("dialog");
+  opening.textContent = tr("正在打开工程…", "Opening your project…");
+  opening.setAttribute("aria-label", tr("载入工程", "Loading project"));
+  opening.addEventListener("cancel", (event) => event.preventDefault());
+  document.body.append(opening);
+  opening.showModal();
   guarded(async () => {
-    localize();
-    s.library = await request("/api/workstation/library");
-    engine.setLibrary(s.library);
-    previewEngine.setLibrary(s.library);
-    const sessions = await request("/api/workstation/projects"),
-      key =
-        new URLSearchParams(location.search).get("session") ||
-        localStorage.getItem("station-session");
-    const start = new URLSearchParams(location.search).get("start");
-    const exists = sessions.find((p) => p.id === key) || sessions[0];
-    if (exists) accept(exists);
-    else await create();
-    if (new URLSearchParams(location.search).has("tools")) {
-      view("models", true);
-    }
-    if (start) {
-      if (start === "example") tutorialPanel.show();
-      const clean = new URL(location.href);
-      clean.searchParams.delete("start");
-      history.replaceState({}, "", clean);
-      if (start === "ai") $("open-generation").click();
-      if (start === "recording")
-        document.querySelector('[data-view="assets"]').click();
-    }
-    animate();
-    setInterval(() => {
-      if (
-        s.dock === "tasks" ||
-        s.view === "models" ||
-        [...s.tasks, ...s.generations].some((t) =>
-          ["queued", "checking", "running"].includes(t.status),
+    try {
+      localize();
+      s.library = await request("/api/workstation/library");
+      engine.setLibrary(s.library);
+      previewEngine.setLibrary(s.library);
+      const sessions = await request("/api/workstation/projects"),
+        key =
+          new URLSearchParams(location.search).get("session") ||
+          localStorage.getItem("station-session");
+      const start = new URLSearchParams(location.search).get("start");
+      const exists = sessions.find((p) => p.id === key) || sessions[0];
+      if (exists) accept(exists);
+      else await create();
+      if (new URLSearchParams(location.search).has("tools")) {
+        view("models", true);
+      }
+      if (start) {
+        if (start === "example") tutorialPanel.show();
+        const clean = new URL(location.href);
+        clean.searchParams.delete("start");
+        history.replaceState({}, "", clean);
+        if (start === "ai") $("open-generation").click();
+        if (start === "recording")
+          document.querySelector('[data-view="assets"]').click();
+      }
+      animate();
+      setInterval(() => {
+        if (
+          s.dock === "tasks" ||
+          s.view === "models" ||
+          [...s.tasks, ...s.generations].some((t) =>
+            ["queued", "checking", "running"].includes(t.status),
+          )
         )
-      )
-        pollTasks();
-    }, 4000);
+          pollTasks();
+      }, 4000);
+      document.body.dataset.ready = "true";
+    } finally {
+      opening.close();
+      opening.remove();
+    }
   })();
 })();

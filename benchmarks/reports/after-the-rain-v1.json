@@ -1,0 +1,219 @@
+{
+  "title": "雨后的街灯 / After the Rain",
+  "version": "0.2.0.dev21",
+  "creation_editing": "UI only; Playwright clicked/typed ordinary controls. Verification reads/API exports below do not create the arrangement.",
+  "bars": 32,
+  "tracks": 3,
+  "clips": 7,
+  "buses": 2,
+  "restored_project": "82bb8c4725e048ac",
+  "portable_content_equal": true,
+  "restored_wav_equal": true,
+  "measurements": {
+    "levels": {
+      "sample_rate": 44100,
+      "channels": 2,
+      "frames": 2897370,
+      "duration": 65.7,
+      "peak": 0.42807185649871826,
+      "peak_dbfs": -7.36966647667445,
+      "rms_dbfs": -26.44645935051871,
+      "samples_at_or_above_full_scale": 0,
+      "dc_offset": [
+        0.0014784177230770816,
+        0.002303155831339697
+      ],
+      "measurement": "Sample peak and full-file RMS; not LUFS or true peak"
+    },
+    "loudness": {
+      "integrated_lufs": -23.141872372764215,
+      "true_peak_dbtp": -7.366794575115989,
+      "sample_peak_dbfs": -7.36966647667445,
+      "loudness_range_lu": 7.900000000000002,
+      "loudness_range_stable": true,
+      "channel_true_peaks_dbtp": [
+        -7.387409870844856,
+        -7.366794575115989
+      ],
+      "frames": 2897370,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration": 65.7,
+      "backend": "libebur128 1.2.6",
+      "algorithm": "ITU-R BS.1770 gated integrated loudness; libebur128 true peak",
+      "unmeasurable_reason": null,
+      "notes": []
+    }
+  },
+  "exports": {
+    "After-the-Rain.wav": {
+      "bytes": 17384264,
+      "sha256": "db189510f8284bfff6b4ad2dc63dbde2c1ead3dca8ec74bd4e31b0d1afc9deb7"
+    },
+    "After-the-Rain.mid": {
+      "bytes": 483,
+      "sha256": "bb62e948e93e95f5e427592deb055513a9082aea6f08ddd953f0b79975f0eb2a"
+    },
+    "After-the-Rain.mwb": {
+      "bytes": 12728014,
+      "sha256": "de49fd47593810dd5a9bc3e729a4a2a5ff41ee3a332924e2e9fe6f76aa35f39f"
+    }
+  },
+  "generations": [
+    {
+      "id": "7865f13e0a1b471d",
+      "parameters": {
+        "use_blueprint": true,
+        "section_id": "e95b0ae6ddca4849",
+        "development": "contrast",
+        "gpu_profile": "auto",
+        "prompt": "Develop the supplied solo piano phrase into a contrasting sparse bell-like piano variation. Preserve the source harmony and small rising motif, hopeful after-rain atmosphere, 120 BPM, C major, no drums, no vocals, no bass instrument, clear phrase ending.\nProject musical intentions (requested, not verified):\nCreative brief: 雨停后的街道：独奏钢琴像路灯，马林巴像水滴。先疏朗，第二段回应，第三段映出不同色彩，最后安静归家。\nInstrument palette: Intimate upright piano, quiet marimba echoes, one contrasting bell-like piano variation. No drums or vocals.\nMotif to preserve: A small rising phrase with space; keep the source harmony, change texture in the third section, then return.\nHarmonic direction: C major is a requested center, not a verified transcription. Follow the source piano harmony.\nTarget tempo: 120 BPM; meter: 4/4.\nRequested key: C major.\nPrevious section: 街灯 / Streetlight (free).\nNext section: 归家 / Home (free).\nTarget section: 水面 / Reflection; planned length: 16 seconds.\nContrast the previous texture using space, rhythm or a different register.",
+        "lyrics": "",
+        "instrumental": true,
+        "duration": 16,
+        "bpm": 120,
+        "seed": 42,
+        "steps": 8,
+        "language": "unknown",
+        "key": "C major",
+        "mode": "cover",
+        "source_clip": "e45a30c84bf04bc0",
+        "reference_strength": 0.65,
+        "repaint_start": 4.0,
+        "repaint_end": 8.0,
+        "repaint_blend": 0.1
+      },
+      "metrics": {
+        "load_seconds": 47.579,
+        "generation_seconds": 16.562,
+        "total_seconds": 64.141,
+        "device": "NVIDIA GeForce RTX 4070 Laptop GPU",
+        "torch": "2.10.0+cu128",
+        "language_model": false,
+        "profile": {
+          "id": "low-vram",
+          "quantization": "int8_weight_only",
+          "offload_to_cpu": true,
+          "offload_dit_to_cpu": true,
+          "dtype": "bfloat16",
+          "gpu": {
+            "index": 0,
+            "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+            "memory_mib": 8187,
+            "free_mib": 7054,
+            "capability": 8.9
+          },
+          "note": "Policies for 10–60 s, batch 1. Setup tests actual inference on your GPU; RTX 4070 Laptop 8 GB is the locally measured reference."
+        },
+        "offload": true,
+        "quantization": "int8_weight_only",
+        "quantization_scope": "DiT decoder linear weights only; VAE/text encoder remain floating point",
+        "grad_enabled": false,
+        "cpu_threads": 8,
+        "checkpoint_backend": "pread",
+        "resident_ram_mib": 7854.5,
+        "peak_allocated_mib": 3346.2,
+        "peak_reserved_mib": 3444.0,
+        "available_ram_mib": 2067.0,
+        "cuda_free_mib": 6426.0,
+        "private_commit_mib": 13354.9,
+        "peak_private_commit_mib": 18254.0,
+        "available_system_commit_mib": 5823.1,
+        "peak_resident_ram_mib": 10211.6
+      },
+      "sha256": "9e236c11b5530bcda250249eb36a0ef4d7c6d82d0028f7e28712c16894832131"
+    },
+    {
+      "id": "8e1028e799314071",
+      "parameters": {
+        "use_blueprint": false,
+        "section_id": null,
+        "development": "establish",
+        "gpu_profile": "auto",
+        "prompt": "An intimate solo upright piano instrumental in C major at 120 BPM. A gentle rising three-note motif, lightly syncopated left-hand chords, warm natural room, clear isolated piano notes, hopeful after-rain mood, no drums, no vocals, no other instruments. A concise eight-bar phrase with a gentle ending.",
+        "lyrics": "",
+        "instrumental": true,
+        "duration": 20,
+        "bpm": 120,
+        "seed": 42,
+        "steps": 8,
+        "language": "unknown",
+        "key": "C major",
+        "mode": "text2music",
+        "source_clip": null,
+        "reference_strength": 0.65,
+        "repaint_start": 4.0,
+        "repaint_end": 8.0,
+        "repaint_blend": 0.1
+      },
+      "metrics": {
+        "load_seconds": 48.328,
+        "generation_seconds": 17.219,
+        "total_seconds": 65.547,
+        "device": "NVIDIA GeForce RTX 4070 Laptop GPU",
+        "torch": "2.10.0+cu128",
+        "language_model": false,
+        "profile": {
+          "id": "low-vram",
+          "quantization": "int8_weight_only",
+          "offload_to_cpu": true,
+          "offload_dit_to_cpu": true,
+          "dtype": "bfloat16",
+          "gpu": {
+            "index": 0,
+            "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+            "memory_mib": 8187,
+            "free_mib": 7054,
+            "capability": 8.9
+          },
+          "note": "Policies for 10–60 s, batch 1. Setup tests actual inference on your GPU; RTX 4070 Laptop 8 GB is the locally measured reference."
+        },
+        "offload": true,
+        "quantization": "int8_weight_only",
+        "quantization_scope": "DiT decoder linear weights only; VAE/text encoder remain floating point",
+        "grad_enabled": false,
+        "cpu_threads": 8,
+        "checkpoint_backend": "pread",
+        "resident_ram_mib": 5369.1,
+        "peak_allocated_mib": 3156.7,
+        "peak_reserved_mib": 3234.0,
+        "available_ram_mib": 2518.8,
+        "cuda_free_mib": 6724.0,
+        "private_commit_mib": 13106.5,
+        "peak_private_commit_mib": 17994.1,
+        "available_system_commit_mib": 10401.4,
+        "peak_resident_ram_mib": 8464.5
+      },
+      "sha256": "0aea937d1fe6627eb89cc3b9aebdd52d8fb13ba4cb5906b482cc0be35739dbf1"
+    }
+  ],
+  "transcription": [
+    {
+      "model": "transkun-piano",
+      "metrics": {
+        "timing_method": null,
+        "seconds": 10.764,
+        "audio_seconds": 16.0,
+        "realtime_factor": 0.673,
+        "device": "cuda",
+        "compute_type": null,
+        "torch_peak_mb": 904.03,
+        "memory_note": "Torch allocator only; excludes CUDA context and CTranslate2.",
+        "worker_reused": false,
+        "model_reused": false,
+        "worker_pid": 61760,
+        "invocation_seconds": 18.313
+      },
+      "source_range": {
+        "scope": "clip",
+        "start_frame": 0,
+        "end_frame": 705600,
+        "sample_rate": 44100,
+        "start": 0.0,
+        "end": 16.0,
+        "source_frames": 882000,
+        "source_sha256": "0aea937d1fe6627eb89cc3b9aebdd52d8fb13ba4cb5906b482cc0be35739dbf1"
+      }
+    }
+  ]
+}

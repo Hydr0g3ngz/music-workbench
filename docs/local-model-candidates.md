@@ -17,7 +17,7 @@
 | 高质量分轨 | [BSRoFormer / MelBand RoFormer 推理框架](https://github.com/ZFTurbo/Music-Source-Separation-Training) | 人声、伴奏和乐器分离候选；与现有 Demucs 基线比较 | 模型家族不是一个 checkpoint；明确目标声部、权重哈希/许可、窗口长度、对齐与显存 |
 | 按描述提取声音 | [SAM Audio](https://github.com/facebookresearch/sam-audio) | 文本、时间范围等条件提取目标声音，产出目标和残余轨 | 自定义 SAM License；资源与依赖待测，不能当作宽松许可默认包 |
 | 综合音乐转谱 | [SheetSage2](https://huggingface.co/m-a-p/SheetSage2) | 旋律、和弦、节拍、调性、段落到 ABC/MIDI/事件；适合接入工程音乐结构 | 权重 CC BY-NC 4.0，依赖 MERT2；隔离环境、验证时间/音高与曲谱往返 |
-| 钢琴转录 | [Transkun](https://github.com/Yujia-Yan/Transkun) | 钢琴复音、力度与起止音的专用候选 | 代码 MIT；固定模型和许可，使用真实钢琴参考评测；钢琴结果不外推到完整混音 |
+| 钢琴转录 | [Transkun](https://github.com/Yujia-Yan/Transkun) | dev21 已接入钢琴复音、力度与起止音，FP32 | 代码 MIT；固定模型和许可，使用真实钢琴参考评测；钢琴结果不外推到完整混音 |
 | 多乐器转录 | [YourMT3+](https://github.com/mimbres/YourMT3) | 多乐器音频到带乐器信息的 MIDI | 仓库 GPL-3.0，README 指向预发布实现；先验证代码/权重可复现性与许可 |
 | 轻量音频转 MIDI | [Basic Pitch](https://github.com/spotify/basic-pitch) | dev20 已接入 ONNX CPU，多音结果可加入乐器轨修改 | 较早基线，不标为 SOTA；[实测](polyphony-benchmark.md)与[边界](polyphonic-notes.md)，弯音不进入钢琴卷帘 |
 | 可控歌声合成 | [OpenVPI DiffSinger](https://github.com/openvpi/DiffSinger) | 音符和歌词到歌声，控制音高与表现参数 | 代码 Apache-2.0；声库/声码器许可分别核查，验证中英音素、时长和调音参数 |

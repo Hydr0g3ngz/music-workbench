@@ -63,7 +63,8 @@ class WorkbenchWindow : Form {
             Log("Display: "+detail);MessageBox.Show(this,detail,T(english,"显示清晰度","Display diagnostics"));
         };
         display.DropDownItems.AddRange(new ToolStripItem[]{reset,info});
-        menu.Items.AddRange(new ToolStripItem[]{home,files,logs,reload,display});MainMenuStrip=menu;
+        var updates=new ToolStripMenuItem(T(english,"版本与更新","Version & updates"));updates.Click+=delegate {if(ready)view.CoreWebView2.Navigate(origin+"updates.html");};
+        menu.Items.AddRange(new ToolStripItem[]{home,files,logs,reload,display,updates});MainMenuStrip=menu;
         view.Dock=DockStyle.Fill;view.DefaultBackgroundColor=BackColor;
         loading.Dock=DockStyle.Fill;loading.BackColor=BackColor;
         message.Dock=DockStyle.Fill;message.TextAlign=ContentAlignment.MiddleCenter;

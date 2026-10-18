@@ -1,4 +1,14 @@
-# Changelog / 更新记录
+# Changelog
+
+## 0.2.0.dev21 — From draft to editable piece / 从草稿到可编辑作品
+
+- Transkun piano transcription: isolated, hash-verified FP32 runtime; actual offline setup and piano benchmark.
+- Auditionable note-part simplification; batch clip gain/fades with undo.
+- Preserve task buttons across unchanged polls; serialize saves, protect adoption while it completes, recover notifications after dialog rebuilds and clear stale note selections.
+- Version and manual update entry in the desktop app.
+- UI-created After the Rain example, portable restore, installer upgrade checks and a narrated introductory film.
+
+See [release notes / 版本说明](docs/releases/v0.2.0.dev21.md). / 更新记录
 
 ## 0.2.0.dev20 — Group, transcribe and route / 成组编排、多音音符与路由（本地开发版）
 

@@ -2,6 +2,8 @@
 
 [中文](README.md) · [Project home](../README.en.md)
 
+- [Piano transcription](piano-notes.en.md) · [Note simplification and batch fades](note-editing.en.md) · [dev21 validation](dev21-validation.md)
+
 ## Get started
 
 - [Install and upgrade](windows-install.md): Windows installer, requirements and project locations.

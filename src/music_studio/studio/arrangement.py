@@ -824,7 +824,9 @@ class ArrangementService:
                 id=uid(),
                 name=source.name + " · notes",
                 kind="midi",
-                instrument="vcsl-piano" if task["model"] == "basic-pitch" else "vcsl-marimba",
+                instrument="vcsl-piano"
+                if task["model"] in ("basic-pitch", "transkun-piano")
+                else "vcsl-marimba",
                 gain_db=-9,
                 color=COLORS[len(content.tracks) % len(COLORS)],
                 clips=[

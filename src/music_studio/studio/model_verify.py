@@ -35,14 +35,22 @@ def verify(pack, root):
     sf.write(folder / "speech.wav", np.repeat(speech, 2, axis=1), 44100, subtype="FLOAT")
     # Real factory samples exercise non-silent inference, including the Demucs forward pass.
     music = np.zeros((44100 * 4, 2), dtype=np.float32)
-    for filename, first in (
+    sample_events = (
         ("marimba-72.flac", 0),
         ("marimba-59.flac", 44100),
         ("marimba-72.flac", 88200),
         ("kick.flac", 0),
         ("snare.flac", 66150),
         ("kick.flac", 88200),
-    ):
+    )
+    if pack == "piano-notes":
+        sample_events = (
+            ("piano-60.flac", 0),
+            ("piano-72.flac", 44100),
+            ("piano-66.flac", 88200),
+            ("piano-60.flac", 132300),
+        )
+    for filename, first in sample_events:
         sample, rate = sf.read(
             package / "data/creation" / filename, dtype="float32", always_2d=True
         )
@@ -83,6 +91,10 @@ def verify(pack, root):
             }
         )
         result = read_json(folder / model / "result.json")
+        if model in ("basic-pitch", "transkun-piano"):
+            note_result = read_json(folder / model / "melody.json")
+            if not note_result["notes"]:
+                raise ValueError("Note model verification did not produce any notes")
         if pack == "qwen-transcription":
             transcript = read_json(folder / model / "lyrics.json")
             words = [w for line in transcript["segments"] for w in line["words"]]

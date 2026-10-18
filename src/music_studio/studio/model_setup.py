@@ -11,6 +11,23 @@ from .ai_setup import ACTIVE, AISetup, data_root
 from .service import StudioError
 
 PACKS = {
+    "piano-notes": {
+        "title": ["钢琴多音音符 · Transkun", "Piano notes · Transkun"],
+        "description": [
+            "钢琴专用转录；估计音高、起止与力度，试听后进入钢琴卷帘修改。",
+            "Piano-specific pitch, timing and velocity estimates; "
+            "audition and edit in the piano roll.",
+        ],
+        "models": ["transkun-piano"],
+        "device": "cuda",
+        "min_vram_mib": 4000,
+        "required_free_bytes": 10 * 1024**3,
+        "download_estimate": "3–5 GB",
+        "backend": "Transkun 2.0.1 · FP32 · Torch CUDA 12.8 · 16 s windows",
+        "license": "MIT (upstream source and bundled checkpoint)",
+        "source": "https://github.com/Yujia-Yan/Transkun",
+        "entry": "/station.html?tools=piano-notes",
+    },
     "polyphonic-notes": {
         "title": ["多音音符 · Basic Pitch", "Polyphonic notes · Basic Pitch"],
         "description": [

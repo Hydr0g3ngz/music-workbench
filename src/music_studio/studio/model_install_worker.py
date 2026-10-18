@@ -162,6 +162,10 @@ for name in names:
                 for n in ("config.json", "model.bin", "tokenizer.json", "vocabulary.txt")
             ),
         ]
+    elif pack == "piano-notes":
+        from .piano_notes import install_assets
+
+        files = install_assets(root, cache)
     elif pack == "polyphonic-notes":
         from .polyphony import install_assets
 

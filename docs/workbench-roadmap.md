@@ -16,9 +16,9 @@ Music Workbench 专注新作品的制作；整曲分析由独立 Music Studio �
 
 Music Workbench focuses on making new music. Full-song analysis belongs to the independent Music Studio product. Separation, transcription and note extraction should help users continue creating. See [product boundaries](product-boundaries.md) for entries, data and compatibility.
 
-## 当前可用 / Available in dev20 source builds
+## 当前可用 / Available in dev21
 
-GitHub 公开安装版仍为 dev14；以下包括后续本地开发版，按版本说明使用。The public GitHub installer remains dev14; the list includes subsequent local development builds.
+dev21 提供以下功能，安装版与源码按同一版本发布。The dev21 installer and source share the capabilities below.
 
 - 多轨编排、采样乐器、鼓点、MIDI 编辑、段落与创作蓝图。Arrangement, instruments, grooves, MIDI editing, sections and creative blueprint.
 - 本地录音、循环、节拍器、EQ/压缩/混响、音量曲线与交叉淡化。Recording, loops, metronome, effects, volume curves and crossfades.
@@ -38,8 +38,8 @@ GitHub 公开安装版仍为 dev14；以下包括后续本地开发版，按版�
 | 优先级 / Priority | 工作 / Work | 对用户的价值 / Value | 验证方式 / Validation |
 | --- | --- | --- | --- |
 | 基础已完成 / Foundation delivered | 分组与段落 / Groups and form | dev20 已从 8 小节扩展至 32 小节，独立分组复制、撤销与恢复。Independent groups, copy, undo and recovery. | [验证 / Validation](preagent-validation.md)；继续观察真实用户编辑复杂工程的卡点。Observe complex-project editing. |
-| 基础已完成，质量继续 / Baseline delivered, quality ongoing | 可编辑 AI 音符 / Editable AI notes | Basic Pitch ONNX 已贯通；Transkun 仍为未接入候选。Basic Pitch integrated; Transkun remains a candidate. | [五首参数对照 / Five-case comparison](polyphony-benchmark.md)；下一步独立钢琴集、力度和人工修改量，避免训练数据重叠。Next: held-out piano, velocity and correction effort. |
-| 案例已完成 / Case delivered | 创作闭环 / Creation workflow | 《窗灯》完成生成、转音符、段落对比、总线与交付。Windowlight validates generation, editable notes, contrast, routing and delivery. | 案例区分界面操作与脚本后期；仍需零基础用户试用与完成率数据。Distinguishes UI and scripted finishing; beginner completion rates remain unmeasured. |
+| 基础已完成，质量继续 / Baseline delivered, quality ongoing | 可编辑 AI 音符 / Editable AI notes | Basic Pitch 与 Transkun 已贯通，提供声部整理。Both backends and note-part simplification are integrated. | [五首参数对照 / Five-case comparison](polyphony-benchmark.md)；[钢琴六片段评测 / Piano comparison](piano-benchmark.md)已完成；仍需更广风格与人工修改量。Broader styles and correction effort remain. |
+| 案例已完成 / Case delivered | 创作闭环 / Creation workflow | 《窗灯》完成生成、转音符、段落对比、总线与交付。Windowlight validates generation, editable notes, contrast, routing and delivery. | dev21《雨后的街灯》创作编辑已全程 UI 验证；仍需目标用户试用。UI-only creation validated; observed beginner trials remain. |
 | 基础已完成 / Foundation delivered | 混音 / Mixing | dev20 已提供总线/发送；效果参数自动化、VST、同步叠录和延迟补偿仍未提供。Buses/sends delivered; FX automation, VST, overdubbing and latency compensation remain unavailable. | 路由数值、尾音、旁路、历史与实时音源不重载回归。Routing, tails, bypass, history and no-source-reload checks. |
 | P1 | 本地 AI 交付 / Local AI delivery | dev15–18 已完成自动工具包和首台 CUDA 验证；扩展硬件覆盖与冷启动体验。Managed packs and first CUDA-host checks landed in dev15–18; broaden hardware coverage and improve cold startup. | [安装与工程衔接验证 / Setup validation](model-tools-validation.md)，再扩展全新 Windows 与 GPU 配置。 |
 | P1 | 安装与首次创作可靠性 / Installation and first creation | 更多电脑能顺利完成安装、学习和导出；覆盖缺少 WebView2、受限网络、显示缩放与失败恢复。Broader hardware/network/display coverage and recovery. | 全新 Windows 环境与目标用户试用，记录卡点、完成率及恢复结果。Clean machines and observed user trials. |

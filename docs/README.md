@@ -2,6 +2,8 @@
 
 [English](README.en.md) · [返回项目首页](../README.md)
 
+- [钢琴专用转录](piano-notes.md) · [音符整理与批量淡变](note-editing.md) · [dev21 新版验证](dev21-validation.md)
+
 ## 开始使用
 
 - [安装与升级](windows-install.md)：Windows 安装器、电脑要求、作品位置。

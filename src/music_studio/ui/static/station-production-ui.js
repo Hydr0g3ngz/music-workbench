@@ -124,7 +124,10 @@ window.StationProduction = {
               ).toFixed(4)
             : 9
         }"></label>
-        <div class="production-actions"><button data-group-op="move" ${!count ? "disabled" : ""}>${tr("整体移动", "Move selection")}</button><button class="primary" data-group-op="copy" ${!count ? "disabled" : ""}>${tr("复制到这里", "Copy here")}</button><button data-group-op="delete" ${!count ? "disabled" : ""}>${tr("删除所选", "Delete selection")}</button></div>`;
+        <div class="production-actions"><button data-group-op="move" ${!count ? "disabled" : ""}>${tr("整体移动", "Move selection")}</button><button class="primary" data-group-op="copy" ${!count ? "disabled" : ""}>${tr("复制到这里", "Copy here")}</button><button data-group-op="delete" ${!count ? "disabled" : ""}>${tr("删除所选", "Delete selection")}</button></div>
+        <h3>${tr("批量调整片段", "Batch clip properties")}</h3>
+        <div class="production-actions"><label>${tr("片段音量 dB", "Clip gain dB")}<input id="group-gain" type="number" min="-60" max="12" step=".5" value="-3"></label><button data-group-op="gain" ${!count ? "disabled" : ""}>${tr("应用音量", "Apply gain")}</button></div>
+        <div class="production-actions"><label>${tr("淡变秒数", "Fade seconds")}<input id="group-fade" type="number" min="0" max="30" step=".1" value="1"></label><button data-group-op="fade-in" ${!count ? "disabled" : ""}>${tr("应用淡入", "Apply fade in")}</button><button data-group-op="fade-out" ${!count ? "disabled" : ""}>${tr("应用淡出", "Apply fade out")}</button></div>`;
       } else {
         body.innerHTML = `<p class="panel-copy">${tr("把相关轨道输出到一个总线统一混音；用发送共享混响。发送位于推子后，总线直接进入主输出。", "Route related tracks through a bus. Use post-fader sends for shared effects; buses feed the master.")}</p>
         <div class="production-actions"><button data-add-bus="group" ${(content().buses || []).length >= 8 ? "disabled" : ""}>＋ ${tr("分组总线", "Group bus")}</button><button data-add-bus="reverb" ${(content().buses || []).length >= 8 ? "disabled" : ""}>＋ ${tr("共享混响", "Shared reverb")}</button></div>
@@ -196,6 +199,16 @@ window.StationProduction = {
           (b) =>
             (b.onclick = guarded(async () => {
               const operation = b.dataset.groupOp;
+              if (["gain", "fade-in", "fade-out"].includes(operation)) {
+                const input = $(
+                  operation === "gain" ? "group-gain" : "group-fade",
+                );
+                if (!input.checkValidity()) {
+                  input.reportValidity();
+                  return;
+                }
+                return groupAction(operation, Number(input.value));
+              }
               const destination = Number($("group-destination").value);
               const first = Math.min(
                 ...content()

@@ -1,0 +1,12 @@
+# Transkun inference only. Official source + checkpoint extracted separately.
+# Training dependencies (ncls, optimizer, plotting, TensorBoard) are not installed.
+numpy==1.26.4
+scipy==1.15.3
+soundfile==0.13.1
+pretty-midi==0.2.11
+mir-eval==0.8.2
+pydantic==2.12.3
+platformdirs==4.5.0
+filelock==3.20.0
+mido==1.3.3
+rich==14.2.0

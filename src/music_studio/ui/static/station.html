@@ -28,6 +28,8 @@
     <script src="/station-recording-ui.js" defer></script>
     <script src="/station-timing-ui.js" defer></script>
     <script src="/station-edit.js" defer></script>
+    <script src="/station-note-tools.js" defer></script>
+    <script src="/station-note-tools-ui.js" defer></script>
     <script src="/station-workflow.js" defer></script>
     <script src="/station-composition.js" defer></script>
     <script src="/station-composition-ui.js" defer></script>
@@ -111,10 +113,19 @@
         maxlength="150"
       /><span id="save-state" class="save-state"></span>
       <div class="top-actions">
-        <button id="open-tutorial" class="quiet" aria-expanded="false">入门</button>
+        <button id="open-tutorial" class="quiet" aria-expanded="false">
+          入门
+        </button>
         <button id="open-projects" class="quiet" data-t="projects">工程</button
         ><button id="new-project" class="quiet" data-t="new">新建</button
-        ><a id="asset-editor" href="/next.html" target="_blank" rel="noopener" class="previous" data-t="previous">素材编辑器 ↗</a
+        ><a
+          id="asset-editor"
+          href="/next.html"
+          target="_blank"
+          rel="noopener"
+          class="previous"
+          data-t="previous"
+          >素材编辑器 ↗</a
         ><button id="language" class="quiet language">EN</button
         ><button id="export" class="primary">
           <svg><use href="#i-upload" /></svg
@@ -236,7 +247,9 @@
         >
       </section>
       <section id="models-view" class="browser-view" hidden>
-        <a href="/ai-setup.html" class="ai-setup-link">AI 自动配置 / AI setup →</a>
+        <a href="/ai-setup.html" class="ai-setup-link"
+          >AI 自动配置 / AI setup →</a
+        >
         <button id="open-generation" class="generation-launch">
           <span class="generation-launch-icon">✦</span
           ><strong data-t="generationSubmit">生成音乐草稿</strong
@@ -636,12 +649,21 @@
           </div>
           <details class="generation-advanced">
             <summary data-t="generationAdvanced">更多参数</summary>
-            <label><span data-t="generationGPUProfile">显卡运行方案</span>
+            <label
+              ><span data-t="generationGPUProfile">显卡运行方案</span>
               <select id="generation-gpu-profile">
-                <option value="auto" data-t="generationGPUAuto">自动选择</option>
-                <option value="low-vram" data-t="generationGPULow">节省显存 · DiT INT8 + 内存卸载</option>
-                <option value="balanced" data-t="generationGPUBalanced">均衡 · DiT INT8 · 需 10 GB 空闲显存</option>
-                <option value="quality" data-t="generationGPUQuality">原始精度 · BF16 · 需 18 GB 空闲显存</option>
+                <option value="auto" data-t="generationGPUAuto">
+                  自动选择
+                </option>
+                <option value="low-vram" data-t="generationGPULow">
+                  节省显存 · DiT INT8 + 内存卸载
+                </option>
+                <option value="balanced" data-t="generationGPUBalanced">
+                  均衡 · DiT INT8 · 需 10 GB 空闲显存
+                </option>
+                <option value="quality" data-t="generationGPUQuality">
+                  原始精度 · BF16 · 需 18 GB 空闲显存
+                </option>
               </select>
             </label>
             <label
@@ -688,8 +710,8 @@
           </button>
           <p id="generation-health" class="library-caption" role="status"></p>
           <p class="generation-footnote" data-t="generationProfile">
-            实验功能 · 需 NVIDIA 8 GB 及以上显存 · 精度与卸载随方案变化 · 不加载语言模型。先试 12–20
-            秒；生成节奏可能偏离目标 BPM。
+            实验功能 · 需 NVIDIA 8 GB 及以上显存 · 精度与卸载随方案变化 ·
+            不加载语言模型。先试 12–20 秒；生成节奏可能偏离目标 BPM。
           </p>
           <a
             href="https://github.com/ACE-Step/ACE-Step-1.5"

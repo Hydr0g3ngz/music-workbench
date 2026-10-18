@@ -1,0 +1,44 @@
+{
+  "record": "13753319",
+  "version": 2,
+  "license": "CC BY-NC-SA 3.0",
+  "url": "https://zenodo.org/records/13753319/files/SMD-piano_v2.zip?download=1",
+  "assets": [
+    {
+      "path": "mono-Bach_BWV849-01_001_20090916-SMD.wav",
+      "member": "wav_22050_mono/Bach_BWV849-01_001_20090916-SMD.wav",
+      "sha256": "c6e7eeb973aeae6133bb60db36d2ef186e36b99fbce62d14a8fadfc8b7a33ad2",
+      "bytes": 6923744
+    },
+    {
+      "path": "mono-Beethoven_Op027No1-01_003_20090916-SMD.wav",
+      "member": "wav_22050_mono/Beethoven_Op027No1-01_003_20090916-SMD.wav",
+      "sha256": "62faf30197fa45c561bdd2345c6f1d35c0dbc1f9f30164a247f5a821844ee34b",
+      "bytes": 19007144
+    },
+    {
+      "path": "mono-Chopin_Op028-04_003_20100611-SMD.wav",
+      "member": "wav_22050_mono/Chopin_Op028-04_003_20100611-SMD.wav",
+      "sha256": "c58d9fade3370c2424ecb9b6b7ba8bd62cac6af738b60ba40e618d80bcfa0b65",
+      "bytes": 5247944
+    },
+    {
+      "path": "Bach_BWV849-01_001_20090916-SMD.mid",
+      "member": "midi/Bach_BWV849-01_001_20090916-SMD.mid",
+      "sha256": "95bdfd46cfa37637d18db809d8a586608e3b18aa64ec0206b491e2de9d115fab",
+      "bytes": 18480
+    },
+    {
+      "path": "Beethoven_Op027No1-01_003_20090916-SMD.mid",
+      "member": "midi/Beethoven_Op027No1-01_003_20090916-SMD.mid",
+      "sha256": "ae31451905e6ecf684bca9d736497a3c7085e64b42be649422e339d3e40cb90e",
+      "bytes": 61875
+    },
+    {
+      "path": "Chopin_Op028-04_003_20100611-SMD.mid",
+      "member": "midi/Chopin_Op028-04_003_20100611-SMD.mid",
+      "sha256": "4c1d0b3cd15eb576e1c0506f69725bf61edf8ec5f998bef02c4a8fbd8c88401f",
+      "bytes": 11824
+    }
+  ]
+}

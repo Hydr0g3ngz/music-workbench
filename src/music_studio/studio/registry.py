@@ -19,6 +19,20 @@ from .process import TaskStopped, log_tail, run_owned
 from .service import StudioError
 
 CATALOG = {
+    "transkun-piano": {
+        "title": ["钢琴 → 可编辑多音 MIDI", "Piano → editable polyphonic MIDI"],
+        "description": [
+            "Transkun 钢琴专用 FP32 模型；估计音符与力度。非混合乐器扒谱，踏板事件不进入卷帘。",
+            "Transkun FP32 for piano notes and velocity. Not mixed-instrument transcription; "
+            "pedal events stay outside the piano roll.",
+        ],
+        "runtime": "piano",
+        "imports": ["torch", "torchaudio", "pretty_midi", "mir_eval"],
+        "stage": "melody",
+        "license": "MIT",
+        "weight_id": "transkun-2.0.1/2.0.pt",
+        "source": "https://github.com/Yujia-Yan/Transkun",
+    },
     "basic-pitch": {
         "title": ["独奏乐器 → 多音 MIDI", "Solo instrument → polyphonic MIDI"],
         "description": [
@@ -381,6 +395,8 @@ elif spec['runtime'] == 'lyrics':
         alignment = root/'lyrics/aligner/c7cbfc2048c462b0d63a45797104fc9db3ad62b7'
         weights.extend(alignment/n for n in ('config.json','model.safetensors',
             'tokenizer_config.json','vocab.json','merges.txt','preprocessor_config.json'))
+elif spec['runtime'] == 'piano':
+    weights = [root/'transkun-source/transkun/pretrained'/n for n in ('2.0.pt','2.0.conf')]
 elif spec['runtime'] == 'polyphony':
     weights = [root/'basic-pitch-source/basic_pitch/saved_models/icassp_2022/nmp.onnx']
 elif stage == 'melody':

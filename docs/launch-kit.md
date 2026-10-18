@@ -8,15 +8,15 @@ Music Workbench is an open-source local music workstation with editable tracks, 
 
 | 素材 / Asset | 内容 / Contents |
 | --- | --- |
-| [36 秒有声演示 / 36-second MP4](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/Music-Workbench-First-Sketch-Demo.mp4) | 实际界面截图剪辑，配示例导出音乐 / Edited UI screenshots with exported example audio |
+| [入门宣传片 / Introductory film](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/Music-Workbench-dev21-Promo-1080p.mp4) | 实机录屏、作品原声、VoxCPM2 合成旁白与字幕 / Real UI footage, original examples, synthetic narration and subtitles |
 | [GIF](images/first-sketch-demo.gif) | 无声界面预览 / Silent interface preview |
-| [可编辑示例 / Editable MWB](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev14/First-Sketch-Example.mwb) | 八小节、四轨示例，可恢复后修改 / Eight bars, four tracks, ready to restore and edit |
+| [可编辑示例 / Editable MWB](https://github.com/Hydr0g3ngz/music-workbench/releases/download/v0.2.0.dev21/First-Sketch-Example.mwb) | 八小节、四轨示例，可恢复后修改 / Eight bars, four tracks, ready to restore and edit |
 | [入门教程 / Beginner lesson](first-sketch.md) | 软件内五步跟练的操作说明 / Companion guide to the five in-app steps |
-| [安装器与校验 / Installer and checksums](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev14) | Windows 预览版 / Windows preview |
+| [安装器与校验 / Installer and checksums](https://github.com/Hydr0g3ngz/music-workbench/releases/tag/v0.2.0.dev21) | Windows 预览版 / Windows preview |
 
-演示使用内置乐器，基础示例无需 AI。视频是操作画面节选，未呈现连续实时录屏或实际模型生成等待过程。
+入门跟练使用内置乐器，无需 AI；《雨后的街灯》案例使用 ACE-Step 与 Transkun。视频采用实际操作录屏，生成等待经过剪辑并注明实测时间，配音为 VoxCPM2 合成女声。
 
-The example uses built-in instruments without AI. The video contains edited UI highlights, not a continuous screen recording or a generation-speed demonstration.
+The beginner lesson uses built-in instruments without AI; After the Rain uses ACE-Step and Transkun. The film edits real UI recordings, identifies shortened waits with measured times, and uses VoxCPM2 synthetic narration.
 
 ## 项目简介 / Description
 
@@ -34,9 +34,9 @@ The example uses built-in instruments without AI. The video contains edited UI h
 
 ## 版本与署名 / Version and attribution
 
-当前发布是 Windows 10 22H2 / 11 x64 开发预览，安装器未签名。ACE-Step 自动配置需要兼容 NVIDIA ≥8 GB 显卡与 35 GB 空间；其他模型安装方式见 [模型目录](models.md)。功能状态与限制以 [发布说明](releases/v0.2.0.dev14.md) 为准。
+当前发布是 Windows 10 22H2 / 11 x64 开发预览，安装器未签名。ACE-Step 自动配置需要兼容 NVIDIA ≥8 GB 显卡与 35 GB 空间；其他模型安装方式见 [模型目录](models.md)。功能状态与限制以 [发布说明](releases/v0.2.0.dev21.md) 为准。
 
-The release is an unsigned Windows development preview. ACE-Step automatic setup requires a compatible NVIDIA GPU with at least 8 GB VRAM and 35 GB free space. Other models have separate setup paths; see [supported models](models.en.md) and [release notes](releases/v0.2.0.dev14.md).
+The release is an unsigned Windows development preview. ACE-Step automatic setup requires a compatible NVIDIA GPU with at least 8 GB VRAM and 35 GB free space. Other models have separate setup paths; see [supported models](models.en.md) and [release notes](releases/v0.2.0.dev21.md).
 
 介绍项目时请附上 [源码与下载入口](https://github.com/Hydr0g3ngz/music-workbench)。代码、模型权重、截图中的素材及示例工程分别适用其许可，详见 [第三方说明](../THIRD_PARTY_NOTICES.md)；导出工程的素材署名可从软件取得。
 

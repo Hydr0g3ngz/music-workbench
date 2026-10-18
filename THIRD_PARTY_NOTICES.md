@@ -62,3 +62,11 @@ or an MIT audio asset. The full paired dataset and enhanced audio remain outside
 
 Next 另含 VoiceBank-DEMAND 的 CC BY 4.0 带噪语音演示，保留署名和改动说明；
 代码许可不替代录音许可。官方 EBU 响度测试音频未再分发。
+
+## Transkun piano transcription / 钢琴转录
+
+The optional Piano notes pack uses unchanged official Transkun 2.0.1 Python source and the V2 checkpoint/configuration from its hash-pinned wheel, under MIT. Its LICENSE is retained with the extracted files. Inference dependencies are isolated; training-only ncls and the upstream package metadata are not installed. No user-supplied pickle checkpoint is loaded.
+
+- Official project and license: https://github.com/Yujia-Yan/Transkun
+- Runtime: PyTorch / torchaudio (BSD-style), NumPy (BSD), SciPy (BSD), PrettyMIDI (MIT), mir_eval (MIT), SoundFile (BSD). These are downloaded separately, not part of the basic installer.
+- SMD v2 evaluation: https://zenodo.org/records/13753319 and https://www.audiolabs-erlangen.de/resources/MIR/SMD/ . CC BY-NC-SA 3.0. Local noncommercial evaluation only; recordings and reference MIDI are not redistributed in this repository or used as promotional music. Public manifests contain provenance and hashes only.

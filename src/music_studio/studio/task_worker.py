@@ -90,7 +90,12 @@ def execute(request):
         random.seed(config["seed"])
         np.random.seed(config["seed"])
     if model != "basic-pitch" and stage not in (
-        "inspect", "rhythm", "loudness", "denoise", "musical", "transform"
+        "inspect",
+        "rhythm",
+        "loudness",
+        "denoise",
+        "musical",
+        "transform",
     ):
         import torch
 
@@ -106,7 +111,9 @@ def execute(request):
         if config["device"] == "cuda":
             if model == "qwen3-asr" and torch.cuda.get_device_capability()[0] < 8:
                 raise RuntimeError("Qwen BF16 inference needs an Ampere or newer GPU; choose CPU")
-            minimum = {"qwen3-asr": 6000, "mel-band-roformer-kj": 3000}.get(model)
+            minimum = {"qwen3-asr": 6000, "mel-band-roformer-kj": 3000, "transkun-piano": 2000}.get(
+                model
+            )
             if (
                 minimum
                 and not request.get("worker_reused")
@@ -214,7 +221,12 @@ def execute(request):
         from ..export import write_midi
         from ..schema import Lyrics, Rhythm
 
-        if model == "basic-pitch":
+        if model == "transkun-piano":
+            from .piano_notes import extract
+
+            config["_compute_type"] = "float32"
+            melody = extract(source, output, config)
+        elif model == "basic-pitch":
             from .polyphony import extract
 
             melody = extract(source, output, config)
@@ -232,7 +244,7 @@ def execute(request):
         artifact("melody", "json", "melody.json", "application/json")
         artifact("midi", "midi", "melody.mid", "audio/midi")
         artifact("note-synthesis", "audio", "melody-preview.wav", "audio/wav")
-        if model != "basic-pitch":
+        if model not in ("basic-pitch", "transkun-piano"):
             artifact("pitch", "json", "analysis/pitch.json", "application/json")
     elif stage == "rhythm":
         from ..backends.rhythm import estimate_rhythm

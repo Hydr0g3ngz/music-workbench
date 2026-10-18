@@ -1,0 +1,337 @@
+{
+  "suite": "smd-v2-piano-development-v1",
+  "dataset": {
+    "record": "13753319",
+    "version": 2,
+    "license": "CC BY-NC-SA 3.0",
+    "url": "https://zenodo.org/records/13753319/files/SMD-piano_v2.zip?download=1",
+    "assets": [
+      {
+        "path": "mono-Bach_BWV849-01_001_20090916-SMD.wav",
+        "member": "wav_22050_mono/Bach_BWV849-01_001_20090916-SMD.wav",
+        "sha256": "c6e7eeb973aeae6133bb60db36d2ef186e36b99fbce62d14a8fadfc8b7a33ad2",
+        "bytes": 6923744
+      },
+      {
+        "path": "mono-Beethoven_Op027No1-01_003_20090916-SMD.wav",
+        "member": "wav_22050_mono/Beethoven_Op027No1-01_003_20090916-SMD.wav",
+        "sha256": "62faf30197fa45c561bdd2345c6f1d35c0dbc1f9f30164a247f5a821844ee34b",
+        "bytes": 19007144
+      },
+      {
+        "path": "mono-Chopin_Op028-04_003_20100611-SMD.wav",
+        "member": "wav_22050_mono/Chopin_Op028-04_003_20100611-SMD.wav",
+        "sha256": "c58d9fade3370c2424ecb9b6b7ba8bd62cac6af738b60ba40e618d80bcfa0b65",
+        "bytes": 5247944
+      },
+      {
+        "path": "Bach_BWV849-01_001_20090916-SMD.mid",
+        "member": "midi/Bach_BWV849-01_001_20090916-SMD.mid",
+        "sha256": "95bdfd46cfa37637d18db809d8a586608e3b18aa64ec0206b491e2de9d115fab",
+        "bytes": 18480
+      },
+      {
+        "path": "Beethoven_Op027No1-01_003_20090916-SMD.mid",
+        "member": "midi/Beethoven_Op027No1-01_003_20090916-SMD.mid",
+        "sha256": "ae31451905e6ecf684bca9d736497a3c7085e64b42be649422e339d3e40cb90e",
+        "bytes": 61875
+      },
+      {
+        "path": "Chopin_Op028-04_003_20100611-SMD.mid",
+        "member": "midi/Chopin_Op028-04_003_20100611-SMD.mid",
+        "sha256": "4c1d0b3cd15eb576e1c0506f69725bf61edf8ec5f998bef02c4a8fbd8c88401f",
+        "bytes": 11824
+      }
+    ]
+  },
+  "python": "3.12.4",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+  "models": {
+    "basic-pitch": {
+      "version": "0.4.0",
+      "model_sha256": "2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec",
+      "runtime": "ONNX CPU"
+    },
+    "transkun-piano": {
+      "version": "2.0.1",
+      "model_sha256": "50a80010effc2a59ffcd068a95cd2b29bd7f23a27a3515bc3ccd209c89a3d44c",
+      "runtime": "Torch CUDA FP32"
+    }
+  },
+  "cases": [
+    {
+      "piece": "Bach_BWV849-01_001_20090916-SMD",
+      "start": 10,
+      "backend": "basic-pitch",
+      "device": "cpu",
+      "reference_notes": 65,
+      "estimated_notes": 72,
+      "seconds": 9.163542000009329,
+      "torch_peak_mib": null,
+      "onset": {
+        "precision": 0.7777777777777778,
+        "recall": 0.8615384615384616,
+        "f1": 0.8175182481751826
+      },
+      "onset_offset": {
+        "precision": 0.20833333333333334,
+        "recall": 0.23076923076923078,
+        "f1": 0.21897810218978103
+      },
+      "velocity_mae": 28.75
+    },
+    {
+      "piece": "Bach_BWV849-01_001_20090916-SMD",
+      "start": 10,
+      "backend": "transkun-piano",
+      "device": "cuda",
+      "reference_notes": 65,
+      "estimated_notes": 63,
+      "seconds": 13.789034400004311,
+      "torch_peak_mib": 883.326171875,
+      "onset": {
+        "precision": 1.0,
+        "recall": 0.9692307692307692,
+        "f1": 0.9843749999999999
+      },
+      "onset_offset": {
+        "precision": 0.9047619047619048,
+        "recall": 0.8769230769230769,
+        "f1": 0.890625
+      },
+      "velocity_mae": 5.825396825396825
+    },
+    {
+      "piece": "Bach_BWV849-01_001_20090916-SMD",
+      "start": 40,
+      "backend": "basic-pitch",
+      "device": "cpu",
+      "reference_notes": 77,
+      "estimated_notes": 105,
+      "seconds": 5.5503707000025315,
+      "torch_peak_mib": null,
+      "onset": {
+        "precision": 0.6285714285714286,
+        "recall": 0.8571428571428571,
+        "f1": 0.7252747252747251
+      },
+      "onset_offset": {
+        "precision": 0.21904761904761905,
+        "recall": 0.2987012987012987,
+        "f1": 0.25274725274725274
+      },
+      "velocity_mae": 25.12121212121212
+    },
+    {
+      "piece": "Bach_BWV849-01_001_20090916-SMD",
+      "start": 40,
+      "backend": "transkun-piano",
+      "device": "cuda",
+      "reference_notes": 77,
+      "estimated_notes": 77,
+      "seconds": 8.04632190000848,
+      "torch_peak_mib": 883.326171875,
+      "onset": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "onset_offset": {
+        "precision": 0.9090909090909091,
+        "recall": 0.9090909090909091,
+        "f1": 0.9090909090909091
+      },
+      "velocity_mae": 5.454545454545454
+    },
+    {
+      "piece": "Beethoven_Op027No1-01_003_20090916-SMD",
+      "start": 10,
+      "backend": "basic-pitch",
+      "device": "cpu",
+      "reference_notes": 80,
+      "estimated_notes": 103,
+      "seconds": 6.492662500008009,
+      "torch_peak_mib": null,
+      "onset": {
+        "precision": 0.7281553398058253,
+        "recall": 0.9375,
+        "f1": 0.8196721311475409
+      },
+      "onset_offset": {
+        "precision": 0.14563106796116504,
+        "recall": 0.1875,
+        "f1": 0.16393442622950818
+      },
+      "velocity_mae": 38.973333333333336
+    },
+    {
+      "piece": "Beethoven_Op027No1-01_003_20090916-SMD",
+      "start": 10,
+      "backend": "transkun-piano",
+      "device": "cuda",
+      "reference_notes": 80,
+      "estimated_notes": 80,
+      "seconds": 7.770098799999687,
+      "torch_peak_mib": 883.326171875,
+      "onset": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "onset_offset": {
+        "precision": 0.8875,
+        "recall": 0.8875,
+        "f1": 0.8875
+      },
+      "velocity_mae": 6.7125
+    },
+    {
+      "piece": "Beethoven_Op027No1-01_003_20090916-SMD",
+      "start": 40,
+      "backend": "basic-pitch",
+      "device": "cpu",
+      "reference_notes": 71,
+      "estimated_notes": 74,
+      "seconds": 5.578148299988243,
+      "torch_peak_mib": null,
+      "onset": {
+        "precision": 0.8648648648648649,
+        "recall": 0.9014084507042254,
+        "f1": 0.8827586206896552
+      },
+      "onset_offset": {
+        "precision": 0.24324324324324326,
+        "recall": 0.2535211267605634,
+        "f1": 0.2482758620689655
+      },
+      "velocity_mae": 32.109375
+    },
+    {
+      "piece": "Beethoven_Op027No1-01_003_20090916-SMD",
+      "start": 40,
+      "backend": "transkun-piano",
+      "device": "cuda",
+      "reference_notes": 71,
+      "estimated_notes": 71,
+      "seconds": 9.664822199993068,
+      "torch_peak_mib": 883.326171875,
+      "onset": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "onset_offset": {
+        "precision": 0.6619718309859155,
+        "recall": 0.6619718309859155,
+        "f1": 0.6619718309859155
+      },
+      "velocity_mae": 7.591549295774648
+    },
+    {
+      "piece": "Chopin_Op028-04_003_20100611-SMD",
+      "start": 10,
+      "backend": "basic-pitch",
+      "device": "cpu",
+      "reference_notes": 90,
+      "estimated_notes": 98,
+      "seconds": 6.531030500002089,
+      "torch_peak_mib": null,
+      "onset": {
+        "precision": 0.8877551020408163,
+        "recall": 0.9666666666666667,
+        "f1": 0.9255319148936171
+      },
+      "onset_offset": {
+        "precision": 0.05102040816326531,
+        "recall": 0.05555555555555555,
+        "f1": 0.05319148936170213
+      },
+      "velocity_mae": 47.98850574712644
+    },
+    {
+      "piece": "Chopin_Op028-04_003_20100611-SMD",
+      "start": 10,
+      "backend": "transkun-piano",
+      "device": "cuda",
+      "reference_notes": 90,
+      "estimated_notes": 89,
+      "seconds": 7.021748200000729,
+      "torch_peak_mib": 883.326171875,
+      "onset": {
+        "precision": 1.0,
+        "recall": 0.9888888888888889,
+        "f1": 0.9944134078212291
+      },
+      "onset_offset": {
+        "precision": 0.7752808988764045,
+        "recall": 0.7666666666666667,
+        "f1": 0.7709497206703911
+      },
+      "velocity_mae": 8.191011235955056
+    },
+    {
+      "piece": "Chopin_Op028-04_003_20100611-SMD",
+      "start": 40,
+      "backend": "basic-pitch",
+      "device": "cpu",
+      "reference_notes": 69,
+      "estimated_notes": 76,
+      "seconds": 4.880865900006029,
+      "torch_peak_mib": null,
+      "onset": {
+        "precision": 0.8026315789473685,
+        "recall": 0.8840579710144928,
+        "f1": 0.8413793103448277
+      },
+      "onset_offset": {
+        "precision": 0.13157894736842105,
+        "recall": 0.14492753623188406,
+        "f1": 0.13793103448275862
+      },
+      "velocity_mae": 51.032786885245905
+    },
+    {
+      "piece": "Chopin_Op028-04_003_20100611-SMD",
+      "start": 40,
+      "backend": "transkun-piano",
+      "device": "cuda",
+      "reference_notes": 69,
+      "estimated_notes": 69,
+      "seconds": 7.932985999999801,
+      "torch_peak_mib": 883.326171875,
+      "onset": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "onset_offset": {
+        "precision": 0.855072463768116,
+        "recall": 0.855072463768116,
+        "f1": 0.855072463768116
+      },
+      "velocity_mae": 6.855072463768116
+    }
+  ],
+  "method": "Three pieces, two 15 s excerpts at 10 and 40 s. Only note onsets 0.1\u201314.9 s enter scoring; offsets clipped at 15 s. Raw MIDI key-release times; no CC64 extension or manual alignment. 50 ms onset, 50 cents pitch, 20%/50 ms offset. Macro average over six excerpts. Raw velocity MAE for onset/pitch matches, not calibrated confidence.",
+  "limits": [
+    "Small development suite, not a broad ranking or verified training-disjoint test.",
+    "Official SMD v2 synchronization has residual timing limits.",
+    "Quality uses identical mono 22050 Hz audio. Speed compares different devices.",
+    "Each call reloads the model; wall time includes imports/load. CUDA context and peak host RAM excluded."
+  ],
+  "macro": {
+    "basic-pitch": {
+      "onset": 0.8353558250875914,
+      "onset_offset": 0.1791763611799947,
+      "mean_seconds": 6.3661033166693715,
+      "velocity_mae": 37.329202181152965
+    },
+    "transkun-piano": {
+      "onset": 0.9964647346368715,
+      "onset_offset": 0.8292016540858888,
+      "mean_seconds": 9.03750191666768,
+      "velocity_mae": 6.77167921257335
+    }
+  }
+}

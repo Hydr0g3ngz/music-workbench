@@ -4,7 +4,7 @@
 
 Models are optional. Sampled instruments, MIDI, recording, arrangement, effects and exports work without neural weights.
 
-These tools are part of **dev20 development builds**: six processing packs, plus separate ACE-Step setup. The published dev14 installer automatically prepares ACE-Step only.
+**dev21** offers seven isolated processing packs, plus separate ACE-Step setup. Models are optional downloads, outside the basic installer.
 
 | Capability | Backend | Setup | Guide |
 | --- | --- | --- | --- |
@@ -12,6 +12,7 @@ These tools are part of **dev20 development builds**: six processing packs, plus
 | Vocal/backing separation | Mel-Band RoFormer KJ | AI tools → Vocals & backing | [Setup and use](qwen-and-separation.en.md) · [Separation](separation.en.md) |
 | Two/four-part separation | Demucs htdemucs | AI tools → Stems, melody & transcription | [Workflow](ai-production-workflow.md) |
 | Monophonic MIDI | CREPE | Shared automatic tool pack with Demucs | [Workflow](ai-production-workflow.md) · [Evaluation](melody-next.en.md) |
+| Piano polyphonic MIDI | Transkun 2.0.1 V2 FP32 | AI tools → Piano notes | [Use and limits](piano-notes.en.md) · [Piano comparison](piano-benchmark.md) |
 | Single-instrument polyphonic MIDI | Basic Pitch 0.4.0 ONNX CPU | AI tools → Polyphonic notes | [Use and limits](polyphonic-notes.en.md) · [Parameter comparison](polyphony-benchmark.md) |
 | Transcription and text correction | Whisper small | Stems, melody & transcription pack; detailed text editing in the asset editor | [Editor models](next-models.en.md) |
 | Transcription and word timing | Qwen3-ASR-1.7B + ForcedAligner-0.6B | AI tools → Speech, lyrics & word timing | [Setup and use](qwen-and-separation.en.md) |
@@ -51,6 +52,6 @@ Existing manual RoFormer/Qwen3-ASR environments remain supported, and explicit i
 
 `next.html` is the retained single-asset editor for speech processing, transcription and detailed results. Its Next runtime instructions are not prerequisites for the installed app's basic features.
 
-Basic Pitch is integrated into the workstation. Beat This, Transkun, DiffSinger, CLAP and other research/evaluation candidates are not necessarily available. See [model research and licenses](local-model-candidates.en.md).
+Basic Pitch and Transkun are integrated into the workstation. Beat This, DiffSinger, CLAP and other research/evaluation candidates are not necessarily available. See [model research and licenses](local-model-candidates.en.md).
 
 Code and weights have separate license terms. Individual guides record revisions, hashes and measurements. A runtime check or completed download does not establish output quality; audition and review results.

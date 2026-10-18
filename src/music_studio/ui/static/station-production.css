@@ -62,6 +62,15 @@
   max-height: 86vh;
   overflow: auto;
 }
+#note-cleanup-dialog {
+  width: min(720px, 94vw);
+  max-height: 86vh;
+  overflow: auto;
+}
+#note-cleanup-dialog p {
+  line-height: 1.8;
+  color: #c8c9d5;
+}
 #production-tools {
   white-space: nowrap;
   font-size: 12px;

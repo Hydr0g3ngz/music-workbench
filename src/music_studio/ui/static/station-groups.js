@@ -18,6 +18,28 @@
       selected = new Set(expand(next, ids));
     const items = clips(next).filter((c) => selected.has(c.id));
     if (!items.length) throw Error("Select clips first / 请先选择片段");
+    if (["gain", "fade-in", "fade-out"].includes(operation)) {
+      if (
+        !Number.isFinite(value) ||
+        (operation === "gain"
+          ? value < -60 || value > 12
+          : value < 0 || value > 30)
+      )
+        throw Error("Invalid level or fade / 音量或淡变数值无效");
+      const key = {
+        gain: "gain_db",
+        "fade-in": "fade_in",
+        "fade-out": "fade_out",
+      }[operation];
+      for (const c of items) {
+        c[key] = value;
+        if (c.fade_in + c.fade_out > c.duration)
+          throw Error(
+            "Fades exceed a selected clip / 淡入与淡出之和超出某个所选片段长度",
+          );
+      }
+      return next;
+    }
     if (["move", "copy"].includes(operation)) {
       if (!Number.isFinite(value)) throw Error("Invalid position");
       if (

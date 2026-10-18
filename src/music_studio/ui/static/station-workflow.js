@@ -38,6 +38,10 @@ window.StationWorkflow = {
       ((selectedClip().offset + selectedClip().duration) * content().bpm) / 60;
     const selected = () => [...selection];
     const root = $("piano");
+    const cleanup = StationNoteToolsUI.mount({
+      ...api,
+      onApply: () => selection.clear(),
+    });
     root.tabIndex = 0;
     const keys = () =>
       `<option value="">${tr("未指定", "Unspecified")}</option>` +
@@ -89,6 +93,7 @@ window.StationWorkflow = {
         ${button("quantize", tr("量化", "Quantize"))}${button("down", "−1 ♩", tr("降半音", "Semitone down"))}${button("up", "+1 ♩", tr("升半音", "Semitone up"))}
         <label>${tr("力度", "Velocity")} <input id="note-group-velocity" type="number" min="1" max="127" step="1" value="${velocity}"></label>
         ${button("delete", "×", tr("删除选中音符", "Delete selected notes"))}
+        ${button("simplify", tr("整理声部", "Simplify part"))}
         <small>${tr("拖动移动 · 右边缘拉长 · Shift 多选 / 空白拖动框选", "Drag to move · right edge to resize · Shift select / drag empty grid to select")}</small>
       </div>`,
       );
@@ -141,6 +146,7 @@ window.StationWorkflow = {
     function action(name) {
       const c = selectedClip();
       if (!c || selectedTrack()?.kind !== "midi") return;
+      if (name === "simplify") return cleanup.open();
       if (name === "all") {
         selection = new Set(c.notes.map((_, i) => i));
         paintSelection();
@@ -188,15 +194,13 @@ window.StationWorkflow = {
           selectedTrack()?.instrument,
         );
       const n = e.target.closest("[data-note]");
-      if (n) {
+      const clip = selectedClip();
+      if (n && clip?.notes[Number(n.dataset.note)]) {
         const i = Number(n.dataset.note);
-        s.noteClip = selectedClip().id;
+        s.noteClip = clip.id;
         s.noteIndex = i;
         renderInspector();
-        await engine.note(
-          selectedClip().notes[i].pitch,
-          selectedTrack().instrument,
-        );
+        await engine.note(clip.notes[i].pitch, selectedTrack().instrument);
       }
     });
     root.onchange = guarded((e) => {
@@ -211,6 +215,10 @@ window.StationWorkflow = {
       "keydown",
       guarded((e) => {
         if (e.target.matches("input,select,textarea")) return;
+        if (!selectedClip()) {
+          selection.clear();
+          return;
+        }
         const ctrl = e.ctrlKey || e.metaKey,
           key = e.key.toLowerCase();
         const op = ctrl

@@ -9,11 +9,17 @@ test("notifications are visible in the current modal and return to the page afte
     require.resolve("../src/music_studio/ui/static/station.js"),
     "utf8",
   );
-  const item = {
+  const makeItem = () => ({
     hidden: true,
     classList: { toggle() {} },
     parentElement: null,
-  };
+    setAttribute(key, value) {
+      this[key] = value;
+    },
+  });
+  let item = makeItem();
+  const original = item,
+    timers = [];
   const host = () => ({
     append(node) {
       node.parentElement = this;
@@ -23,11 +29,17 @@ test("notifications are visible in the current modal and return to the page afte
     body = host();
   let open = modal;
   const context = vm.createContext({
-    document: { querySelector: () => open, body },
+    document: {
+      querySelector: () => open,
+      body,
+      createElement: () => (item = makeItem()),
+    },
     $: () => item,
     toastTimer: null,
     clearTimeout() {},
-    setTimeout() {},
+    setTimeout(callback) {
+      timers.push(callback);
+    },
   });
   const start = source.indexOf("function toast(");
   vm.runInContext(
@@ -40,6 +52,15 @@ test("notifications are visible in the current modal and return to the page afte
   open = null;
   context.toast("Saved");
   assert.equal(item.parentElement, body);
+  item = null; // A dialog rebuild removed the previous notice from the DOM.
+  open = modal;
+  context.toast("Invalid fade", true);
+  assert.notEqual(item, original);
+  assert.equal(item.parentElement, modal);
+  assert.equal(item.role, "status");
+  assert.equal(item.hidden, false);
+  timers[0](); // An old timer closes only its own detached notice.
+  assert.equal(item.hidden, false);
 });
 
 test("structure sketches have continuous bounded timing, unique IDs and optional energy", () => {
